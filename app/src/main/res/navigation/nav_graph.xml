@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment android:id="@+id/homeFragment"
+        android:name="com.gigakin.stockbuddy.ui.home.HomeFragment"
+        android:label="StockBuddy">
+        <action android:id="@+id/action_home_to_linkingOptions" app:destination="@id/linkingOptionsFragment" />
+        <action android:id="@+id/action_home_to_inventoryEntry" app:destination="@id/inventoryEntryFragment" />
+        <action android:id="@+id/action_home_to_assets" app:destination="@id/assetsFragment" />
+        <action android:id="@+id/action_home_to_settings" app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/linkingOptionsFragment"
+        android:name="com.gigakin.stockbuddy.ui.linking.LinkingOptionsFragment"
+        android:label="Linking">
+        <action android:id="@+id/action_to_individualLinking" app:destination="@id/individualLinkingFragment" />
+        <action android:id="@+id/action_to_bulkLinking" app:destination="@id/bulkLinkingFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/individualLinkingFragment"
+        android:name="com.gigakin.stockbuddy.ui.linking.IndividualLinkingFragment"
+        android:label="@string/linking_title" />
+
+    <fragment android:id="@+id/bulkLinkingFragment"
+        android:name="com.gigakin.stockbuddy.ui.linking.BulkLinkingFragment"
+        android:label="@string/bulk_linking_title" />
+
+    <fragment android:id="@+id/inventoryEntryFragment"
+        android:name="com.gigakin.stockbuddy.ui.inventory.InventoryEntryFragment"
+        android:label="Inventory">
+        <action android:id="@+id/action_to_scanning" app:destination="@id/scanningFragment" />
+        <action android:id="@+id/action_to_reportsList" app:destination="@id/reportsListFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/scanningFragment"
+        android:name="com.gigakin.stockbuddy.ui.inventory.ScanningFragment"
+        android:label="Scanning">
+        <argument android:name="sessionId" app:argType="long" />
+        <argument android:name="sessionCode" app:argType="string" />
+        <action android:id="@+id/action_scanning_to_results" app:destination="@id/resultsFragment"
+            app:popUpTo="@id/homeFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/reportsListFragment"
+        android:name="com.gigakin.stockbuddy.ui.inventory.ReportsListFragment"
+        android:label="Inventory Reports">
+        <action android:id="@+id/action_reports_to_results" app:destination="@id/resultsFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/resultsFragment"
+        android:name="com.gigakin.stockbuddy.ui.results.ResultsFragment"
+        android:label="Results">
+        <argument android:name="sessionId" app:argType="long" />
+        <argument android:name="sessionCode" app:argType="string" />
+    </fragment>
+
+    <fragment android:id="@+id/assetsFragment"
+        android:name="com.gigakin.stockbuddy.ui.assets.AssetsFragment"
+        android:label="@string/assets_title" />
+
+    <fragment android:id="@+id/settingsFragment"
+        android:name="com.gigakin.stockbuddy.ui.settings.SettingsFragment"
+        android:label="@string/settings_title">
+        <action android:id="@+id/action_settings_to_categories" app:destination="@id/categoryFragment" />
+        <action android:id="@+id/action_settings_to_fieldConfig" app:destination="@id/fieldConfigFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/categoryFragment"
+        android:name="com.gigakin.stockbuddy.ui.category.CategoryFragment"
+        android:label="@string/categories_title" />
+
+    <fragment android:id="@+id/fieldConfigFragment"
+        android:name="com.gigakin.stockbuddy.ui.fieldconfig.FieldConfigFragment"
+        android:label="@string/field_config_title" />
+
+</navigation>

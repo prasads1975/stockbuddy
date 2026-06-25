@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MD3 seed-derived palette (NFR-10a). Brand logo/hex palette pending (Section 7,
+         MVP Scope doc) — these are sensible MD3 defaults, swap when brand colors arrive. -->
+    <color name="md_theme_primary">#0061A4</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#D1E4FF</color>
+    <color name="md_theme_onPrimaryContainer">#001D36</color>
+    <color name="md_theme_secondary">#535F70</color>
+    <color name="md_theme_background">#FDFCFF</color>
+    <color name="md_theme_onBackground">#1A1C1E</color>
+    <color name="md_theme_surface">#FDFCFF</color>
+    <color name="md_theme_onSurface">#1A1C1E</color>
+    <color name="md_theme_outline">#73777F</color>
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+
+    <!-- Status semantic colours (NFR-11) — paired with icon/text per NFR-13a, never colour-alone -->
+    <color name="status_available">#1B873D</color>
+    <color name="status_missing">#BA1A1A</color>
+    <color name="status_excess">#B8860B</color>
+
+    <!-- Reader connection status (FR-81) -->
+    <color name="reader_connected">#1B873D</color>
+    <color name="reader_not_connected">#B8860B</color>
+    <color name="reader_not_available">#79747E</color>
+</resources>

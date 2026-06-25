@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:minHeight="48dp">
+
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/tvLabel" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="16sp" android:textStyle="bold" tools:text="Net Weight *" />
+        <TextView android:id="@+id/tvType" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="13sp" android:textColor="?attr/colorOutline" tools:text="NUMBER" />
+    </LinearLayout>
+
+    <ImageButton android:id="@+id/btnDelete" style="@style/Widget.StockBuddy.BarcodeScanIcon"
+        android:layout_width="48dp" android:layout_height="48dp"
+        android:src="@drawable/ic_delete" android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Remove field" />
+
+</LinearLayout>

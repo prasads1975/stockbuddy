@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvSessionCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="3 June Morning" />
+
+    <!-- FR-35: display/reporting filter only — never affects what the antenna reads -->
+    <Spinner
+        android:id="@+id/spinnerCategoryFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" />
+
+    <TextView
+        android:id="@+id/tvScanCount"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        tools:text="0 tags scanned" />
+
+    <!-- NFR-10c/d: START is the single oversized, thumb-zone primary action -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnStart"
+        style="@style/Widget.StockBuddy.PrimaryActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:text="@string/action_start" />
+
+    <!-- FR-24: STOP is visually distinct — full-width, red/error colour -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnStop"
+        style="@style/Widget.StockBuddy.PrimaryActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:visibility="gone"
+        app:backgroundTint="@color/md_theme_error"
+        android:text="@string/action_stop" />
+
+</LinearLayout>

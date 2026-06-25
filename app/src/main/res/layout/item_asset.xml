@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:minHeight="48dp">
+
+    <TextView android:id="@+id/tvName" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="16sp" android:textStyle="bold" tools:text="Hot Wheels Track Set" />
+    <TextView android:id="@+id/tvBarcode" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="13sp" android:textColor="?attr/colorOutline" tools:text="Barcode: 0000265423514" />
+    <TextView android:id="@+id/tvRfid" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="13sp" android:fontFamily="monospace" tools:text="RFID: E28003241B4D419B1B673BD4" />
+    <TextView android:id="@+id/tvArticleId" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textSize="13sp" android:textColor="?attr/colorOutline" tools:text="Article ID: ART0001" />
+
+</LinearLayout>

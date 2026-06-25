@@ -1,0 +1,47 @@
+# Gradle
+.gradle/
+build/
+gradle-wrapper.jar
+
+# Android Studio
+.idea/
+*.iml
+*.apk
+*.ap_
+*.aab
+*.aar
+*.so
+*.dylib
+*.dll
+*.exe
+*.o
+*.a
+*.lib
+
+# IDE
+.DS_Store
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local configuration
+local.properties
+signing.properties
+gradle.properties
+
+# Build outputs
+app/build/
+.gradle/
+*.class
+
+# Java
+out/
+
+# Kotlin
+*.kt.bak
+*.kexe
+
+# Runtime
+*.log
+crash_report.txt

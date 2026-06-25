@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StockBuddy</string>
+
+    <!-- Home -->
+    <string name="home_linking">Linking</string>
+    <string name="home_inventory">Inventory</string>
+    <string name="home_assets">Assets</string>
+    <string name="home_settings">Settings</string>
+
+    <!-- Reader status (FR-81) -->
+    <string name="reader_connected">Reader Connected</string>
+    <string name="reader_not_connected">Reader Not Connected</string>
+    <string name="reader_not_available">No RFID Reader (Emulator Mode)</string>
+
+    <!-- Individual Linking -->
+    <string name="linking_title">Link Item</string>
+    <string name="field_product_name">Product Name *</string>
+    <string name="field_barcode">Barcode *</string>
+    <string name="field_category">Category *</string>
+    <string name="field_article_id">Article ID</string>
+    <string name="field_rfid">RFID Tag ID *</string>
+    <string name="action_save_link">Save Link</string>
+    <string name="action_scan_rfid">Scan RFID</string>
+    <string name="legend_required">* Required field</string>
+    <string name="error_rfid_not_detected">No tag detected. Hold the device close to the tag and try again.</string>
+    <string name="error_rfid_multiple">Multiple tags in range (%1$d detected). Remove other tags from the scanning area and try again.</string>
+    <string name="error_rfid_duplicate">This RFID Tag ID is already linked to another item.</string>
+    <string name="error_reader_unavailable">RFID reader not detected — connect the C72 reader to continue.</string>
+    <string name="error_demo_items_limit">Demo limit reached (%1$d items). Delete an item to add a new one.</string>
+
+    <!-- Bulk Linking -->
+    <string name="bulk_linking_title">Bulk Linking</string>
+    <string name="action_choose_csv">Choose CSV File</string>
+    <string name="action_import">Import</string>
+    <string name="import_summary_format">Inserted: %1$d   Updated: %2$d   Rejected: %3$d</string>
+
+    <!-- Inventory -->
+    <string name="inventory_code_hint">Inventory Code (e.g. \"3 June Morning\")</string>
+    <string name="action_start">START</string>
+    <string name="action_stop">STOP</string>
+    <string name="scanned_count_format">%1$d tags scanned</string>
+    <string name="filter_all_categories">All</string>
+
+    <!-- Results -->
+    <string name="tab_available">Available</string>
+    <string name="tab_missing">Missing</string>
+    <string name="tab_excess">Excess</string>
+    <string name="results_title_format">%1$s — %2$s</string>
+    <string name="unrecognized_tag">(Unrecognized tag)</string>
+
+    <!-- Export -->
+    <string name="export_title">Export Report</string>
+    <string name="action_share">Share</string>
+    <string name="action_download">Download</string>
+    <string name="download_success_format">Saved to %1$s</string>
+
+    <!-- Assets -->
+    <string name="assets_title">Assets</string>
+    <string name="search_hint">Search by name, barcode, RFID…</string>
+    <string name="assets_count_format">%1$d items</string>
+
+    <!-- Categories -->
+    <string name="categories_title">Categories</string>
+    <string name="action_add_category">Add Category</string>
+    <string name="error_demo_categories_limit">Demo limit reached (%1$d categories). Edit or delete an existing category to add a new one.</string>
+    <string name="error_category_not_found_title">Category not in the system list</string>
+    <string name="action_add_and_continue">Add &amp; Continue</string>
+    <string name="action_pick_existing">Pick Existing</string>
+
+    <!-- Field Configuration -->
+    <string name="field_config_title">Field Configuration</string>
+    <string name="template_toy_retail">Toy Retail: Price</string>
+    <string name="template_jewellery">Jewellery: Net/Gross Weight, Purity</string>
+    <string name="template_generic">Generic: none</string>
+    <string name="article_id_mode_label">Article ID Usage</string>
+    <string name="article_id_mode_not_used">Not Used</string>
+    <string name="article_id_mode_optional">Optional</string>
+    <string name="article_id_mode_mandatory">Mandatory</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_categories">Categories</string>
+    <string name="settings_field_config">Field Configuration</string>
+    <string name="settings_app_info">App Info</string>
+</resources>

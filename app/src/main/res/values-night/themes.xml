@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Inherits Theme.StockBuddy; Material3 DayNight handles dark-mode token swaps automatically.
+         Override individual tokens here if/when brand colors require explicit dark variants. -->
+</resources>

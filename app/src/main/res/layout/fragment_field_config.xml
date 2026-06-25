@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Starter Templates"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- FR-77l: the live domain-switch demo moment -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTemplateToyRetail"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:textAllCaps="false"
+            android:text="@string/template_toy_retail" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTemplateJewellery"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:textAllCaps="false"
+            android:text="@string/template_jewellery" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTemplateGeneric"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:textAllCaps="false"
+            android:text="@string/template_generic" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" android:layout_marginVertical="20dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Current Fields"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerFields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginTop="4dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="New field label">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editNewFieldLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/spinnerNewFieldType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchMandatory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Mandatory field" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddField"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:textAllCaps="false"
+            android:text="Add Field" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/colorOutline" android:layout_marginVertical="20dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/article_id_mode_label"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- FR-77o / NFR-56: Not Used / Optional (default) / Mandatory -->
+        <RadioGroup
+            android:id="@+id/radioGroupArticleId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton android:id="@+id/radioNotUsed" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/article_id_mode_not_used" />
+            <RadioButton android:id="@+id/radioOptional" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/article_id_mode_optional" />
+            <RadioButton android:id="@+id/radioMandatory" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/article_id_mode_mandatory" />
+        </RadioGroup>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
