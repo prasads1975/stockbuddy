@@ -298,11 +298,19 @@ Defined as `BuildConfig` fields in `app/build.gradle.kts`. Read via `DemoLimits.
 - **Gradle**: 8.7 configured, wrapper present, flatDir ready for SDK
 - **Java/Kotlin**: 17 target, 1.9.24 Kotlin compiler, KSP annotation processing working
 
-### Chainway SDK Status ⚠️
-- **Status**: Awaiting physical `.aar` file from Chainway
-- **Readiness**: Build system ready (flatDir configured, dependency commented out, TODOs documented in `ChainwayScannerManager.kt`)
-- **Fallback**: `EmulatorScannerManager` provides graceful degradation (NFR-26a) — app builds and runs without SDK
-- **Next step**: Drop `.aar` in `app/libs/`, uncomment line 93 in `app/build.gradle.kts`, fill TODO blocks
+### Chainway SDK Status ✅
+- **Status**: SDK integrated (DeviceAPI_ver20251103_release.aar)
+- **Build status**: ✅ BUILD SUCCESSFUL with SDK included
+- **Native libraries**: 
+  - libDeviceAPIM.so (UHF RFID module)
+  - libDeviceAPIQ.so (Imager module)
+  - libIDFingerprintAlg.so (ID fingerprint algorithm)
+- **Next step**: Fill TODO blocks in `ChainwayScannerManager.kt` with SDK APIs:
+  - `init{}` — initialize reader handle
+  - `scanSingleRfidTag()` — single-tag inventory burst at minimum power (FR-07a)
+  - `startContinuousScan()` — continuous mode with tag callbacks
+  - `stopContinuousScan()` — stop continuous mode
+  - `scanBarcode()` — barcode/QR imager activation (FR-06)
 
 ### Git Configuration ❌ CRITICAL
 - **Current state**: No git repository initialized; no version control
