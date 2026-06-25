@@ -18,10 +18,10 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <!-- FR-77l: the live domain-switch demo moment -->
+        <!-- FR-77l: the live domain-switch demo moment - TonalButton for inviting appearance -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTemplateToyRetail"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:textAllCaps="false"
@@ -29,7 +29,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTemplateJewellery"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
@@ -38,7 +38,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTemplateGeneric"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"

@@ -77,12 +77,23 @@ class ResultsFragment : Fragment() {
     }
 
     private fun renderCurrentTab() {
+        val results = viewModel.currentResults()
+
+        // Update tab labels with counts
+        val availableCount = results.count { it.status == InventoryRepository.Status.AVAILABLE }
+        val missingCount = results.count { it.status == InventoryRepository.Status.MISSING }
+        val excessCount = results.count { it.status == InventoryRepository.Status.EXCESS }
+
+        binding.tabs.getTabAt(0)?.text = "${getString(R.string.tab_available)} ($availableCount)"
+        binding.tabs.getTabAt(1)?.text = "${getString(R.string.tab_missing)} ($missingCount)"
+        binding.tabs.getTabAt(2)?.text = "${getString(R.string.tab_excess)} ($excessCount)"
+
         val status = when (binding.tabs.selectedTabPosition) {
             0 -> InventoryRepository.Status.AVAILABLE
             1 -> InventoryRepository.Status.MISSING
             else -> InventoryRepository.Status.EXCESS
         }
-        adapter.submitList(viewModel.currentResults().filter { it.status == status })
+        adapter.submitList(results.filter { it.status == status })
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

@@ -55,6 +55,16 @@ class ResultGroupAdapter(
             b.tvName.text = g.name
             b.tvBarcode.text = "Barcode: ${g.barcode}  •  ${g.category}"
             b.tvCount.text = "${g.units.size}"
+
+            // Set left accent colour based on status (green/red/amber) — faster to scan than text label
+            val statusColorId = when (g.units.firstOrNull()?.status) {
+                InventoryRepository.Status.AVAILABLE -> com.gigakin.stockbuddy.R.color.status_available
+                InventoryRepository.Status.MISSING -> com.gigakin.stockbuddy.R.color.status_missing
+                InventoryRepository.Status.EXCESS -> com.gigakin.stockbuddy.R.color.status_excess
+                else -> com.gigakin.stockbuddy.R.color.status_available
+            }
+            b.statusAccent.setBackgroundColor(context.getColor(statusColorId))
+
             b.root.setOnClickListener {
                 if (g.barcode in expanded) expanded.remove(g.barcode) else expanded.add(g.barcode)
                 notifyDataSetChanged()
