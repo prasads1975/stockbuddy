@@ -89,8 +89,8 @@ dependencies {
     // JSON (domain-specific field attributes, Section 1.7)
     implementation("org.json:json:20240303")
 
-    // Chainway SDK — uncomment once the real .aar is placed in app/libs/ (see app/libs/README.md)
-    // implementation(name = "chainway-sdk", ext = "aar")
+    // Chainway SDK (NFR-23: UHF RFID + imager integration for C72)
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
