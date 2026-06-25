@@ -17,10 +17,9 @@ object ScannerManagerProvider {
 
     private fun create(context: Context): ScannerManager =
         try {
-            // TODO: once the real SDK is wired in, detect non-presence here (e.g. SDK init
-            // throws, or a class-not-found check) and fall through to EmulatorScannerManager
-            // instead of returning ChainwayScannerManager unconditionally.
-            ChainwayScannerManager()
+            // Try to initialize real Chainway SDK; fall back to emulator if SDK unavailable
+            // (e.g. running on Android emulator, SDK missing, or device not C72)
+            ChainwayScannerManager(context)
         } catch (e: Throwable) {
             EmulatorScannerManager()
         }
