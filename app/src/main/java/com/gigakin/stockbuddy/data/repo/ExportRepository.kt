@@ -20,14 +20,12 @@ class ExportRepository(private val context: Context) {
         return "${safeCode}_$ts.csv"
     }
 
-    /** FR-38/50: builds CSV rows — Status, fixed fields, Article ID (if used), domain fields, RFID. */
+    /** FR-38/50: builds CSV rows — Status, fixed fields, domain fields (including Article ID if configured), RFID. */
     fun buildCsv(
         results: List<InventoryRepository.ResultItem>,
-        fieldDefs: List<FieldDefinitionEntity>,
-        articleIdUsed: Boolean
+        fieldDefs: List<FieldDefinitionEntity>
     ): List<Array<String>> {
         val header = mutableListOf("Status", "Product Name", "Barcode", "Category")
-        if (articleIdUsed) header.add("Article ID")
         fieldDefs.forEach { header.add(it.label) }
         header.add("RFID Tag ID")
 
@@ -35,7 +33,7 @@ class ExportRepository(private val context: Context) {
         results.forEach { r ->
             val attrs = JsonAttributes.toMap(r.item.attributesJson)
             val row = mutableListOf(r.status.name, r.item.name, r.item.barcode, r.item.categoryName)
-            if (articleIdUsed) row.add(r.item.articleId ?: "")
+            // All domain-specific fields including articleId are in attributesJson
             fieldDefs.forEach { row.add(attrs[it.key] ?: "") }
             row.add(r.item.rfidTagId)
             rows.add(row.toTypedArray())

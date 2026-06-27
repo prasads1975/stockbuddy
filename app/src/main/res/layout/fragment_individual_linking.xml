@@ -3,27 +3,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/home_background">
 
+    <!-- Header: Back button + Title (at top, replacing StockBuddy header) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:background="@color/home_background">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:scaleType="centerInside"
+            android:tint="@color/md_theme_onSurface"
+            android:contentDescription="@string/action_back"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/linking_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_primary"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+
+    <!-- Main Content Area -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
-            <TextView
-                android:id="@+id/legendRequired"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="?attr/colorOutline"
-                android:layout_marginBottom="8dp" />
 
+            <!-- Product Name * -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutName"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -36,29 +68,79 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- FR-06 / NFR-10f: Barcode field with compact inline scan icon (not full-size button) -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutBarcode"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- RFID Tag ID * (with Scan Button on RHS) -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="@string/field_barcode"
-                app:endIconMode="custom"
-                app:endIconDrawable="@drawable/ic_barcode"
-                app:endIconContentDescription="Scan barcode">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editBarcode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutRfid"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/field_rfid">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editRfid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/btnScanRfid"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/button_circular"
+                    android:src="@drawable/sensors_24px"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/action_scan_rfid"
+                    android:tint="@color/md_theme_onSecondaryContainer" />
+            </LinearLayout>
+
+            <!-- Barcode / EAN * (with Scan Button on RHS) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutBarcode"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/field_barcode">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editBarcode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/btnScanBarcode"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/button_circular"
+                    android:src="@drawable/barcode_scanner_24px"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/action_scan_barcode"
+                    android:tint="@color/md_theme_onSecondaryContainer" />
+            </LinearLayout>
+
+            <!-- Category * (Dropdown) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutCategory"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:hint="@string/field_category">
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
@@ -66,6 +148,7 @@
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Article ID (Optional/Mandatory - visibility controlled by mode) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutArticleId"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -79,7 +162,7 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- NFR-52: domain-specific fields rendered dynamically here at runtime -->
+            <!-- Domain-specific fields rendered dynamically here at runtime (NFR-52) -->
             <LinearLayout
                 android:id="@+id/dynamicFieldsContainer"
                 android:layout_width="match_parent"
@@ -87,39 +170,26 @@
                 android:orientation="vertical"
                 android:layout_marginTop="4dp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutRfid"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+            <!-- Legend: Required Fields -->
+            <TextView
+                android:id="@+id/legendRequired"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="@string/field_rfid">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editRfid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- FR-07/07a / NFR-10f: RFID scan = prominent labelled button, NOT a bare icon -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnScanRfid"
-                style="@style/Widget.StockBuddy.RfidScanButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/action_scan_rfid" />
+                android:textSize="12sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginTop="24dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- NFR-10c/10d: Save Link is the single oversized, thumb-zone-anchored primary action,
-         pinned outside the scroll area at the bottom of the screen. -->
+    <!-- Primary Action Button: Save Link (Fixed at bottom, outside scroll area) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSaveLink"
         style="@style/Widget.StockBuddy.PrimaryActionButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        app:icon="@drawable/link_24px"
         android:text="@string/action_save_link" />
 
 </LinearLayout>

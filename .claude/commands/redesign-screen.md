@@ -47,6 +47,30 @@ Extract from the HTML:
 
 ---
 
+## Step 1b — Study Existing Screens for Consistency
+
+Before analyzing the HTML, read 2-3 already-finalized screens from the project to extract
+the established layout conventions. Good reference screens to read:
+- `res/layout/fragment_home.xml` — tile layout, spacing, toolbar style
+- `res/layout/fragment_individual_linking.xml` — form layout, input fields, button placement
+- `res/layout/fragment_results.xml` — list layout, status colors, empty state handling
+
+From these, extract and carry forward:
+- Toolbar height, title style, back button usage
+- Card elevation, corner radius, stroke width
+- Button placement (bottom of screen vs inline)
+- Input field style (outlined vs filled `TextInputLayout`)
+- RecyclerView item layout conventions
+- Empty state layout pattern (icon + message + action)
+- FAB usage and placement
+- Section header style
+- How status colors are applied (icon + text, never color alone — NFR-11)
+
+**The HTML sample defines what to show. The existing screens define how it should look.**
+When the two conflict, match the existing screen style and note the deviation to the user.
+
+---
+
 ## Step 2 — Cross-check with SRS and MVP
 
 Before writing any code:
@@ -123,6 +147,7 @@ Then a short summary:
 - Which FR/NFR requirements this screen satisfies
 - Any MVP scope decisions (what was included, what was excluded and why)
 - Any assumptions made
+- Any deviations from the HTML sample (where existing screen style took precedence)
 - Any open questions still remaining
 
 ---

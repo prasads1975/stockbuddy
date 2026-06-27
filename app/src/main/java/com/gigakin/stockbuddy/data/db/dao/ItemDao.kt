@@ -14,8 +14,7 @@ interface ItemDao {
         WHERE (:category IS NULL OR categoryName = :category)
         AND (name LIKE '%' || :query || '%'
              OR barcode LIKE '%' || :query || '%'
-             OR rfidTagId LIKE '%' || :query || '%'
-             OR (articleId IS NOT NULL AND articleId LIKE '%' || :query || '%'))
+             OR rfidTagId LIKE '%' || :query || '%')
         ORDER BY name ASC
     """)
     fun search(query: String, category: String?): LiveData<List<ItemEntity>>

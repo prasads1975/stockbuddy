@@ -9,6 +9,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -23,9 +24,10 @@ import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /**
  * S06 — Manual Entry form (QR mode, FR-01-04, is cut from MVP; this is the only entry path).
- * Renders fixed fields + Article ID (mode-dependent, NFR-56) + domain-specific fields
- * dynamically (NFR-52). Barcode scan = compact inline icon (NFR-10f); RFID scan = prominent
- * labelled button (NFR-10f); Save Link = the one oversized thumb-zone primary action (NFR-10c/d).
+ * Renders fixed fields (name, barcode, category, RFID) + all domain-specific fields
+ * (including articleId) dynamically from field_definitions (NFR-52). Article ID is now
+ * a configurable field stored in attributesJson, not a separate column. RFID/Barcode scan
+ * use secondary container buttons (NFR-10f); Save Link = thumb-zone primary action (NFR-10c/d).
  */
 class IndividualLinkingFragment : Fragment() {
     private var _binding: FragmentIndividualLinkingBinding? = null
@@ -46,15 +48,33 @@ class IndividualLinkingFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Hide the activity's header and status bar since we show our own header
+        binding.root.post {
+            try {
+                val headerToolbar = requireActivity().findViewById<View>(R.id.toolbarHeader)
+                headerToolbar?.visibility = View.GONE
+
+                val readerStatusBar = requireActivity().findViewById<View>(R.id.readerStatusBarContainer)
+                readerStatusBar?.visibility = View.GONE
+            } catch (e: Exception) {
+                // Silently ignore if views not found
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Back button navigation
+        binding.btnBack.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         binding.legendRequired.text = getString(R.string.legend_required)
 
-        // Article ID visibility/requirement follows the configured mode (Section 1.7, NFR-56)
-        when (viewModel.articleIdMode) {
-            ArticleIdMode.NOT_USED -> binding.layoutArticleId.visibility = View.GONE
-            ArticleIdMode.OPTIONAL -> binding.layoutArticleId.hint = getString(R.string.field_article_id)
-            ArticleIdMode.MANDATORY -> binding.layoutArticleId.hint = getString(R.string.field_article_id) + " *"
-        }
+        // Article ID is now controlled via field_definitions, not ArticleIdMode
+        // If no field definition exists for articleId, hide the fixed field
+        binding.layoutArticleId.visibility = View.GONE
 
         viewModel.categories.observe(viewLifecycleOwner) { cats ->
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, cats.map { it.name })
@@ -66,16 +86,16 @@ class IndividualLinkingFragment : Fragment() {
             renderDynamicFields(defs)
         }
 
-        // NFR-10f: Barcode scan = compact inline icon, adjacent to the field
-        binding.layoutBarcode.setEndIconOnClickListener {
+        // RFID scan button
+        binding.btnScanRfid.setOnClickListener { viewModel.scanRfid() }
+
+        // Barcode scan button
+        binding.btnScanBarcode.setOnClickListener {
             viewModel.scanBarcode { result ->
                 if (result != null) binding.editBarcode.setText(result)
                 else showReaderUnavailableIfNeeded()
             }
         }
-
-        // NFR-10f: RFID scan = prominent labelled button, distinct from Save Link
-        binding.btnScanRfid.setOnClickListener { viewModel.scanRfid() }
 
         viewModel.rfidScanResult.observe(viewLifecycleOwner) { result ->
             when (result) {
@@ -142,10 +162,11 @@ class IndividualLinkingFragment : Fragment() {
         val barcode = binding.editBarcode.text?.toString()?.trim().orEmpty()
         val category = (binding.layoutCategory.editText?.text?.toString() ?: "").trim()
         val rfid = binding.editRfid.text?.toString()?.trim().orEmpty()
-        val articleId = binding.editArticleId.text?.toString()?.trim()
+
+        // All domain-specific fields (including articleId) are now stored in attributesJson
         val attributes = dynamicFieldViews.mapValues { (_, v) -> v.text?.toString()?.trim().orEmpty() }
 
-        viewModel.save(name, barcode, category, rfid, articleId, attributes)
+        viewModel.save(name, barcode, category, rfid, attributes)
     }
 
     private fun handleSaveResult(result: com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult?) {
@@ -173,27 +194,37 @@ class IndividualLinkingFragment : Fragment() {
         if (errors.containsKey("barcode")) binding.layoutBarcode.error = "Required"
         if (errors.containsKey("category")) binding.layoutCategory.error = "Required"
         if (errors.containsKey("rfid")) binding.layoutRfid.error = "Required"
-        if (errors.containsKey("articleId")) binding.layoutArticleId.error = "Required"
-        errors.keys.filter { it.startsWith("attr_") }.forEach { key ->
-            val fieldKey = key.removePrefix("attr_")
-            // Find the TextInputLayout parent of the matching dynamic field to show an error.
-            (dynamicFieldViews[fieldKey]?.parent as? TextInputLayout)?.error = "Required"
+
+        // All domain-specific field errors are in the form "attr_fieldKey" or just "fieldKey"
+        dynamicFieldViews.forEach { (fieldKey, view) ->
+            if (errors.containsKey(fieldKey) || errors.containsKey("attr_$fieldKey")) {
+                (view.parent as? TextInputLayout)?.error = errors[fieldKey] ?: errors["attr_$fieldKey"] ?: "Required"
+            }
         }
     }
 
     private fun clearFieldErrors() {
         binding.layoutName.error = null; binding.layoutBarcode.error = null
         binding.layoutCategory.error = null; binding.layoutRfid.error = null
-        binding.layoutArticleId.error = null
         dynamicFieldViews.values.forEach { (it.parent as? TextInputLayout)?.error = null }
     }
 
     private fun clearForm() {
         binding.editName.text?.clear(); binding.editBarcode.text?.clear()
         (binding.layoutCategory.editText)?.text?.clear()
-        binding.editRfid.text?.clear(); binding.editArticleId.text?.clear()
+        binding.editRfid.text?.clear()
         dynamicFieldViews.values.forEach { it.text?.clear() }
     }
 
-    override fun onDestroyView() { super.onDestroyView(); _binding = null }
+    override fun onDestroyView() {
+        // Restore the activity's header and status bar when leaving this screen
+        val headerToolbar = requireActivity().findViewById<View>(R.id.toolbarHeader)
+        headerToolbar?.visibility = View.VISIBLE
+
+        val readerStatusBar = requireActivity().findViewById<View>(R.id.readerStatusBarContainer)
+        readerStatusBar?.visibility = View.VISIBLE
+
+        super.onDestroyView()
+        _binding = null
+    }
 }

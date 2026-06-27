@@ -8,6 +8,7 @@ import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.ItemResultGroupBinding
 import com.gigakin.stockbuddy.databinding.ItemResultUnitBinding
+import com.gigakin.stockbuddy.util.JsonAttributes
 
 /**
  * FR-45: results grouped by Barcode, per-group count, tap to expand and see each unit's
@@ -75,7 +76,11 @@ class ResultGroupAdapter(
     inner class UnitVH(val b: ItemResultUnitBinding) : RecyclerView.ViewHolder(b.root) {
         internal fun bind(item: InventoryRepository.ResultItem) {
             b.tvRfid.text = "RFID: ${item.item.rfidTagId}"
-            b.tvArticleId.text = if (articleIdEnabled && !item.item.articleId.isNullOrBlank()) "Article ID: ${item.item.articleId}" else ""
+
+            // Article ID is now stored in attributesJson
+            val attrs = JsonAttributes.toMap(item.item.attributesJson)
+            val articleId = attrs["articleId"]
+            b.tvArticleId.text = if (articleIdEnabled && !articleId.isNullOrBlank()) "Article ID: $articleId" else ""
             b.tvArticleId.visibility = if (b.tvArticleId.text.isBlank()) android.view.View.GONE else android.view.View.VISIBLE
         }
     }

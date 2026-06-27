@@ -52,7 +52,8 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
     private suspend fun exportThen(action: (java.io.File) -> Unit) {
         val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
         val fieldDefs = app.fieldConfigRepository.getFields()
-        val rows = app.exportRepository.buildCsv(results, fieldDefs, app.fieldConfigRepository.articleIdMode != ArticleIdMode.NOT_USED)
+        // Article ID is now included in fieldDefs if configured, no need to pass articleIdUsed
+        val rows = app.exportRepository.buildCsv(results, fieldDefs)
         val fileName = app.exportRepository.buildFileName(sessionCode)
         val file = app.exportRepository.writeCsvFile(fileName, rows)
         action(file)

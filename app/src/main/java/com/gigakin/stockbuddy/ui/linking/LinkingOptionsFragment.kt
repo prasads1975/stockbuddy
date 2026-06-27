@@ -23,10 +23,6 @@ class LinkingOptionsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // Hide the activity's header since we show our own header
-        val headerToolbar = requireActivity().findViewById<View>(com.gigakin.stockbuddy.R.id.toolbarHeader)
-        headerToolbar?.visibility = View.GONE
-
         // Back button navigation
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
@@ -58,10 +54,29 @@ class LinkingOptionsFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Hide the activity's header and status bar since we show our own header
+        binding.root.post {
+            try {
+                val headerToolbar = requireActivity().findViewById<View>(R.id.toolbarHeader)
+                headerToolbar?.visibility = View.GONE
+
+                val readerStatusBar = requireActivity().findViewById<View>(R.id.readerStatusBarContainer)
+                readerStatusBar?.visibility = View.GONE
+            } catch (e: Exception) {
+                // Silently ignore if views not found
+            }
+        }
+    }
+
     override fun onDestroyView() {
-        // Restore the activity's header when leaving this screen
-        val headerToolbar = requireActivity().findViewById<View>(com.gigakin.stockbuddy.R.id.toolbarHeader)
+        // Restore the activity's header and status bar when leaving this screen
+        val headerToolbar = requireActivity().findViewById<View>(R.id.toolbarHeader)
         headerToolbar?.visibility = View.VISIBLE
+
+        val readerStatusBar = requireActivity().findViewById<View>(R.id.readerStatusBarContainer)
+        readerStatusBar?.visibility = View.VISIBLE
 
         super.onDestroyView()
         _binding = null

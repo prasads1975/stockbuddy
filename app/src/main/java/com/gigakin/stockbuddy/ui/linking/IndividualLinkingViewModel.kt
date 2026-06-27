@@ -11,7 +11,6 @@ import com.gigakin.stockbuddy.data.repo.FieldConfigRepository
 import com.gigakin.stockbuddy.data.repo.ItemRepository
 import com.gigakin.stockbuddy.hardware.RfidScanResult
 import com.gigakin.stockbuddy.hardware.ScannerManager
-import com.gigakin.stockbuddy.util.ArticleIdMode
 import kotlinx.coroutines.launch
 
 /** FR-05-10, FR-09a-c, NFR-51-56: backs the Individual Linking form. */
@@ -24,7 +23,6 @@ class IndividualLinkingViewModel(
 
     val fieldDefs: LiveData<List<FieldDefinitionEntity>> = fieldConfigRepository.observeFields()
     val categories: LiveData<List<CategoryEntity>> = categoryRepository.observeAll()
-    val articleIdMode: ArticleIdMode get() = fieldConfigRepository.articleIdMode
 
     private val _saveResult = MutableLiveData<ItemRepository.SaveResult?>()
     val saveResult: LiveData<ItemRepository.SaveResult?> get() = _saveResult
@@ -44,10 +42,10 @@ class IndividualLinkingViewModel(
 
     fun save(
         name: String, barcode: String, category: String, rfid: String,
-        articleId: String?, attributes: Map<String, String>
+        attributes: Map<String, String>
     ) = viewModelScope.launch {
         _saveResult.value = itemRepository.saveLinkedItem(
-            name, barcode, category, rfid, articleId, articleIdMode, attributes
+            name, barcode, category, rfid, attributes
         )
     }
 

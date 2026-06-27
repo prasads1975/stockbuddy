@@ -7,8 +7,8 @@ import com.gigakin.stockbuddy.data.db.entity.ProductEntity
 class ProductRepository(private val dao: ProductDao) {
     suspend fun upsertFromLinkedItem(
         barcode: String, name: String, categoryName: String,
-        articleId: String?, attributesJson: String
+        attributesJson: String
     ) {
-        dao.upsert(ProductEntity(barcode, name, categoryName, articleId, attributesJson))
+        dao.upsert(ProductEntity(barcode, name, categoryName, attributesJson))
     }
 }

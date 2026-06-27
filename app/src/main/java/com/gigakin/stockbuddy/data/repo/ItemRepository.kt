@@ -32,16 +32,15 @@ class ItemRepository(
 
     /**
      * FR-08/09/09a/09b/09c: full save-time validation for Individual Linking, both fixed
-     * mandatory fields and configured-mandatory domain-specific fields, plus mode-dependent
-     * Article ID handling. On success, also auto-upserts the Product Master (FR-21).
+     * mandatory fields and configured-mandatory domain-specific fields (including Article ID).
+     * Article ID is now configurable via field_definitions. On success, auto-upserts the
+     * Product Master (FR-21).
      */
     suspend fun saveLinkedItem(
         name: String,
         barcode: String,
         categoryName: String,
         rfidTagId: String,
-        articleId: String?,
-        articleIdMode: ArticleIdMode,
         attributes: Map<String, String>
     ): SaveResult {
         val errors = mutableMapOf<String, String>()
@@ -50,15 +49,10 @@ class ItemRepository(
         if (categoryName.isBlank()) errors["category"] = "Required"
         if (rfidTagId.isBlank()) errors["rfid"] = "Required"
 
-        // FR-09c: Article ID validation is mode-dependent, never a uniqueness key.
-        if (articleIdMode == ArticleIdMode.MANDATORY && articleId.isNullOrBlank()) {
-            errors["articleId"] = "Required"
-        }
-
-        // FR-09a: configured-mandatory domain-specific fields.
+        // FR-09a: configured-mandatory domain-specific fields (including articleId if configured).
         val fieldDefs = fieldDefDao.getAll()
-        fieldDefs.filter { it.mandatory }.forEach { f ->
-            if (attributes[f.key].isNullOrBlank()) errors["attr_${f.key}"] = "Required"
+        fieldDefs.filter { it.mandatory && it.showOnLinking }.forEach { f ->
+            if (attributes[f.key].isNullOrBlank()) errors[f.key] = "Required"
         }
 
         if (errors.isNotEmpty()) return SaveResult.ValidationError(errors)
@@ -69,22 +63,19 @@ class ItemRepository(
         // Demo item cap (Section 4, MVP Scope doc) — applies to manual Linking saves.
         if (itemDao.count() >= DemoLimits.MAX_ITEMS) return SaveResult.DemoLimitReached
 
-        val effectiveArticleId = if (articleIdMode == ArticleIdMode.NOT_USED) null else articleId
-
         itemDao.insert(
             ItemEntity(
                 rfidTagId = rfidTagId,
                 barcode = barcode,
                 name = name,
                 categoryName = categoryName,
-                articleId = effectiveArticleId,
                 attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
             )
         )
 
         // FR-21: auto-upsert Product Master, matched by Barcode.
         productRepository.upsertFromLinkedItem(
-            barcode, name, categoryName, effectiveArticleId,
+            barcode, name, categoryName,
             com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
         )
 
@@ -100,7 +91,6 @@ class ItemRepository(
      */
     suspend fun bulkImport(
         rows: List<Array<String>>,
-        articleIdMode: ArticleIdMode,
         fieldDefs: List<FieldDefinitionEntity>
     ): BulkImportResult {
         if (rows.isEmpty()) return BulkImportResult(0, 0, 0, emptyList())
@@ -110,7 +100,6 @@ class ItemRepository(
         fun colIndex(name: String) = header.indexOfFirst { it.equals(name, ignoreCase = true) }
         val iName = colIndex("Name"); val iBarcode = colIndex("Barcode")
         val iCategory = colIndex("Category"); val iRfid = colIndex("RFID")
-        val iArticleId = colIndex("ArticleId")
 
         var inserted = 0; var updated = 0; var rejected = 0
         val reasons = mutableListOf<String>()
@@ -120,7 +109,6 @@ class ItemRepository(
             fun get(i: Int) = if (i in row.indices) row[i].trim() else ""
             val name = get(iName); val barcode = get(iBarcode)
             val category = get(iCategory); val rfid = get(iRfid)
-            val articleId = if (iArticleId >= 0) get(iArticleId) else null
 
             if (name.isBlank() || barcode.isBlank() || rfid.isBlank()) {
                 rejected++; reasons.add("Row ${rowIdx + 2}: missing mandatory field"); continue
@@ -135,22 +123,21 @@ class ItemRepository(
             }
 
             val existing = itemDao.getByRfid(rfid)
+            // Build attributes map from all configured field_definitions
             val attrs = fieldDefs.associate { fd ->
                 val ci = colIndex(fd.label)
                 fd.key to (if (ci >= 0) get(ci) else "")
             }
-            val effectiveArticleId = if (articleIdMode == ArticleIdMode.NOT_USED) null else articleId
 
             val entity = ItemEntity(
                 rfidTagId = rfid, barcode = barcode, name = name, categoryName = category,
-                articleId = effectiveArticleId,
                 attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attrs)
             )
             if (existing == null) { itemDao.insert(entity); inserted++ }
             else { itemDao.update(entity); updated++ }
 
             productRepository.upsertFromLinkedItem(
-                barcode, name, category, effectiveArticleId,
+                barcode, name, category,
                 com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attrs)
             )
         }

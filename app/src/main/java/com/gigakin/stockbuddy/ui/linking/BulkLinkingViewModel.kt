@@ -24,7 +24,8 @@ class BulkLinkingViewModel(
     fun importCsv(inputStream: java.io.InputStream) = viewModelScope.launch {
         val rows = withContext(Dispatchers.IO) { CsvUtils.read(InputStreamReader(inputStream)) }
         val fieldDefs = fieldConfigRepository.getFields()
-        _result.value = itemRepository.bulkImport(rows, fieldConfigRepository.articleIdMode, fieldDefs)
+        // Article ID is now configurable via field_definitions, no separate articleIdMode parameter
+        _result.value = itemRepository.bulkImport(rows, fieldDefs)
     }
 
     fun consumeResult() { _result.value = null }

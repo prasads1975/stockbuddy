@@ -16,7 +16,12 @@
     <string name="reader_not_available">No RFID Reader (Emulator Mode)</string>
 
     <!-- Individual Linking -->
-    <string name="linking_title">Link Item</string>
+    <string name="linking_title">Individual Linking</string>
+    <string name="linking_associate_hardware">Associate Hardware</string>
+    <string name="linking_description">Enter item details and scan the unique RFID tag to establish a permanent inventory link.</string>
+    <string name="field_rfid_hint">Scan or enter RFID ID</string>
+    <string name="field_barcode_hint">Scan or type barcode</string>
+    <string name="action_scan_barcode">Scan Barcode</string>
     <string name="field_product_name">Product Name *</string>
     <string name="field_barcode">Barcode *</string>
     <string name="field_category">Category *</string>
