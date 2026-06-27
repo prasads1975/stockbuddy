@@ -1,25 +1,280 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:background="@color/home_background">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnIndividual"
-        style="@style/Widget.StockBuddy.PrimaryActionButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Individual Linking" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBulk"
-        style="@style/Widget.Material3.Button.OutlinedButton"
+    <!-- Header: Back button + Title (at top, replacing StockBuddy header) -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:textAllCaps="false"
-        android:text="Bulk Linking (CSV Import)" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:background="@color/home_background">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:scaleType="centerInside"
+            android:tint="@color/md_theme_onSurface"
+            android:contentDescription="@string/action_back"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/home_linking"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_primary"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Hardware Status Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@color/md_theme_surface">
+
+        <ImageView
+            android:id="@+id/readerStatusIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/sensors_24px"
+            android:tint="@color/status_available"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/tvReaderStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:text="@string/reader_connected" />
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
+
+            <!-- Section Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Operation Mode"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_onSurface"
+                android:alpha="0.7"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Description -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Choose how you want to associate assets with the digital inventory system."
+                android:textSize="14sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Option 1: Individual Linking Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnIndividual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/md_theme_surfaceContainerLowest"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/md_theme_outlineVariant">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/home_icon_bg_blue"
+                        android:layout_marginEnd="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/add_box_24px"
+                            android:tint="@color/md_theme_primary"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Individual Linking"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/md_theme_onSurface"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Scan or manually link a single item."
+                            android:textSize="14sp"
+                            android:textColor="@color/md_theme_onSurfaceVariant" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/arrow_forward_24px"
+                        android:tint="@color/md_theme_outline"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Option 2: Bulk Linking Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnBulk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/md_theme_surfaceContainerLowest"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/md_theme_outlineVariant">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/home_icon_bg_green"
+                        android:layout_marginEnd="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/upload_file_24px"
+                            android:tint="@color/home_icon_green"
+                            android:contentDescription="@null" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bulk Linking"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/md_theme_onSurface"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Import multiple items via CSV or RFID."
+                            android:textSize="14sp"
+                            android:textColor="@color/md_theme_onSurfaceVariant" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/arrow_forward_24px"
+                        android:tint="@color/md_theme_outline"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/md_theme_surfaceContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_info"
+                        android:tint="@color/md_theme_outline"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Need help? Check the Hardware Guide for scanner calibration tips."
+                        android:textSize="14sp"
+                        android:textColor="@color/md_theme_onSurfaceVariant"
+                        android:lineSpacingMultiplier="1.3" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

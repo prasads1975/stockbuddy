@@ -50,11 +50,13 @@
         android:paddingBottom="8dp"
         android:background="@color/md_theme_surface">
 
-        <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="@drawable/reader_status_dot"
-            android:id="@+id/readerStatusDot" />
+        <ImageView
+            android:id="@+id/readerStatusIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/sensors_24px"
+            android:tint="@color/status_available"
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/tvReaderStatus"

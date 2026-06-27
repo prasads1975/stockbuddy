@@ -37,6 +37,8 @@
     <color name="md_theme_onSurface">#191C1B</color>
     <color name="md_theme_surfaceVariant">#DEE4E3</color>
     <color name="md_theme_onSurfaceVariant">#4F616E</color>
+    <color name="md_theme_surfaceContainer">#EEF0EE</color>
+    <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
 
     <!-- OUTLINE: For borders and dividers — professional grey -->
     <color name="md_theme_outline">#7F8B87</color>
@@ -89,6 +91,8 @@
     <color name="home_icon_bg_blue">#c9e2fd</color>          <!-- Linking icon bg (light blue) -->
     <color name="home_icon_bg_peach">#ffddb0</color>         <!-- Assets icon bg (peach) -->
     <color name="home_icon_bg_grey">#e3e2e5</color>          <!-- Reports/Settings icon bg (grey) -->
+    <color name="home_icon_bg_green">#A8D5BA</color>         <!-- Bulk Linking icon bg (light green) -->
+    <color name="home_icon_green">#2E7D32</color>            <!-- Bulk Linking icon tint (dark green) -->
     <color name="home_reader_status_bg">#2E7D32</color>      <!-- Green for reader connected -->
 
 </resources>

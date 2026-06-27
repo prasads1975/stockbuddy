@@ -105,7 +105,7 @@ class ScanningFragment : Fragment() {
                 ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
                 ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
             }
-            binding.readerStatusDot.setBackgroundColor(requireContext().getColor(statusColor))
+            binding.readerStatusIcon.setColorFilter(requireContext().getColor(statusColor))
         }
 
         binding.btnStart.setOnClickListener {
