@@ -6,7 +6,9 @@
     <string name="home_linking">Linking</string>
     <string name="home_inventory">Inventory</string>
     <string name="home_assets">Assets</string>
+    <string name="home_reports">Reports</string>
     <string name="home_settings">Settings</string>
+    <string name="notifications">Notifications</string>
 
     <!-- Reader status (FR-81) -->
     <string name="reader_connected">Reader Connected</string>
@@ -36,11 +38,17 @@
     <string name="import_summary_format">Inserted: %1$d   Updated: %2$d   Rejected: %3$d</string>
 
     <!-- Inventory -->
+    <string name="new_inventory_session">New Inventory Session</string>
+    <string name="inventory_code_description">Enter an Inventory Code to identify this session (e.g., \"3 June Morning\").</string>
     <string name="inventory_code_hint">Inventory Code (e.g. \"3 June Morning\")</string>
+    <string name="inventory_scan_title">Inventory Scan</string>
+    <string name="action_back">Back</string>
     <string name="action_start">START</string>
     <string name="action_stop">STOP</string>
+    <string name="action_cancel">Cancel</string>
     <string name="scanned_count_format">%1$d tags scanned</string>
     <string name="filter_all_categories">All</string>
+    <string name="view_past_reports">View Past Reports</string>
 
     <!-- Results -->
     <string name="tab_available">Available</string>

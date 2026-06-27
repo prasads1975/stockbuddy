@@ -12,22 +12,22 @@
            (only change: md_theme_primary, md_theme_secondary, md_theme_tertiary)
          ============================================================================ -->
 
-    <!-- PRIMARY: Deep Teal — main brand colour, high contrast, retail-ready -->
-    <color name="md_theme_primary">#0D7C7C</color>
+    <!-- PRIMARY: Dark Navy — main brand colour from Figma design -->
+    <color name="md_theme_primary">#002440</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
-    <color name="md_theme_primaryContainer">#4FF8F8</color>
-    <color name="md_theme_onPrimaryContainer">#002020</color>
+    <color name="md_theme_primaryContainer">#1b3a57</color>
+    <color name="md_theme_onPrimaryContainer">#87a4c6</color>
 
-    <!-- SECONDARY: Warm Slate — accent for secondary actions, provides sophistication -->
-    <color name="md_theme_secondary">#4F616E</color>
+    <!-- SECONDARY: Slate — accent for secondary actions -->
+    <color name="md_theme_secondary">#496177</color>
     <color name="md_theme_onSecondary">#FFFFFF</color>
-    <color name="md_theme_secondaryContainer">#D1E5F5</color>
-    <color name="md_theme_onSecondaryContainer">#0B1B2A</color>
+    <color name="md_theme_secondaryContainer">#c9e2fd</color>
+    <color name="md_theme_onSecondaryContainer">#4d657b</color>
 
-    <!-- TERTIARY: Warm Taupe — accent for differentiation, soft warmth -->
-    <color name="md_theme_tertiary">#7A5D52</color>
+    <!-- TERTIARY: Brown — accent for differentiation -->
+    <color name="md_theme_tertiary">#321f00</color>
     <color name="md_theme_onTertiary">#FFFFFF</color>
-    <color name="md_theme_tertiaryContainer">#FFDDD4</color>
+    <color name="md_theme_tertiaryContainer">#ffddb0</color>
     <color name="md_theme_onTertiaryContainer">#2D1609</color>
 
     <!-- NEUTRAL SURFACES: Clean, professional off-white -->
@@ -77,5 +77,18 @@
          For modals, bottom sheets, and dimmed backgrounds
          ============================================================================ -->
     <color name="scrim">#000000</color>                       <!-- 32% alpha overlay -->
+
+    <!-- ============================================================================
+         HOME SCREEN DESIGN (from Figma)
+         ============================================================================ -->
+    <color name="home_background">#faf9fc</color>            <!-- Light background -->
+    <color name="home_featured_subtitle">#B3D9E8</color>     <!-- Light blue subtitle text -->
+    <color name="home_tile_background">#f4f3f6</color>       <!-- Tile background -->
+    <color name="home_tile_border">#E0E2E5</color>           <!-- Tile border -->
+    <color name="home_tile_title">#1a1c1e</color>            <!-- Tile text -->
+    <color name="home_icon_bg_blue">#c9e2fd</color>          <!-- Linking icon bg (light blue) -->
+    <color name="home_icon_bg_peach">#ffddb0</color>         <!-- Assets icon bg (peach) -->
+    <color name="home_icon_bg_grey">#e3e2e5</color>          <!-- Reports/Settings icon bg (grey) -->
+    <color name="home_reader_status_bg">#2E7D32</color>      <!-- Green for reader connected -->
 
 </resources>

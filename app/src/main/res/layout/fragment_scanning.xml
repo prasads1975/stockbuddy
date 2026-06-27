@@ -5,49 +5,225 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/home_background">
 
-    <TextView
-        android:id="@+id/tvSessionCode"
+    <!-- Header: Back button + Title (at top, replacing StockBuddy header) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:background="@color/home_background">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:scaleType="centerInside"
+            android:tint="@color/md_theme_onSurface"
+            android:contentDescription="@string/action_back"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/inventory_scan_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_primary"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Hardware Status Bar -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:text="3 June Morning" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@color/md_theme_surface">
 
-    <!-- FR-35: display/reporting filter only — never affects what the antenna reads -->
-    <Spinner
-        android:id="@+id/spinnerCategoryFilter"
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/reader_status_dot"
+            android:id="@+id/readerStatusDot" />
+
+        <TextView
+            android:id="@+id/tvReaderStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:text="@string/reader_connected" />
+    </LinearLayout>
+
+    <!-- Session Identity & Filter Section -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
 
-    <TextView
-        android:id="@+id/tvScanCount"
+        <!-- Left: Session Code -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Session Code"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvSessionCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_onSurface"
+                tools:text="3 June Morning" />
+        </LinearLayout>
+
+        <!-- Right: Category Filter -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:minWidth="140dp"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerCategoryFilter"
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Tag Counter Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        app:cardBackgroundColor="@color/md_theme_primaryContainer"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unique Tags Scanned"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onPrimaryContainer"
+                android:alpha="0.6"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvScanCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="48sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/md_theme_onPrimaryContainer"
+                    tools:text="42" />
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/sensors_24px"
+                    android:tint="@color/md_theme_onPrimaryContainer"
+                    android:layout_marginStart="12dp"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <!-- Progress bar -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@color/md_theme_primary"
+                android:alpha="0.3" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Spacer -->
+    <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        tools:text="0 tags scanned" />
+        android:layout_weight="1" />
 
-    <!-- NFR-10c/d: START is the single oversized, thumb-zone primary action -->
+    <!-- START Button (Primary action) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStart"
         style="@style/Widget.StockBuddy.PrimaryActionButton"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
         android:text="@string/action_start" />
 
-    <!-- FR-24: STOP is visually distinct — full-width, red/error colour -->
+    <!-- STOP Button (Red, with icon) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStop"
-        style="@style/Widget.StockBuddy.PrimaryActionButton"
+        style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:visibility="gone"
         app:backgroundTint="@color/md_theme_error"
-        android:text="@string/action_stop" />
+        android:textColor="@color/md_theme_onError"
+        android:text="@string/action_stop"
+        app:icon="@drawable/stop_circle_24px"
+        app:iconTint="@color/md_theme_onError" />
 
 </LinearLayout>

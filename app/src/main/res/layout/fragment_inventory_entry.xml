@@ -3,35 +3,94 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/home_background">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutCode"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    <!-- Header Spacer -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <!-- Card Container -->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/inventory_code_hint">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editCode"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnStartSession"
-        style="@style/Widget.StockBuddy.PrimaryActionButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/action_start" />
+            <!-- Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/new_inventory_session"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_onSurface"
+                android:layout_marginBottom="8dp" />
 
+            <!-- Description -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/inventory_code_description"
+                android:textSize="14sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Code Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutCode"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/inventory_code_hint">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Button Group -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginTop="24dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancel"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:text="@string/action_cancel" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStartSession"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_start" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Reports Option -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnViewReports"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:textAllCaps="false"
-        android:text="View Past Reports" />
+        android:text="@string/view_past_reports" />
 
 </LinearLayout>

@@ -1,31 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <!-- FR-81: persistent global hardware status indicator, visible on every screen -->
-    <TextView
-        android:id="@+id/readerStatusBar"
+    <!-- Main content: header + navigation -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top AppBar Header (from Figma design) -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarHeader"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/home_background"
+            app:titleTextColor="@color/md_theme_primary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <!-- Logo + StockBuddy Text -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <FrameLayout
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/home_logo_bg"
+                        android:layout_marginEnd="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="G"
+                            android:textColor="@android:color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="StockBuddy"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/md_theme_primary" />
+                </LinearLayout>
+
+                <!-- Notifications Icon -->
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_notifications"
+                    android:tint="@color/home_tile_title"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/notifications" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <!-- Navigation Host Fragment -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph" />
+    </LinearLayout>
+
+    <!-- FR-81: Reader status bar - fixed at bottom, 80dp from bottom -->
+    <FrameLayout
+        android:id="@+id/readerStatusBarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:gravity="center_vertical"
-        android:drawablePadding="8dp"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:background="?attr/colorSurfaceVariant"
-        tools:text="Reader Connected" />
+        android:layout_gravity="bottom"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="88dp">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:cardBackgroundColor="@color/home_reader_status_bg"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
 
-</LinearLayout>
+            <LinearLayout
+                android:id="@+id/readerStatusBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="12dp"
+                tools:text="Reader Connected">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/sensors_24px"
+                    android:tint="@android:color/white"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/readerStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    tools:text="Reader Connected" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
+</FrameLayout>

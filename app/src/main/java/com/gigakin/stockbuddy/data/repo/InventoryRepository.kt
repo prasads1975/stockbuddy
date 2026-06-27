@@ -1,5 +1,6 @@
 package com.gigakin.stockbuddy.data.repo
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.gigakin.stockbuddy.data.db.dao.InventorySessionDao
 import com.gigakin.stockbuddy.data.db.dao.ItemDao
@@ -8,6 +9,8 @@ import com.gigakin.stockbuddy.data.db.entity.InventorySessionEntity
 import com.gigakin.stockbuddy.data.db.entity.ItemEntity
 import com.gigakin.stockbuddy.data.db.entity.ScannedTagEntity
 import com.gigakin.stockbuddy.util.DemoLimits
+
+private const val TAG = "InventoryRepository"
 
 /**
  * FR-29-47: Inventory session lifecycle, scanning, and Available/Missing/Excess computation.
@@ -23,10 +26,28 @@ class InventoryRepository(
 
     /** FR-29: start a new session, enforcing rolling retention at MAX_SESSIONS (Section 4). */
     suspend fun startSession(code: String): Long {
-        if (sessionDao.count() >= DemoLimits.MAX_SESSIONS) {
-            sessionDao.getAllAscending().firstOrNull()?.let { oldest -> sessionDao.delete(oldest) }
+        val count = sessionDao.count()
+        Log.d(TAG, "startSession: Current session count = $count, MAX_SESSIONS = ${DemoLimits.MAX_SESSIONS}")
+
+        if (count >= DemoLimits.MAX_SESSIONS) {
+            val oldest = sessionDao.getAllAscending().firstOrNull()
+            if (oldest != null) {
+                Log.d(TAG, "Rolling purge: Deleting oldest session (id=${oldest.id}, code=${oldest.code})")
+                sessionDao.delete(oldest)
+            }
         }
-        return sessionDao.insert(InventorySessionEntity(code = code))
+
+        val newSessionId = sessionDao.insert(InventorySessionEntity(code = code))
+        Log.d(TAG, "Created new session (id=$newSessionId, code=$code)")
+        return newSessionId
+    }
+
+    /** Get all sessions for debugging. */
+    suspend fun getAllSessions(): List<InventorySessionEntity> {
+        val sessions = sessionDao.getAllAscending().reversed() // Reverse to get descending order
+        Log.d(TAG, "getAllSessions: Found ${sessions.size} sessions")
+        sessions.forEach { Log.d(TAG, "  - Session(id=${it.id}, code=${it.code}, createdAt=${it.createdAt})") }
+        return sessions
     }
 
     /** FR-37: real-time dedup via DAO's OnConflictStrategy.IGNORE. */

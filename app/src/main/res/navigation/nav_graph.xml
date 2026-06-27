@@ -9,7 +9,9 @@
         android:label="StockBuddy">
         <action android:id="@+id/action_home_to_linkingOptions" app:destination="@id/linkingOptionsFragment" />
         <action android:id="@+id/action_home_to_inventoryEntry" app:destination="@id/inventoryEntryFragment" />
+        <action android:id="@+id/action_home_to_scanning" app:destination="@id/scanningFragment" />
         <action android:id="@+id/action_home_to_assets" app:destination="@id/assetsFragment" />
+        <action android:id="@+id/action_home_to_reportsList" app:destination="@id/reportsListFragment" />
         <action android:id="@+id/action_home_to_settings" app:destination="@id/settingsFragment" />
     </fragment>
 
@@ -40,6 +42,7 @@
         android:label="Scanning">
         <argument android:name="sessionId" app:argType="long" />
         <argument android:name="sessionCode" app:argType="string" />
+        <argument android:name="autoStart" app:argType="boolean" android:defaultValue="false" />
         <action android:id="@+id/action_scanning_to_results" app:destination="@id/resultsFragment"
             app:popUpTo="@id/homeFragment" />
     </fragment>

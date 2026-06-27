@@ -1,12 +1,14 @@
 package com.gigakin.stockbuddy.ui
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.ActivityMainBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
+import com.google.android.material.card.MaterialCardView
 
 /**
  * Single-Activity + Navigation Component host. Hosts the persistent global Reader status
@@ -27,14 +29,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderReaderStatus(status: ReaderStatus) {
-        val (text, colorRes, icon) = when (status) {
-            ReaderStatus.CONNECTED -> Triple(getString(R.string.reader_connected), R.color.reader_connected, R.drawable.ic_reader_connected)
-            ReaderStatus.NOT_CONNECTED -> Triple(getString(R.string.reader_not_connected), R.color.reader_not_connected, R.drawable.ic_reader_warning)
-            ReaderStatus.NOT_AVAILABLE -> Triple(getString(R.string.reader_not_available), R.color.reader_not_available, R.drawable.ic_reader_unavailable)
+        val (text, colorRes) = when (status) {
+            ReaderStatus.CONNECTED -> Pair(getString(R.string.reader_connected), R.color.reader_connected)
+            ReaderStatus.NOT_CONNECTED -> Pair(getString(R.string.reader_not_connected), R.color.reader_not_connected)
+            ReaderStatus.NOT_AVAILABLE -> Pair(getString(R.string.reader_not_available), R.color.reader_not_available)
         }
-        binding.readerStatusBar.text = text
-        binding.readerStatusBar.setTextColor(getColor(colorRes))
-        binding.readerStatusBar.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0)
+
+        // Update text
+        val statusText = binding.readerStatusBar.findViewById<TextView>(R.id.readerStatusText)
+        statusText?.text = text
+
+        // Find the MaterialCardView inside the container and update its background color
+        val statusContainer = binding.root.findViewById<android.widget.FrameLayout>(R.id.readerStatusBarContainer)
+        statusContainer?.let {
+            val cardView = it.getChildAt(0) as? MaterialCardView
+            cardView?.setCardBackgroundColor(getColor(colorRes))
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean =

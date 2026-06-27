@@ -33,6 +33,9 @@ class InventoryEntryFragment : Fragment() {
                 )
             }
         }
+        binding.btnCancel.setOnClickListener {
+            findNavController().popBackStack()
+        }
         binding.btnViewReports.setOnClickListener {
             findNavController().navigate(InventoryEntryFragmentDirections.actionToReportsList())
         }
