@@ -43,9 +43,9 @@ class StockBuddyApp : Application() {
 
         categoryRepository = CategoryRepository(database.categoryDao())
         fieldConfigRepository = FieldConfigRepository(database.fieldDefinitionDao(), prefs)
-        productRepository = ProductRepository(database.productDao())
-        itemRepository = ItemRepository(database.itemDao(), database.fieldDefinitionDao(), productRepository)
-        inventoryRepository = InventoryRepository(database.inventorySessionDao(), database.scannedTagDao(), database.itemDao())
+        productRepository = ProductRepository(database.productMasterDao())
+        itemRepository = ItemRepository(database.linkedItemDao(), database.fieldDefinitionDao(), productRepository)
+        inventoryRepository = InventoryRepository(database.inventorySessionDao(), database.sessionTagDao(), database.linkedItemDao())
         exportRepository = ExportRepository(this)
     }
 }

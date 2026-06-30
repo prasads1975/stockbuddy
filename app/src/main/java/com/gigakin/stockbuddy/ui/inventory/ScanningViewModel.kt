@@ -24,7 +24,7 @@ class ScanningViewModel(
     private val _scanning = MutableLiveData(false)
     val scanning: LiveData<Boolean> get() = _scanning
 
-    fun start(sessionId: Long) {
+    fun start(sessionId: String) {
         _scanning.value = true
         scannerManager.startContinuousScan { tag ->
             viewModelScope.launch {
@@ -34,7 +34,7 @@ class ScanningViewModel(
         }
     }
 
-    fun stop(sessionId: Long) = viewModelScope.launch {
+    fun stop(sessionId: String) = viewModelScope.launch {
         scannerManager.stopContinuousScan()
         _scanning.value = false
         inventoryRepository.stopSession(sessionId)

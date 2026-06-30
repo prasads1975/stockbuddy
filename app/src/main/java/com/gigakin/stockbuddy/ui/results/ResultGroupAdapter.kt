@@ -8,25 +8,23 @@ import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.ItemResultGroupBinding
 import com.gigakin.stockbuddy.databinding.ItemResultUnitBinding
-import com.gigakin.stockbuddy.util.JsonAttributes
 
 /**
  * FR-45: results grouped by Barcode, per-group count, tap to expand and see each unit's
- * RFID Tag ID (and Article ID, where enabled) — RFID Tag ID is always the unit-level
- * identifier, Article ID is shown only as supplementary info per Section 1.7.
+ * RFID Tag ID and Article ID (mandatory). RFID Tag ID is the unit-level identifier,
+ * Article ID is the product-level business key.
  */
 class ResultGroupAdapter(
-    private val context: Context,
-    private val articleIdEnabled: Boolean
+    private val context: Context
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    internal data class Group(val barcode: String, val name: String, val category: String, val units: List<InventoryRepository.ResultItem>)
+    internal data class Group(val barcode: String, val productName: String, val category: String, val units: List<InventoryRepository.ResultItem>)
     private var groups: List<Group> = emptyList()
     private val expanded = mutableSetOf<String>()
 
     fun submitList(items: List<InventoryRepository.ResultItem>) {
         groups = items.groupBy { it.item.barcode }.map { (barcode, units) ->
-            Group(barcode, units.first().item.name, units.first().item.categoryName, units)
+            Group(barcode, units.first().item.productName, units.first().item.category, units)
         }
         notifyDataSetChanged()
     }
@@ -53,7 +51,7 @@ class ResultGroupAdapter(
 
     inner class GroupVH(val b: ItemResultGroupBinding) : RecyclerView.ViewHolder(b.root) {
         internal fun bind(g: Group) {
-            b.tvName.text = g.name
+            b.tvName.text = g.productName
             b.tvBarcode.text = "Barcode: ${g.barcode}  •  ${g.category}"
             b.tvCount.text = "${g.units.size}"
 
@@ -77,11 +75,8 @@ class ResultGroupAdapter(
         internal fun bind(item: InventoryRepository.ResultItem) {
             b.tvRfid.text = "RFID: ${item.item.rfidTagId}"
 
-            // Article ID is now stored in attributesJson
-            val attrs = JsonAttributes.toMap(item.item.attributesJson)
-            val articleId = attrs["articleId"]
-            b.tvArticleId.text = if (articleIdEnabled && !articleId.isNullOrBlank()) "Article ID: $articleId" else ""
-            b.tvArticleId.visibility = if (b.tvArticleId.text.isBlank()) android.view.View.GONE else android.view.View.VISIBLE
+            // Article ID field hidden (barcode is the primary business identifier)
+            b.tvArticleId.visibility = android.view.View.GONE
         }
     }
 }

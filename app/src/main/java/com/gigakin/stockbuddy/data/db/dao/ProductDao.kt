@@ -1,13 +1,13 @@
 package com.gigakin.stockbuddy.data.db.dao
 
 import androidx.room.*
-import com.gigakin.stockbuddy.data.db.entity.ProductEntity
+import com.gigakin.stockbuddy.data.db.entity.ProductMasterEntity
 
 @Dao
-interface ProductDao {
-    @Query("SELECT * FROM products WHERE barcode = :barcode LIMIT 1")
-    suspend fun getByBarcode(barcode: String): ProductEntity?
+interface ProductMasterDao {
+    @Query("SELECT * FROM product_master WHERE barcode = :barcode LIMIT 1")
+    suspend fun getByBarcode(barcode: String): ProductMasterEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(product: ProductEntity)
+    suspend fun upsert(product: ProductMasterEntity)
 }

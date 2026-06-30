@@ -4,11 +4,10 @@ import androidx.lifecycle.LiveData
 import com.gigakin.stockbuddy.data.db.dao.FieldDefinitionDao
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.data.prefs.AppPrefs
-import com.gigakin.stockbuddy.util.ArticleIdMode
 
 /**
- * FR-77i-o / NFR-51-56: the headline dynamic-field-configuration feature, and the
- * Article ID usage toggle (NFR-56). Section 1.1 of the MVP Scope doc.
+ * FR-77i-o: the headline dynamic-field-configuration feature.
+ * Article ID is mandatory (no mode toggle needed). Section 1.1 of the MVP Scope doc.
  */
 class FieldConfigRepository(
     private val dao: FieldDefinitionDao,
@@ -21,10 +20,6 @@ class FieldConfigRepository(
         dao.clearAll()
         dao.insertAll(fields.mapIndexed { i, f -> f.copy(sortOrder = i) })
     }
-
-    var articleIdMode: ArticleIdMode
-        get() = prefs.articleIdMode
-        set(value) { prefs.articleIdMode = value }
 
     var setupCompleted: Boolean
         get() = prefs.fieldConfigCompleted

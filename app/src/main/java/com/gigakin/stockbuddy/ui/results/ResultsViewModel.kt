@@ -20,7 +20,7 @@ class ResultsViewModel(
 
     val filteredResults = MutableLiveData<List<InventoryRepository.ResultItem>>()
 
-    fun load(sessionId: Long) = viewModelScope.launch {
+    fun load(sessionId: String) = viewModelScope.launch {
         val results = inventoryRepository.computeResults(sessionId, null)
         _allResults.value = results
         applyFilter()
@@ -35,7 +35,7 @@ class ResultsViewModel(
     private fun applyFilter() {
         val filter = _categoryFilter.value
         val all = _allResults.value ?: emptyList()
-        filteredResults.value = if (filter == null) all else all.filter { it.item.categoryName == filter || it.status == InventoryRepository.Status.EXCESS }
+        filteredResults.value = if (filter == null) all else all.filter { it.item.category == filter || it.status == InventoryRepository.Status.EXCESS }
     }
 
     fun currentResults(): List<InventoryRepository.ResultItem> = filteredResults.value ?: emptyList()

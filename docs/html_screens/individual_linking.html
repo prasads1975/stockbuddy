@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<!DOCTYPE html><html class="light" lang="en" style="width: 390px; height: 987px; overflow: hidden; position: relative;"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 <title>Individual Linking - StockBuddy</title>
@@ -129,26 +129,23 @@
   </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 <!-- Top AppBar (from JSON) -->
-<header class="w-full top-0 sticky z-40 bg-surface dark:bg-surface-container-highest border-b border-border-subtle dark:border-outline-variant flex items-center px-margin-mobile h-14">
+<header class="fixed top-0 left-0 w-full z-50 flex items-center px-4 h-14 bg-transparent">
 <button class="mr-4 active:scale-95 duration-100 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors p-2 rounded-full" onclick="window.location.href='{{DATA:SCREEN:SCREEN_13}}'">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed">arrow_back</span>
 </button>
 <h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-primary dark:text-primary-fixed">Individual Linking</h1>
 </header>
 <!-- Hardware Status Bar (as per Style Guidance) -->
-<div class="bg-surface-container-low px-4 py-1.5 flex items-center justify-between border-b border-border-subtle">
-<div class="flex items-center gap-2">
-<div class="w-2 h-2 rounded-full bg-status-available hardware-pulse"></div>
-<span class="font-label-caption text-label-caption text-on-surface-variant">RFID Reader Connected</span>
-</div>
-<span class="font-label-caption text-label-caption text-on-surface-variant">v2.4.1-PRO</span>
-</div>
+<div class="mt-14 px-4 py-1 flex items-center border-b border-border-subtle bg-surface-container-low"><div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]" data-icon="sensors">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-bold tracking-wider">READER CONNECTED</span>
+</div></div>
 <!-- Content Canvas -->
 <main class="flex-1 overflow-y-auto px-margin-mobile pt-6 pb-32">
 <div class="max-w-md mx-auto space-y-6">
 <!-- Introduction Section -->
 <div class="space-y-1">
-<h2 class="font-title-card text-title-card text-on-surface">Associate Hardware</h2>
+
 <p class="font-body-metadata text-body-metadata text-on-surface-variant">Enter item details and scan the unique RFID tag to establish a permanent inventory link.</p>
 </div>
 <!-- Manual Form Section (MD3 Styled) -->
@@ -259,6 +256,12 @@
             alert('Linking association saved successfully!');
         });
     </script>
+
+
+
+
+
+
 
 
 

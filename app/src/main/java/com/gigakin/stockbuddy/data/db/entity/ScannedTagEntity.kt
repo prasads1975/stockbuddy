@@ -1,27 +1,33 @@
 package com.gigakin.stockbuddy.data.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
 
 /**
- * Raw scan results for a session (FR-34/37). Always retained in full regardless of
- * any category filter applied afterwards (FR-46) — filtering is a display-time concern only.
+ * Session tags crash buffer (FR-34/37): minimal record of scanned RFID tags in a session.
+ * Composite PK: (session_id, rfid_tag_id). No timestamps, no auto-id.
+ * Purpose: crash recovery only. Immutable results snapshots are stored in session_result_items.
  */
 @Entity(
-    tableName = "scanned_tags",
-    indices = [Index(value = ["sessionId", "rfidTagId"], unique = true)],
-    foreignKeys = [ForeignKey(
-        entity = InventorySessionEntity::class,
-        parentColumns = ["id"],
-        childColumns = ["sessionId"],
-        onDelete = ForeignKey.CASCADE
-    )]
+    tableName = "session_tags",
+    primaryKeys = ["session_id", "rfid_tag_id"],
+    indices = [
+        Index(value = ["session_id"])  // I-06
+    ],
+    foreignKeys = [
+        ForeignKey(
+            entity = InventorySessionEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["session_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
-data class ScannedTagEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val sessionId: Long,
-    val rfidTagId: String,
-    val scannedAt: Long = System.currentTimeMillis()
+data class SessionTagEntity(
+    @ColumnInfo(name = "session_id")
+    val sessionId: String,
+    @ColumnInfo(name = "rfid_tag_id")
+    val rfidTagId: String
 )

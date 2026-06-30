@@ -16,10 +16,9 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.FragmentResultsBinding
 import com.gigakin.stockbuddy.ui.export.ExportBottomSheetFragment
-import com.gigakin.stockbuddy.util.ArticleIdMode
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
-/** S13 — Results Summary: Available/Missing tabs (FR-43), grouped by Barcode (FR-45). */
+/** S13 — Results Summary: Available/Missing/Excess tabs (FR-43), grouped by Barcode (FR-45). */
 class ResultsFragment : Fragment() {
     private var _binding: FragmentResultsBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +39,7 @@ class ResultsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.tvSessionTitle.text = getString(R.string.results_title_format, args.sessionCode, "")
 
-        adapter = ResultGroupAdapter(requireContext(), articleIdEnabled = app.fieldConfigRepository.articleIdMode != ArticleIdMode.NOT_USED)
+        adapter = ResultGroupAdapter(requireContext())
         binding.recyclerResults.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerResults.adapter = adapter
         binding.recyclerResults.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))

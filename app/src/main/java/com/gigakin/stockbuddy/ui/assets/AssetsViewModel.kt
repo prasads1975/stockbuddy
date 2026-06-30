@@ -17,7 +17,7 @@ class AssetsViewModel(
     private val query = MutableLiveData("")
     private val category = MutableLiveData<String?>(null)
 
-    val items: LiveData<List<com.gigakin.stockbuddy.data.db.entity.ItemEntity>> =
+    val items: LiveData<List<com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity>> =
         query.switchMap { q -> itemRepository.search(q, category.value) }
 
     fun setQuery(q: String) { query.value = q }

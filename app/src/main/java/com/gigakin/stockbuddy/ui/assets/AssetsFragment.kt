@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentAssetsBinding
-import com.gigakin.stockbuddy.util.ArticleIdMode
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S09 — Assets: flat list (FR-61), search (FR-63), category filter (FR-67), live count (FR-64). */
@@ -33,7 +32,7 @@ class AssetsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = AssetsAdapter(articleIdEnabled = app.fieldConfigRepository.articleIdMode != ArticleIdMode.NOT_USED)
+        adapter = AssetsAdapter()
         binding.recyclerAssets.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerAssets.adapter = adapter
         binding.recyclerAssets.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))

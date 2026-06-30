@@ -1,17 +1,31 @@
 package com.gigakin.stockbuddy.data.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
  * Product Master (FR-21/22): SKU-level catalogue, auto-upserted on every Individual Linking save.
- * Matched/grouped by Barcode (Section 1.7). All domain-specific fields including Article ID
- * are stored in attributesJson for maximum flexibility.
+ * PK: barcode (TEXT) — the business identifier for product lookup in POS systems.
+ * Uniqueness: barcode uniquely identifies a product (standard in retail).
+ * Denormalized fields: product_name, category for O(1) scan-time lookup.
+ * Domain-specific fields: stored in attributes JSON.
  */
-@Entity(tableName = "products")
-data class ProductEntity(
-    @PrimaryKey val barcode: String,
-    val name: String,
-    val categoryName: String,
-    val attributesJson: String = "{}" // domain-specific fields including Article ID (Section 1.7)
+@Entity(
+    tableName = "product_master",
+    indices = [
+        Index(value = ["category"])        // For category filtering
+    ]
+)
+data class ProductMasterEntity(
+    @PrimaryKey
+    val barcode: String,
+    @ColumnInfo(name = "product_name")
+    val productName: String,
+    val category: String,
+    @ColumnInfo(name = "attributes")
+    val attributesJson: String = "{}",
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
 )

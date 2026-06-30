@@ -18,7 +18,6 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.FragmentIndividualLinkingBinding
 import com.gigakin.stockbuddy.hardware.RfidScanResult
-import com.gigakin.stockbuddy.util.ArticleIdMode
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
@@ -72,8 +71,7 @@ class IndividualLinkingFragment : Fragment() {
 
         binding.legendRequired.text = getString(R.string.legend_required)
 
-        // Article ID is now controlled via field_definitions, not ArticleIdMode
-        // If no field definition exists for articleId, hide the fixed field
+        // Article ID field hidden (using barcode as the primary business identifier instead)
         binding.layoutArticleId.visibility = View.GONE
 
         viewModel.categories.observe(viewLifecycleOwner) { cats ->
@@ -163,7 +161,7 @@ class IndividualLinkingFragment : Fragment() {
         val category = (binding.layoutCategory.editText?.text?.toString() ?: "").trim()
         val rfid = binding.editRfid.text?.toString()?.trim().orEmpty()
 
-        // All domain-specific fields (including articleId) are now stored in attributesJson
+        // All domain-specific fields (from field_definitions)
         val attributes = dynamicFieldViews.mapValues { (_, v) -> v.text?.toString()?.trim().orEmpty() }
 
         viewModel.save(name, barcode, category, rfid, attributes)
@@ -195,10 +193,10 @@ class IndividualLinkingFragment : Fragment() {
         if (errors.containsKey("category")) binding.layoutCategory.error = "Required"
         if (errors.containsKey("rfid")) binding.layoutRfid.error = "Required"
 
-        // All domain-specific field errors are in the form "attr_fieldKey" or just "fieldKey"
+        // All domain-specific field errors are in the form "attr_fieldKey"
         dynamicFieldViews.forEach { (fieldKey, view) ->
-            if (errors.containsKey(fieldKey) || errors.containsKey("attr_$fieldKey")) {
-                (view.parent as? TextInputLayout)?.error = errors[fieldKey] ?: errors["attr_$fieldKey"] ?: "Required"
+            if (errors.containsKey("attr_$fieldKey")) {
+                (view.parent as? TextInputLayout)?.error = errors["attr_$fieldKey"] ?: "Required"
             }
         }
     }

@@ -9,29 +9,34 @@ import com.gigakin.stockbuddy.data.db.entity.*
 
 /**
  * NFR-15: local-only SQLite via Room. NFR-18: RFID uniqueness enforced at the DB layer
- * (ItemEntity.rfidTagId is the @PrimaryKey). Barcode/RFID columns are indexed by virtue
- * of being primary keys — see Section 1.11 (Architecture & Scalability Principles) in the
- * MVP scope doc for why this matters even at demo data volumes.
+ * via UNIQUE constraint on linked_items.rfid_tag_id. Article ID is the PK of product_master.
+ * Schema version 2: aligned with finalized System Design document (§4).
  */
 @Database(
     entities = [
         CategoryEntity::class,
         FieldDefinitionEntity::class,
-        ProductEntity::class,
-        ItemEntity::class,
+        ProductMasterEntity::class,
+        LinkedItemEntity::class,
         InventorySessionEntity::class,
-        ScannedTagEntity::class
+        SessionTagEntity::class,
+        SessionResultItemEntity::class,
+        GeneratedReportEntity::class,
+        AppConfigEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun fieldDefinitionDao(): FieldDefinitionDao
-    abstract fun productDao(): ProductDao
-    abstract fun itemDao(): ItemDao
+    abstract fun productMasterDao(): ProductMasterDao
+    abstract fun linkedItemDao(): LinkedItemDao
     abstract fun inventorySessionDao(): InventorySessionDao
-    abstract fun scannedTagDao(): ScannedTagDao
+    abstract fun sessionTagDao(): SessionTagDao
+    abstract fun sessionResultItemDao(): SessionResultItemDao
+    abstract fun generatedReportDao(): GeneratedReportDao
+    abstract fun appConfigDao(): AppConfigDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

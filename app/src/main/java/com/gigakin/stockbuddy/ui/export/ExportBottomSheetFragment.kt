@@ -12,30 +12,30 @@ import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.FragmentExportBottomSheetBinding
-import com.gigakin.stockbuddy.util.ArticleIdMode
 import kotlinx.coroutines.launch
 
 /**
  * S14 — Export Report modal. FR-49: Share and Download only for MVP (API/LAN channels,
  * FR-53-56, are out of scope per Section 2 of the MVP Scope doc).
+ * Article ID is always included in exports (mandatory field).
  */
 class ExportBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: FragmentExportBottomSheetBinding? = null
     private val binding get() = _binding!!
     private val app get() = requireActivity().application as StockBuddyApp
 
-    private var sessionId: Long = -1
+    private var sessionId: String = ""
     private var sessionCode: String = ""
 
     companion object {
-        fun newInstance(sessionId: Long, sessionCode: String) = ExportBottomSheetFragment().apply {
-            arguments = Bundle().apply { putLong("sessionId", sessionId); putString("sessionCode", sessionCode) }
+        fun newInstance(sessionId: String, sessionCode: String) = ExportBottomSheetFragment().apply {
+            arguments = Bundle().apply { putString("sessionId", sessionId); putString("sessionCode", sessionCode) }
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentExportBottomSheetBinding.inflate(inflater, container, false)
-        sessionId = requireArguments().getLong("sessionId")
+        sessionId = requireArguments().getString("sessionId").orEmpty()
         sessionCode = requireArguments().getString("sessionCode").orEmpty()
         return binding.root
     }
@@ -52,7 +52,6 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
     private suspend fun exportThen(action: (java.io.File) -> Unit) {
         val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
         val fieldDefs = app.fieldConfigRepository.getFields()
-        // Article ID is now included in fieldDefs if configured, no need to pass articleIdUsed
         val rows = app.exportRepository.buildCsv(results, fieldDefs)
         val fileName = app.exportRepository.buildFileName(sessionCode)
         val file = app.exportRepository.writeCsvFile(fileName, rows)

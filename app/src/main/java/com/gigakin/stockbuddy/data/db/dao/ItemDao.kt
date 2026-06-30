@@ -2,38 +2,38 @@ package com.gigakin.stockbuddy.data.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.gigakin.stockbuddy.data.db.entity.ItemEntity
+import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 
 @Dao
-interface ItemDao {
-    @Query("SELECT * FROM items ORDER BY name ASC")
-    fun observeAll(): LiveData<List<ItemEntity>>
+interface LinkedItemDao {
+    @Query("SELECT * FROM linked_items ORDER BY product_name ASC")
+    fun observeAll(): LiveData<List<LinkedItemEntity>>
 
     @Query("""
-        SELECT * FROM items
-        WHERE (:category IS NULL OR categoryName = :category)
-        AND (name LIKE '%' || :query || '%'
+        SELECT * FROM linked_items
+        WHERE (:category IS NULL OR category = :category)
+        AND (product_name LIKE '%' || :query || '%'
              OR barcode LIKE '%' || :query || '%'
-             OR rfidTagId LIKE '%' || :query || '%')
-        ORDER BY name ASC
+             OR rfid_tag_id LIKE '%' || :query || '%')
+        ORDER BY product_name ASC
     """)
-    fun search(query: String, category: String?): LiveData<List<ItemEntity>>
+    fun search(query: String, category: String?): LiveData<List<LinkedItemEntity>>
 
-    @Query("SELECT * FROM items")
-    suspend fun getAll(): List<ItemEntity>
+    @Query("SELECT * FROM linked_items")
+    suspend fun getAll(): List<LinkedItemEntity>
 
-    @Query("SELECT * FROM items WHERE rfidTagId = :rfid LIMIT 1")
-    suspend fun getByRfid(rfid: String): ItemEntity?
+    @Query("SELECT * FROM linked_items WHERE rfid_tag_id = :rfid LIMIT 1")
+    suspend fun getByRfid(rfid: String): LinkedItemEntity?
 
-    @Query("SELECT COUNT(*) FROM items")
+    @Query("SELECT COUNT(*) FROM linked_items")
     suspend fun count(): Int
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(item: ItemEntity)
+    suspend fun insert(item: LinkedItemEntity)
 
     @Update
-    suspend fun update(item: ItemEntity)
+    suspend fun update(item: LinkedItemEntity)
 
     @Delete
-    suspend fun delete(item: ItemEntity)
+    suspend fun delete(item: LinkedItemEntity)
 }

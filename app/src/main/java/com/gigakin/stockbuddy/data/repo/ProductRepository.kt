@@ -1,14 +1,30 @@
 package com.gigakin.stockbuddy.data.repo
 
-import com.gigakin.stockbuddy.data.db.dao.ProductDao
-import com.gigakin.stockbuddy.data.db.entity.ProductEntity
+import com.gigakin.stockbuddy.data.db.dao.ProductMasterDao
+import com.gigakin.stockbuddy.data.db.entity.ProductMasterEntity
 
-/** FR-21: auto-upsert on save, matched/grouped by Barcode (Section 1.7) — not Article ID. */
-class ProductRepository(private val dao: ProductDao) {
+/**
+ * FR-21: auto-upsert on save, keyed by Barcode (primary business identifier).
+ * Product Master is the canonical catalogue of all products in the system.
+ */
+class ProductRepository(private val dao: ProductMasterDao) {
     suspend fun upsertFromLinkedItem(
-        barcode: String, name: String, categoryName: String,
+        barcode: String,
+        productName: String,
+        category: String,
         attributesJson: String
     ) {
-        dao.upsert(ProductEntity(barcode, name, categoryName, attributesJson))
+        dao.upsert(
+            ProductMasterEntity(
+                barcode = barcode,
+                productName = productName,
+                category = category,
+                attributesJson = attributesJson
+            )
+        )
+    }
+
+    suspend fun getByBarcode(barcode: String): ProductMasterEntity? {
+        return dao.getByBarcode(barcode)
     }
 }

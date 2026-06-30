@@ -41,11 +41,11 @@ class IndividualLinkingViewModel(
     }
 
     fun save(
-        name: String, barcode: String, category: String, rfid: String,
+        productName: String, barcode: String, category: String, rfid: String,
         attributes: Map<String, String>
     ) = viewModelScope.launch {
         _saveResult.value = itemRepository.saveLinkedItem(
-            name, barcode, category, rfid, attributes
+            productName, barcode, category, rfid, attributes
         )
     }
 

@@ -13,7 +13,6 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.data.repo.FieldConfigRepository
 import com.gigakin.stockbuddy.databinding.FragmentFieldConfigBinding
-import com.gigakin.stockbuddy.util.ArticleIdMode
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /**
@@ -64,20 +63,6 @@ class FieldConfigFragment : Fragment() {
             )
             binding.editNewFieldLabel.text?.clear()
             binding.switchMandatory.isChecked = false
-        }
-
-        // FR-77o / NFR-56: Article ID usage toggle, default Optional
-        binding.radioGroupArticleId.check(when (viewModel.articleIdMode) {
-            ArticleIdMode.NOT_USED -> R.id.radioNotUsed
-            ArticleIdMode.OPTIONAL -> R.id.radioOptional
-            ArticleIdMode.MANDATORY -> R.id.radioMandatory
-        })
-        binding.radioGroupArticleId.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.articleIdMode = when (checkedId) {
-                R.id.radioNotUsed -> ArticleIdMode.NOT_USED
-                R.id.radioMandatory -> ArticleIdMode.MANDATORY
-                else -> ArticleIdMode.OPTIONAL
-            }
         }
     }
 

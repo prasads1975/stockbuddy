@@ -40,7 +40,7 @@
     <fragment android:id="@+id/scanningFragment"
         android:name="com.gigakin.stockbuddy.ui.inventory.ScanningFragment"
         android:label="Scanning">
-        <argument android:name="sessionId" app:argType="long" />
+        <argument android:name="sessionId" app:argType="string" />
         <argument android:name="sessionCode" app:argType="string" />
         <argument android:name="autoStart" app:argType="boolean" android:defaultValue="false" />
         <action android:id="@+id/action_scanning_to_results" app:destination="@id/resultsFragment"
@@ -56,7 +56,7 @@
     <fragment android:id="@+id/resultsFragment"
         android:name="com.gigakin.stockbuddy.ui.results.ResultsFragment"
         android:label="Results">
-        <argument android:name="sessionId" app:argType="long" />
+        <argument android:name="sessionId" app:argType="string" />
         <argument android:name="sessionCode" app:argType="string" />
     </fragment>
 

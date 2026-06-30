@@ -24,7 +24,7 @@ class SessionListAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) {
         val s = items[position]
         holder.binding.tvCode.text = s.code
-        holder.binding.tvTimestamp.text = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date(s.createdAt))
+        holder.binding.tvTimestamp.text = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date(s.startedAt))
         holder.binding.root.setOnClickListener { onClick(s) }
     }
 
