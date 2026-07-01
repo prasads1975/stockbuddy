@@ -1,0 +1,243 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StockBuddy - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#31495e",
+                        "primary": "#002440",
+                        "status-missing": "#C62828",
+                        "surface-tint": "#446180",
+                        "inverse-primary": "#acc9ed",
+                        "status-available": "#2E7D32",
+                        "primary-container": "#1b3a57",
+                        "primary-fixed-dim": "#acc9ed",
+                        "surface-bright": "#faf9fc",
+                        "on-tertiary-fixed-variant": "#5e4112",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f4f3f6",
+                        "inverse-on-surface": "#f1f0f3",
+                        "on-primary-container": "#87a4c6",
+                        "surface-container-high": "#e9e8ea",
+                        "on-tertiary-container": "#c19b63",
+                        "secondary": "#496177",
+                        "on-surface-variant": "#43474d",
+                        "secondary-container": "#c9e2fd",
+                        "status-excess": "#F9A825",
+                        "on-primary": "#ffffff",
+                        "background": "#faf9fc",
+                        "on-tertiary-fixed": "#291800",
+                        "surface-container-highest": "#e3e2e5",
+                        "on-primary-fixed-variant": "#2b4967",
+                        "surface-variant": "#e3e2e5",
+                        "on-secondary-fixed": "#011d31",
+                        "tertiary-container": "#4d3304",
+                        "outline-variant": "#c3c7ce",
+                        "on-surface": "#1a1c1e",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface": "#faf9fc",
+                        "on-primary-fixed": "#001d35",
+                        "on-background": "#1a1c1e",
+                        "on-secondary-container": "#4d657b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#321f00",
+                        "secondary-fixed-dim": "#b0c9e3",
+                        "secondary-fixed": "#cce5ff",
+                        "outline": "#73777e",
+                        "tertiary-fixed-dim": "#e9c085",
+                        "surface-container": "#eeedf0",
+                        "surface-dim": "#dad9dc",
+                        "primary-fixed": "#d0e4ff",
+                        "surface-industrial": "#F8F9FA",
+                        "on-secondary": "#ffffff",
+                        "border-subtle": "#E0E2E5",
+                        "tertiary-fixed": "#ffddb0",
+                        "inverse-surface": "#2f3033",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-gap": "8px",
+                        "action-height-primary": "56px",
+                        "touch-target-min": "48px",
+                        "thumb-zone-bottom": "40%",
+                        "gutter": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-cta": ["Inter"],
+                        "display-count": ["Inter"],
+                        "body-metadata": ["Inter"],
+                        "title-card": ["Inter"],
+                        "body-data": ["Inter"],
+                        "label-caption": ["Inter"],
+                        "headline-page": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                        "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                        "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-page-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        body {
+            background-color: #faf9fc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .thumb-zone-btn {
+            height: 56px;
+        }
+        .admin-lock-tint {
+            background-color: rgba(0, 36, 64, 0.03);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-data text-on-surface">
+<!-- Hardware Status Bar (Global Component) -->
+<!-- Top App Bar -->
+<header class="w-full z-50 flex items-center px-margin-mobile h-14 bg-surface dark:bg-surface-container-highest border-b border-border-subtle dark:border-outline-variant">
+<button class="mr-4 p-2 active:scale-95 duration-100 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">arrow_back</span>
+</button>
+<h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-primary dark:text-primary-fixed">Settings</h1>
+</header><div class="mt-0 px-4 py-1 bg-transparent flex items-center border-b border-border-subtle">
+<div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]" data-icon="sensors">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-bold tracking-wider uppercase">READER CONNECTED</span>
+<div class="flex-grow"></div>
+<div class="flex items-center gap-1">
+
+
+</div>
+</div>
+</div>
+<main class="max-w-xl mx-auto px-margin-mobile py-6 mb-24">
+<!-- Section: Administrative Controls -->
+<div class="mb-8">
+<div class="flex items-center gap-2 px-2 mb-3">
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-widest">Administrative Settings</span>
+<div class="h-[1px] flex-grow bg-outline-variant opacity-30"></div>
+</div>
+<div class="flex flex-col gap-2">
+<!-- Field Configuration -->
+<button class="flex items-center w-full p-4 bg-white border border-border-subtle rounded-xl active:scale-[0.98] transition-transform text-left group">
+
+<div class="flex-grow">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card">Field Configuration</span>
+
+</div>
+<p class="font-body-metadata text-body-metadata text-on-surface-variant">Define custom UHF data fields and labels</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<!-- Category Management -->
+<button class="flex items-center w-full p-4 bg-white border border-border-subtle rounded-xl active:scale-[0.98] transition-transform text-left group">
+
+<div class="flex-grow">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card">Category Management</span>
+
+</div>
+<p class="font-body-metadata text-body-metadata text-on-surface-variant">Organize inventory hierarchies and rules</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Section: General Info -->
+<div class="mb-8">
+<div class="flex items-center gap-2 px-2 mb-3">
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-widest">Application Details</span>
+<div class="h-[1px] flex-grow bg-outline-variant opacity-30"></div>
+</div>
+<div class="flex flex-col gap-2">
+<!-- App Info -->
+<button class="flex items-center w-full p-4 bg-white border border-border-subtle rounded-xl active:scale-[0.98] transition-transform text-left group">
+<div class="p-2 bg-surface-container-highest text-primary rounded-lg mr-4">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div class="flex-grow">
+<span class="font-title-card text-title-card">App Info</span>
+<p class="font-body-metadata text-body-metadata text-on-surface-variant">Version 4.2.0 (Build 1024-Industrial)</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<!-- License Status -->
+<div class="flex items-center w-full p-4 bg-white border border-border-subtle rounded-xl group">
+<div class="p-2 bg-surface-container-highest text-primary rounded-lg mr-4">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div class="flex-grow">
+<span class="font-title-card text-title-card">License Status</span>
+<p class="font-body-metadata text-body-metadata text-status-available flex items-center gap-1">
+                            Active: Enterprise Perpetual
+                        </p>
+</div>
+<div class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold">
+                        VERIFIED
+                    </div>
+</div>
+</div>
+</div>
+<!-- Danger Zone -->
+
+</main>
+<!-- Bottom Navigation Bar -->
+<!-- Desktop Sidebar Anchor Placeholder -->
+<aside class="hidden md:flex fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-20 flex-col items-center py-6 bg-surface-container border-r border-border-subtle">
+<div class="flex flex-col gap-8">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">inventory_2</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">barcode_scanner</span>
+<div class="w-10 h-10 bg-primary-container text-on-primary-container rounded-xl flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">settings</span>
+</div>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">settings_input_antenna</span>
+</div>
+</aside>
+<script>
+        // Micro-interaction for the hardware indicator
+        document.querySelector('.bg-status-available').addEventListener('click', () => {
+            const el = document.querySelector('.bg-status-available');
+            el.classList.add('scale-[1.02]');
+            setTimeout(() => el.classList.remove('scale-[1.02]'), 200);
+            alert('Hardware Health: Excellent\nConnected via Bluetooth (Handheld Module v2)\nBattery Level: 88%');
+        });
+    </script>
+
+
+
+
+</body></html>

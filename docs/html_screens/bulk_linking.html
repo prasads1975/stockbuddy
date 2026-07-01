@@ -1,0 +1,242 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Bulk Linking - StockBuddy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#291800",
+                    "inverse-surface": "#2f3033",
+                    "secondary-fixed-dim": "#b0c9e3",
+                    "on-primary-fixed": "#001d35",
+                    "surface-industrial": "#F8F9FA",
+                    "error-container": "#ffdad6",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#321f00",
+                    "tertiary-fixed": "#ffddb0",
+                    "on-surface-variant": "#43474d",
+                    "primary-fixed": "#d0e4ff",
+                    "on-secondary-fixed-variant": "#31495e",
+                    "on-primary-fixed-variant": "#2b4967",
+                    "status-available": "#2E7D32",
+                    "border-subtle": "#E0E2E5",
+                    "inverse-primary": "#acc9ed",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5e4112",
+                    "surface-container-low": "#f4f3f6",
+                    "tertiary-container": "#4d3304",
+                    "on-tertiary-container": "#c19b63",
+                    "surface-container": "#eeedf0",
+                    "background": "#faf9fc",
+                    "on-surface": "#1a1c1e",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e3e2e5",
+                    "on-secondary-container": "#4d657b",
+                    "secondary": "#496177",
+                    "surface-dim": "#dad9dc",
+                    "surface-tint": "#446180",
+                    "surface-container-high": "#e9e8ea",
+                    "status-missing": "#C62828",
+                    "inverse-on-surface": "#f1f0f3",
+                    "surface-container-highest": "#e3e2e5",
+                    "surface": "#faf9fc",
+                    "primary-container": "#1b3a57",
+                    "outline-variant": "#c3c7ce",
+                    "status-excess": "#F9A825",
+                    "secondary-container": "#c9e2fd",
+                    "tertiary-fixed-dim": "#e9c085",
+                    "secondary-fixed": "#cce5ff",
+                    "primary": "#002440",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#faf9fc",
+                    "on-secondary-fixed": "#011d31",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#acc9ed",
+                    "outline": "#73777e",
+                    "on-background": "#1a1c1e",
+                    "on-primary-container": "#87a4c6",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "stack-gap": "8px",
+                    "action-height-primary": "56px",
+                    "touch-target-min": "48px",
+                    "gutter": "16px",
+                    "thumb-zone-bottom": "40%"
+            },
+            "fontFamily": {
+                    "title-card": ["Inter"],
+                    "label-cta": ["Inter"],
+                    "body-data": ["Inter"],
+                    "display-count": ["Inter"],
+                    "body-metadata": ["Inter"],
+                    "label-caption": ["Inter"],
+                    "headline-page": ["Inter"]
+            },
+            "fontSize": {
+                    "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                    "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                    "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* Custom utility for the thumb zone area */
+      .thumb-zone {
+        min-height: 40vh;
+      }
+      .industrial-border {
+        border: 1px solid #E0E2E5;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-industrial text-on-surface antialiased flex flex-col min-h-screen">
+<!-- Top App Bar (Header) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center px-4 h-14 bg-transparent">
+<div class="flex items-center gap-4 w-full">
+<button class="text-on-surface active:opacity-80 transition-colors" onclick="window.location.href='{{DATA:SCREEN:SCREEN_13}}'">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-page text-headline-page font-bold text-on-surface">Bulk Linking</h1>
+</div>
+</header>
+<!-- Hardware Status Bar -->
+<div class="mt-14 px-4 py-1 flex items-center border-b border-border-subtle bg-surface-container-low">
+<div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]" data-icon="sensors">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-bold tracking-wider">READER CONNECTED</span>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="flex-grow p-margin-mobile flex flex-col gap-6">
+<!-- Upload Zone -->
+<section class="flex flex-col gap-4">
+<label class="cursor-pointer" for="csv-upload">
+<div class="industrial-border bg-surface-container-low rounded-xl border-dashed border-2 border-outline-variant p-8 flex flex-col items-center justify-center text-center gap-3 active:bg-surface-container transition-colors min-h-[200px]">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed-variant text-[32px]">upload_file</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-on-surface">Select CSV File</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">Tap to browse or drag &amp; drop</span>
+</div>
+</div>
+<input accept=".csv" class="hidden" id="csv-upload" type="file">
+</label>
+</section>
+<!-- Schema Preview / Guidance Area -->
+<section class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h2 class="font-title-card text-title-card text-primary uppercase tracking-tight">Expected CSV Schema</h2>
+<span class="font-label-caption text-label-caption text-on-surface-variant">FR-16 Standard</span>
+</div>
+<div class="industrial-border rounded-lg overflow-hidden bg-white shadow-sm">
+<div class="grid grid-cols-4 bg-surface-container-high p-3 border-b border-border-subtle">
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase">Name</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase">Barcode</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase">Category</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase">RFID ID</span>
+</div>
+<div class="divide-y divide-border-subtle">
+<!-- Example Row 1 -->
+<div class="grid grid-cols-4 p-3 bg-surface-container-lowest items-center">
+<span class="font-body-metadata text-body-metadata text-on-surface truncate pr-2">Rugged Case X1</span>
+<span class="font-body-metadata text-body-metadata text-on-surface truncate pr-2">88291022</span>
+<span class="font-body-metadata text-body-metadata text-on-surface truncate pr-2">Accessory</span>
+<span class="font-body-metadata text-body-metadata text-on-surface truncate">E28011912...</span>
+</div>
+<!-- Example Row 2 -->
+<div class="grid grid-cols-4 p-3 bg-surface-container-lowest items-center opacity-60">
+<span class="font-body-metadata text-body-metadata text-on-surface truncate pr-2">...</span>
+<span class="font-body-metadata text-body-metadata text-on-surface truncate pr-2">...</span>
+<span class="font-body-metadata text-body-metadata text-on-surface truncate pr-2">...</span>
+<span class="font-body-metadata text-body-metadata text-on-surface truncate">...</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3 p-3 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">info</span>
+<p class="font-body-metadata text-body-metadata text-on-surface-variant leading-tight">Ensure all RFID Tag IDs are unique. System will flag duplicates during the validation stage.</p>
+</div>
+</section>
+<!-- Thumb Zone Action Area -->
+<section class="mt-auto thumb-zone flex flex-col justify-end gap-stack-gap pb-8">
+<button class="w-full h-action-height-primary bg-primary text-on-primary rounded-xl font-label-cta text-label-cta uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-transform disabled:bg-surface-variant disabled:text-on-surface-variant" disabled="" id="import-btn">
+<span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+                Import Data
+            </button>
+<p class="text-center font-label-caption text-label-caption text-outline">NFR-10d: Batch linking optimized for warehouse scale</p>
+</section>
+</main>
+<!-- Bottom Navigation (Shared Component) -->
+<script>
+        // Simple micro-interaction for file input simulation
+        const fileInput = document.getElementById('csv-upload');
+        const importBtn = document.getElementById('import-btn');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                const uploadZoneTitle = document.querySelector('.font-title-card');
+                const uploadZoneMeta = document.querySelector('.font-body-metadata');
+                
+                uploadZoneTitle.innerText = fileName;
+                uploadZoneTitle.classList.add('text-status-available');
+                uploadZoneMeta.innerText = "File ready for import";
+                
+                importBtn.disabled = false;
+                importBtn.classList.remove('disabled:bg-surface-variant', 'disabled:text-on-surface-variant');
+            }
+        });
+
+        // Tactile feedback simulation
+        importBtn.addEventListener('click', () => {
+            if(!importBtn.disabled) {
+                importBtn.innerHTML = '<span class="animate-spin material-symbols-outlined">sync</span> Processing...';
+                setTimeout(() => {
+                    alert("Import simulation complete. Data mapped to StockBuddy database.");
+                    importBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">cloud_upload</span> Import Data';
+                }, 2000);
+            }
+        });
+    </script>
+
+
+
+
+
+
+</body></html>

@@ -149,7 +149,10 @@
 <p class="font-body-metadata text-body-metadata text-on-surface-variant">Enter item details and scan the unique RFID tag to establish a permanent inventory link.</p>
 </div>
 <!-- Manual Form Section (MD3 Styled) -->
-<form class="space-y-5" id="linking-form">
+<form class="space-y-5" id="linking-form"><div class="relative">
+<label class="block mb-1.5 font-label-caption text-label-caption text-on-surface-variant">Article ID <span class="text-error">*</span></label>
+<input class="w-full h-14 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-data text-body-data focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="Internal SKU or ID" required="" type="text">
+</div>
 <!-- Product Name * -->
 <div class="relative group">
 <label class="block mb-1.5 font-label-caption text-label-caption text-on-surface-variant">Product Name <span class="text-error">*</span></label>
@@ -188,14 +191,11 @@
 <option value="equipment">Equipment</option>
 <option value="accessories">Accessories</option>
 </select>
-<span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant pointer-events-none">expand_more</span>
+
 </div>
 </div>
 <!-- Article ID (Optional) -->
-<div class="relative">
-<label class="block mb-1.5 font-label-caption text-label-caption text-on-surface-variant">Article ID (Optional)</label>
-<input class="w-full h-14 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-data text-body-data focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="Internal SKU or ID" type="text">
-</div>
+
 <!-- RFID Tag ID * (with prominent Scan button) -->
 
 </form>

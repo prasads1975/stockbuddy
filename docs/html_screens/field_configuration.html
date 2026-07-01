@@ -1,0 +1,352 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Domain Field Configuration - StockBuddy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#31495e",
+                    "primary": "#002440",
+                    "status-missing": "#C62828",
+                    "surface-tint": "#446180",
+                    "inverse-primary": "#acc9ed",
+                    "status-available": "#2E7D32",
+                    "primary-container": "#1b3a57",
+                    "primary-fixed-dim": "#acc9ed",
+                    "surface-bright": "#faf9fc",
+                    "on-tertiary-fixed-variant": "#5e4112",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f4f3f6",
+                    "inverse-on-surface": "#f1f0f3",
+                    "on-primary-container": "#87a4c6",
+                    "surface-container-highest": "#e3e2e5",
+                    "on-primary-fixed-variant": "#2b4967",
+                    "surface-variant": "#e3e2e5",
+                    "on-secondary-fixed": "#011d31",
+                    "tertiary-container": "#4d3304",
+                    "outline-variant": "#c3c7ce",
+                    "on-surface": "#1a1c1e",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "surface": "#faf9fc",
+                    "on-primary-fixed": "#001d35",
+                    "on-background": "#1a1c1e",
+                    "on-secondary-container": "#4d657b",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#321f00",
+                    "secondary-fixed-dim": "#b0c9e3",
+                    "secondary-fixed": "#cce5ff",
+                    "outline": "#73777e",
+                    "tertiary-fixed-dim": "#e9c085",
+                    "surface-container": "#eeedf0",
+                    "surface-dim": "#dad9dc",
+                    "primary-fixed": "#d0e4ff",
+                    "surface-industrial": "#F8F9FA",
+                    "on-secondary": "#ffffff",
+                    "border-subtle": "#E0E2E5",
+                    "tertiary-fixed": "#ffddb0",
+                    "inverse-surface": "#2f3033",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-gap": "8px",
+                    "action-height-primary": "56px",
+                    "touch-target-min": "48px",
+                    "thumb-zone-bottom": "40%",
+                    "gutter": "16px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "label-cta": ["Inter"],
+                    "display-count": ["Inter"],
+                    "body-metadata": ["Inter"],
+                    "title-card": ["Inter"],
+                    "body-data": ["Inter"],
+                    "label-caption": ["Inter"],
+                    "headline-page": ["Inter"]
+            },
+            "fontSize": {
+                    "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                    "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                    "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-page-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #faf9fc; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .thumb-zone-action {
+            bottom: calc(20px + 80px); /* Above bottom nav */
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(224, 226, 229, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-50 bg-surface dark:bg-surface-container-highest flex items-center px-margin-mobile h-14 border-b border-border-subtle dark:border-outline-variant transition-colors">
+<div class="flex items-center gap-4 w-full">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed active:scale-95 duration-100 p-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors rounded-full" data-icon="arrow_back">arrow_back</button>
+<h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-primary dark:text-primary-fixed flex-grow">Field Configuration</h1>
+</div>
+</header><div class="bg-surface-container-low px-4 py-1.5 flex items-center justify-between border-b border-border-subtle">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-status-available" style="font-size: 18px;">sensors</span><span class="font-label-caption text-label-caption text-on-surface-variant">READER CONNECTED</span></div>
+</div>
+<main class="p-margin-mobile max-w-2xl mx-auto space-y-6" style="opacity: 1;">
+<!-- Fixed Fields (Read Only) -->
+<section class="space-y-stack-gap">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary" data-icon="lock">lock</span>
+<h3 class="font-title-card text-title-card text-on-surface-variant">Fixed System Fields</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<!-- Field Card 1 -->
+<div class="p-4 bg-surface-container-low border border-border-subtle rounded-lg flex items-center justify-between">
+<div>
+<p class="font-label-caption text-label-caption text-outline">System Label</p>
+<p class="font-body-data text-body-data font-semibold">Product Name</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="info" style="font-size: 18px;">info</span>
+</div>
+<!-- Field Card 2 -->
+<div class="p-4 bg-surface-container-low border border-border-subtle rounded-lg flex items-center justify-between">
+<div>
+<p class="font-label-caption text-label-caption text-outline">System Label</p>
+<p class="font-body-data text-body-data font-semibold">Barcode (GTIN)</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="barcode" style="font-size: 18px;">barcode</span>
+</div>
+<!-- Field Card 3 -->
+<div class="p-4 bg-surface-container-low border border-border-subtle rounded-lg flex items-center justify-between">
+<div>
+<p class="font-label-caption text-label-caption text-outline">System Label</p>
+<p class="font-body-data text-body-data font-semibold">Category</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="category" style="font-size: 18px;">category</span>
+</div>
+<!-- Field Card 4 -->
+<div class="p-4 bg-surface-container-low border border-border-subtle rounded-lg flex items-center justify-between">
+<div>
+<p class="font-label-caption text-label-caption text-outline">System Label</p>
+<p class="font-body-data text-body-data font-semibold">RFID EPC</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="sensors" style="font-size: 18px;">sensors</span>
+</div>
+</div>
+</section>
+<!-- Domain-Specific Fields -->
+<section class="space-y-stack-gap">
+<div class="flex items-center justify-between">
+<h3 class="font-title-card text-title-card text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="dynamic_form">dynamic_form</span>
+                    Domain-Specific Fields
+                </h3>
+<button class="text-primary font-label-cta flex items-center gap-1 hover:underline" onclick="openModal()">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    Add Field
+                </button>
+</div>
+<div class="space-y-3">
+<!-- Field Item 1 -->
+<div class="glass-card p-4 rounded-xl flex items-center gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card">Retail Price</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-[10px] font-bold uppercase tracking-wider">Currency</span>
+</div>
+</div>
+<button class="edit-field-button material-symbols-outlined hover:text-primary transition-colors p-2 text-primary" data-icon="edit" onclick="openEditModal('Retail Price', 'Currency', false)">edit</button>
+<button class="material-symbols-outlined hover:text-error transition-colors p-2 text-error" data-icon="delete">delete</button>
+</div>
+<!-- Field Item 2 -->
+<div class="glass-card p-4 rounded-xl flex items-center gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<span class="font-title-card text-title-card">Gross Weight</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-[10px] font-bold uppercase tracking-wider">Numeric</span>
+</div>
+</div>
+<button class="edit-field-button material-symbols-outlined hover:text-primary transition-colors p-2 text-primary" data-icon="edit" onclick="openEditModal('Gross Weight', 'Numeric', false)">edit</button>
+<button class="material-symbols-outlined hover:text-error transition-colors p-2 text-error" data-icon="delete">delete</button>
+</div>
+</div>
+</section>
+<div class="h-24"></div>
+</main>
+<!-- Modals -->
+<!-- Add Field Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 hidden" id="field-modal">
+<div class="bg-surface-container-lowest w-full max-w-md rounded-xl shadow-xl overflow-hidden flex flex-col">
+<div class="p-6 border-b border-border-subtle flex justify-between items-center">
+<h2 class="font-headline-page text-headline-page-mobile text-primary">Add Custom Field</h2>
+<button class="material-symbols-outlined text-outline p-2 hover:bg-surface-container-low rounded-full" onclick="closeModal()">close</button>
+</div>
+<div class="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
+<div class="space-y-2">
+<label class="font-label-cta text-on-surface-variant">Field Label</label>
+<input class="w-full h-12 px-4 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="e.g., Warehouse Location" type="text">
+</div>
+<div class="space-y-2">
+<label class="font-label-cta text-on-surface-variant">Data Type</label>
+<select class="w-full h-12 px-4 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white" id="add-field-type">
+<option>Text</option>
+<option>Number</option>
+<option>Dropdown</option>
+<option>Date</option>
+<option>Currency</option>
+</select>
+</div>
+<div class="space-y-2 hidden" id="add-dropdown-values-container">
+<label class="font-label-cta text-on-surface-variant">Dropdown Values</label>
+<textarea class="w-full h-24 p-4 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter values separated by commas, e.g., Small, Medium, Large"></textarea>
+</div><div class="flex items-center justify-between py-2">
+<span class="font-label-cta text-on-surface-variant">Mandatory field</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="p-6 border-t border-border-subtle flex gap-3">
+<button class="flex-1 h-12 rounded-full border border-outline text-outline font-label-cta hover:bg-surface-container-low transition-colors" onclick="closeModal()">Cancel</button>
+<button class="flex-1 h-12 rounded-full bg-primary text-white font-label-cta active:scale-95 transition-transform" onclick="closeModal()">Save Field</button>
+</div>
+</div>
+</div>
+<!-- Edit Field Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 hidden" id="edit-field-modal">
+<div class="bg-surface-container-lowest w-full max-w-md rounded-xl shadow-xl overflow-hidden flex flex-col">
+<div class="p-6 border-b border-border-subtle flex justify-between items-center">
+<h2 class="font-headline-page text-headline-page-mobile text-primary">Edit Field</h2>
+<button class="material-symbols-outlined text-outline p-2 hover:bg-surface-container-low rounded-full" onclick="closeEditModal()">close</button>
+</div>
+<div class="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
+<div class="space-y-2">
+<label class="font-label-cta text-on-surface-variant">Field Label</label>
+<input class="w-full h-12 px-4 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="edit-field-label" type="text">
+</div>
+<div class="space-y-2">
+<label class="font-label-cta text-on-surface-variant">Data Type</label>
+<select class="w-full h-12 px-4 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white" id="edit-field-type">
+<option value="Text">Text</option>
+<option value="Number">Number</option>
+<option value="Dropdown">Dropdown</option>
+<option value="Date">Date</option>
+<option value="Currency">Currency</option>
+<option value="Numeric">Numeric</option>
+</select>
+</div>
+<div class="space-y-2 hidden" id="edit-dropdown-values-container">
+<label class="font-label-cta text-on-surface-variant">Dropdown Values</label>
+<textarea class="w-full h-24 p-4 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter values separated by commas, e.g., Small, Medium, Large"></textarea>
+</div><div class="flex items-center justify-between py-2">
+<span class="font-label-cta text-on-surface-variant">Mandatory field</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="edit-field-mandatory" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="p-6 border-t border-border-subtle flex gap-3">
+<button class="flex-1 h-12 rounded-full border border-outline text-outline font-label-cta hover:bg-surface-container-low transition-colors" onclick="closeEditModal()">Cancel</button>
+<button class="flex-1 h-12 rounded-full bg-primary text-white font-label-cta active:scale-95 transition-transform" onclick="closeEditModal()">Save Changes</button>
+</div>
+</div>
+</div>
+<script>
+  // Add Field Modal logic
+  function openModal() {
+    document.getElementById('field-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('field-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('field-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'field-modal') closeModal();
+  });
+
+  // Edit Field Modal logic
+  function openEditModal(label, type, mandatory) {
+    document.getElementById('edit-field-label').value = label;
+    document.getElementById('edit-field-type').value = type;
+    document.getElementById('edit-field-mandatory').checked = mandatory;
+    
+    document.getElementById('edit-field-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeEditModal() {
+    document.getElementById('edit-field-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('edit-field-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'edit-field-modal') closeEditModal();
+  });
+</script>
+
+
+<script>
+  function toggleDropdownValues(selectId, containerId) {
+    const select = document.getElementById(selectId);
+    const container = document.getElementById(containerId);
+    if (select && container) {
+      select.addEventListener('change', () => {
+        if (select.value.toUpperCase() === 'DROPDOWN') {
+          container.classList.remove('hidden');
+        } else {
+          container.classList.add('hidden');
+        }
+      });
+    }
+  }
+  // Initialize for both modals
+  toggleDropdownValues('add-field-type', 'add-dropdown-values-container');
+  toggleDropdownValues('edit-field-type', 'edit-dropdown-values-container');
+
+  // Update openEditModal to handle initial state
+  const originalOpenEditModal = window.openEditModal;
+  window.openEditModal = function(label, type, mandatory) {
+    originalOpenEditModal(label, type, mandatory);
+    const container = document.getElementById('edit-dropdown-values-container');
+    if (type.toUpperCase() === 'DROPDOWN') {
+      container.classList.remove('hidden');
+    } else {
+      container.classList.add('hidden');
+    }
+  };
+</script>
+
+
+
+</body></html>
