@@ -45,7 +45,7 @@ class InventoryCodeDialogFragment : DialogFragment() {
                     Log.d(TAG, "Session created successfully with ID: $sessionId")
                     dismiss()
                     findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToScanning(sessionId, code, autoStart = true)
+                        HomeFragmentDirections.actionHomeToInventoryStart(sessionId, code)
                     )
                 } catch (e: Exception) {
                     Log.e(TAG, "Error creating session", e)

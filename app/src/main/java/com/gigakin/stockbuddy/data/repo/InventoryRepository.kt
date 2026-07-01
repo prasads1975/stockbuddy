@@ -101,4 +101,23 @@ class InventoryRepository(
         }
         return results
     }
+
+    data class SessionStatsData(
+        val available: Int = 0,
+        val missing: Int = 0,
+        val excess: Int = 0
+    )
+
+    /** Real-time session statistics during scanning (no category filter). */
+    suspend fun computeSessionStats(sessionId: String): SessionStatsData {
+        val scanned = tagDao.getForSession(sessionId).map { it.rfidTagId }.toSet()
+        val master = linkedItemDao.getAll()
+        val masterByRfid = master.associateBy { it.rfidTagId }
+
+        val available = master.count { it.rfidTagId in scanned }
+        val missing = master.count { it.rfidTagId !in scanned }
+        val excess = scanned.count { it !in masterByRfid }
+
+        return SessionStatsData(available, missing, excess)
+    }
 }

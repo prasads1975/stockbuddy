@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="en"><head>
+<!DOCTYPE html><html class="light" lang="en" style="width: 390px; height: 664px; overflow: hidden; position: relative;"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>StockBuddy - Home</title>
@@ -124,20 +124,25 @@
   </head>
 <body class="bg-background text-on-surface min-h-screen flex flex-col">
 <!-- TopAppBar -->
-<header class="w-full top-0 sticky z-50 bg-surface dark:bg-surface-container-highest border-b border-border-subtle dark:border-outline-variant flex items-center px-margin-mobile h-14 w-full justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 flex items-center justify-center bg-primary rounded-lg">
-<!-- Placeholder for Gigakin Logo -->
-<img class="w-6 h-6" data-alt="A minimalist professional logo for Gigakin, featuring a stylized geometric 'G' symbol in bold white. The logo is clean and industrial, set against a deep navy blue square background. The design is modern, conveying high-tech reliability and corporate engineering excellence, perfectly suited for a logistics software environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCe4jrR2iFaf_kXMvDgjtTQtpMCbI8sLZ99oV9yPkh-a0GfhOEHjuUUV059kpJoDm8DkO7LEYs5R3OKVnjupn_I3OxkinBoBA8NQg9iC0TCx2Eg98uGPPiCS3HGNOIeSqK4qEakduGi_dzBzUymU6V53dkUhaJSQdwd3fMyLxpK4lSVCfsJxdQQrfhxblt7kp86UmK9NkOQYWIq-Zmdaf1V_np1s4v6UOxKeVY9-iKB3SgdthTpnebOXSl3S4wZF1aQUQqX3_7OyM">
+<header class="fixed top-0 left-0 w-full z-50 flex items-center px-4 h-14 bg-surface border-b border-border-subtle"><div class="flex items-center justify-between w-full">
+  <div class="flex items-center gap-4">
+    <button class="text-on-surface active:opacity-80 transition-colors" onclick="window.history.back()">
+      
+    </button>
+    <h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-on-surface font-bold">StockBuddy</h1>
+  </div>
+  <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95">
+    notifications
+  </button>
+</div></header><div class="mt-14 px-margin-mobile py-2 bg-surface-container-low flex items-center border-b border-border-subtle">
+<div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-bold tracking-widest uppercase">READER CONNECTED</span>
+<div class="flex-grow"></div>
 </div>
-<h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-primary dark:text-primary-fixed">StockBuddy</h1>
 </div>
-<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95">
-            notifications
-        </button>
-</header>
 <!-- Main Content Canvas -->
-<main class="flex-1 overflow-y-auto px-4 py-6">
+<main class="flex-1 overflow-y-auto px-4 py-6 pt-20">
 <!-- Welcome Section -->
 
 <!-- Bento Grid Menu -->
@@ -150,13 +155,13 @@
 <p class="font-label-caption opacity-80">Full audit and stock check</p>
 </div>
 <div class="absolute bottom-4 right-4 bg-on-primary/10 rounded-full p-2 group-hover:bg-on-primary/20 transition-colors">
-<span class="material-symbols-outlined">arrow_forward</span>
+
 </div>
 <!-- Subtle background visual -->
 <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
 </button>
 <!-- Linking Tile -->
-<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group">
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_13}}'">
 <div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-3 group-hover:bg-secondary transition-colors group-hover:text-on-secondary">
 <span class="material-symbols-outlined">link</span>
 </div>
@@ -170,14 +175,14 @@
 <span class="font-title-card text-title-card text-on-surface">Assets</span>
 </button>
 <!-- Reports Tile -->
-<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group">
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_15}}'">
 <div class="w-12 h-12 bg-surface-variant text-on-surface-variant rounded-full flex items-center justify-center mb-3 group-hover:bg-on-surface-variant transition-colors group-hover:text-surface">
 <span class="material-symbols-outlined">analytics</span>
 </div>
 <span class="font-title-card text-title-card text-on-surface">Reports</span>
 </button>
 <!-- Settings Tile -->
-<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group">
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_21}}'">
 <div class="w-12 h-12 bg-outline-variant text-on-surface-variant rounded-full flex items-center justify-center mb-3 group-hover:bg-outline transition-colors group-hover:text-surface">
 <span class="material-symbols-outlined">settings</span>
 </div>
@@ -190,12 +195,7 @@
 
 </main>
 <!-- Hardware Status Bar (Persistent) -->
-<div class="fixed bottom-20 left-0 right-0 z-40 px-4 pointer-events-none">
-<div class="bg-status-available text-white px-4 py-2 rounded-full shadow-lg flex items-center justify-center gap-2 max-w-xs mx-auto animate-pulse">
-<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">sensors</span>
-<span class="font-label-cta text-xs">Reader Connected</span>
-</div>
-</div>
+
 <!-- BottomNavBar -->
 
 <script>
@@ -216,7 +216,7 @@
 
 
 
-<div id="inventory-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+<div id="inventory-modal" class="fixed inset-0 z-[100] items-center justify-center p-4 flex hidden">
   <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('inventory-modal').classList.add('hidden')"></div>
   <div class="relative bg-surface-container-lowest w-full max-w-xs rounded-xl shadow-lg p-6 flex flex-col gap-4">
     <div class="flex flex-col gap-1">
@@ -229,10 +229,24 @@
     </div>
     <div class="flex gap-3 justify-end mt-2">
       <button onclick="document.getElementById('inventory-modal').classList.add('hidden')" class="px-4 py-2 font-label-cta text-primary hover:bg-primary/5 rounded-lg transition-colors">Cancel</button>
-      <button onclick="window.location.href = '{{DATA:SCREEN:SCREEN_15}}'" class="px-6 py-2 font-label-cta bg-primary text-on-primary rounded-lg shadow-sm active:scale-95 transition-transform">Start</button>
+      <button onclick="window.location.href = '{{DATA:SCREEN:SCREEN_20}}'" class="px-6 py-2 font-label-cta bg-primary text-on-primary rounded-lg shadow-sm active:scale-95 transition-transform h-14">Start</button>
     </div>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -9,6 +9,7 @@
         android:label="StockBuddy">
         <action android:id="@+id/action_home_to_linkingOptions" app:destination="@id/linkingOptionsFragment" />
         <action android:id="@+id/action_home_to_inventoryEntry" app:destination="@id/inventoryEntryFragment" />
+        <action android:id="@+id/action_home_to_inventoryStart" app:destination="@id/inventoryStartFragment" />
         <action android:id="@+id/action_home_to_scanning" app:destination="@id/scanningFragment" />
         <action android:id="@+id/action_home_to_assets" app:destination="@id/assetsFragment" />
         <action android:id="@+id/action_home_to_reportsList" app:destination="@id/reportsListFragment" />
@@ -35,6 +36,14 @@
         android:label="Inventory">
         <action android:id="@+id/action_to_scanning" app:destination="@id/scanningFragment" />
         <action android:id="@+id/action_to_reportsList" app:destination="@id/reportsListFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/inventoryStartFragment"
+        android:name="com.gigakin.stockbuddy.ui.inventory.InventoryStartFragment"
+        android:label="Start Scanning">
+        <argument android:name="sessionId" app:argType="string" />
+        <argument android:name="sessionCode" app:argType="string" />
+        <action android:id="@+id/action_inventoryStart_to_scanning" app:destination="@id/scanningFragment" />
     </fragment>
 
     <fragment android:id="@+id/scanningFragment"

@@ -47,7 +47,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "stockbuddy.db"
-                ).build().also { INSTANCE = it }
+                )
+                .fallbackToDestructiveMigration()  // v1→v2: MVP allows data wipe on schema change
+                .build().also { INSTANCE = it }
             }
     }
 }

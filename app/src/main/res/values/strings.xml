@@ -47,6 +47,11 @@
     <string name="inventory_code_description">Enter an Inventory Code to identify this session (e.g., \"3 June Morning\").</string>
     <string name="inventory_code_hint">Inventory Code (e.g. \"3 June Morning\")</string>
     <string name="inventory_scan_title">Inventory Scan</string>
+    <string name="inventory_start_title">Inventory Scan</string>
+    <string name="session_code_label">Session Code</string>
+    <string name="category_label">Category</string>
+    <string name="unique_tags_label">Unique Tags Scanned</string>
+    <string name="action_start_scanning">START SCANNING</string>
     <string name="action_back">Back</string>
     <string name="action_start">START</string>
     <string name="action_stop">STOP</string>

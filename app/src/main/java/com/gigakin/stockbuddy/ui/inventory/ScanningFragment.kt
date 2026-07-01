@@ -35,30 +35,6 @@ class ScanningFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.tvSessionCode.text = args.sessionCode
 
-        // Hide the activity's header and reader status bar since we show our own header and status at the top
-        val headerToolbar = requireActivity().findViewById<View>(com.gigakin.stockbuddy.R.id.toolbarHeader)
-        headerToolbar?.visibility = View.GONE
-
-        val activityView = requireActivity().findViewById<View>(com.gigakin.stockbuddy.R.id.readerStatusBarContainer)
-        activityView?.visibility = View.GONE
-
-        // Back button navigation - prevent going back during active scan
-        binding.btnBack.setOnClickListener {
-            val isScanning = viewModel.scanning.value ?: false
-            if (isScanning) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Stop Scanning")
-                    .setMessage("Scanning is in progress. Please stop the scanning session first before going back.")
-                    .setPositiveButton("Stop Scanning") { _, _ ->
-                        viewModel.stop(args.sessionId)
-                    }
-                    .setNegativeButton("Continue Scanning", null)
-                    .show()
-            } else {
-                findNavController().navigateUp()
-            }
-        }
-
         viewModel.categories.observe(viewLifecycleOwner) { cats ->
             val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
             binding.spinnerCategoryFilter.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, names)
@@ -68,31 +44,33 @@ class ScanningFragment : Fragment() {
             binding.tvScanCount.text = count.toString()
         }
 
-        // Observe scanning state to show/hide appropriate button
+        // Observe scan stats and update summary cards
+        viewModel.scanStats.observe(viewLifecycleOwner) { stats ->
+            binding.tvAvailableCount.text = stats.available.toString()
+            binding.tvMissingCount.text = stats.missing.toString()
+            binding.tvExcessCount.text = stats.excess.toString()
+        }
+
+        // Observe scanning state to show/hide appropriate button and summary cards
         viewModel.scanning.observe(viewLifecycleOwner) { isScanning ->
             if (isScanning) {
                 binding.btnStart.visibility = View.GONE
                 binding.btnStop.visibility = View.VISIBLE
+                binding.summaryCardsContainer.visibility = View.VISIBLE
             } else {
                 binding.btnStart.visibility = View.VISIBLE
                 binding.btnStop.visibility = View.GONE
+                binding.summaryCardsContainer.visibility = View.GONE
             }
         }
 
-        // Auto-start scanning if requested from the dialog (after observers are registered)
-        if (args.autoStart) {
-            viewModel.start(args.sessionId)
-        }
-
-        // FR-81a: disabled with a clear message when the reader isn't available, rather than
-        // allowed to proceed and fail silently.
+        // Reader status indicator
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val available = status == ReaderStatus.CONNECTED
-            binding.btnStart.isEnabled = available
-            binding.btnStart.text = if (available) getString(R.string.action_start)
-                else getString(R.string.action_start) + " (reader unavailable)"
+            // Button always enabled - uses real scanning if available, automatic simulation if not
+            binding.btnStart.isEnabled = true
+            binding.btnStart.text = getString(R.string.action_start)
 
-            // Update reader status indicator
+            // Update reader status text and icon
             val statusText = when (status) {
                 ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
                 ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
@@ -105,6 +83,7 @@ class ScanningFragment : Fragment() {
                 ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
                 ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
             }
+            // Update status icon color
             binding.readerStatusIcon.setColorFilter(requireContext().getColor(statusColor))
         }
 
@@ -117,16 +96,14 @@ class ScanningFragment : Fragment() {
                 ScanningFragmentDirections.actionScanningToResults(args.sessionId, args.sessionCode)
             )
         }
+
+        // Auto-start scanning if coming from InventoryStartFragment
+        if (args.autoStart) {
+            viewModel.start(args.sessionId)
+        }
     }
 
     override fun onDestroyView() {
-        // Restore the activity's header and reader status bar when leaving this screen
-        val headerToolbar = requireActivity().findViewById<View>(com.gigakin.stockbuddy.R.id.toolbarHeader)
-        headerToolbar?.visibility = View.VISIBLE
-
-        val activityView = requireActivity().findViewById<View>(com.gigakin.stockbuddy.R.id.readerStatusBarContainer)
-        activityView?.visibility = View.VISIBLE
-
         super.onDestroyView()
         _binding = null
     }

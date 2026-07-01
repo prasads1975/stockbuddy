@@ -1,261 +1,302 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/home_background">
 
+    <!-- Hardware Status Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:paddingTop="24dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@color/md_theme_surface">
 
-        <!-- Featured Inventory Card (spans full width) -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardInventoryFeatured"
+        <ImageView
+            android:id="@+id/readerStatusIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/sensors_24px"
+            android:tint="@color/status_available"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/tvReaderStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:text="@string/reader_connected" />
+    </LinearLayout>
+
+    <!-- Scrollable Tiles Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="176dp"
-            android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="@color/md_theme_primary"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:paddingTop="24dp">
 
+            <!-- Featured Inventory Card (spans full width) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardInventoryFeatured"
+                android:layout_width="match_parent"
+                android:layout_height="176dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/md_theme_primary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <!-- Top content -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/inventory_2_24px"
+                            android:tint="@color/md_theme_onPrimary"
+                            android:layout_marginBottom="8dp"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_inventory"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/md_theme_onPrimary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Full audit and stock check"
+                            android:textSize="12sp"
+                            android:textColor="@color/home_featured_subtitle"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Row 1: Linking and Assets -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:baselineAligned="false">
 
-                <!-- Top content -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <!-- Linking Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileLinking"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="@color/home_tile_background"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/home_tile_border"
+                    app:strokeWidth="1dp">
 
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/inventory_2_24px"
-                        android:tint="@color/md_theme_onPrimary"
-                        android:layout_marginBottom="8dp"
-                        android:contentDescription="@null" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_inventory"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/md_theme_onPrimary" />
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/home_icon_bg_blue"
+                            android:layout_marginBottom="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Full audit and stock check"
-                        android:textSize="12sp"
-                        android:textColor="@color/home_featured_subtitle"
-                        android:layout_marginTop="4dp" />
-                </LinearLayout>
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/link_24px"
+                                android:tint="#1B4F7C"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_linking"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/home_tile_title" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Assets Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileAssets"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardBackgroundColor="@color/home_tile_background"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/home_tile_border"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="20dp">
+
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/home_icon_bg_peach"
+                            android:layout_marginBottom="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/package_2_24px"
+                                android:tint="#D4851A"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_assets"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/home_tile_title" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Row 1: Linking and Assets -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp"
-            android:baselineAligned="false">
+            <!-- Row 2: Reports and Settings -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="80dp"
+                android:baselineAligned="false">
 
-            <!-- Linking Tile -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tileLinking"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardBackgroundColor="@color/home_tile_background"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="@color/home_tile_border"
-                app:strokeWidth="1dp">
+                <!-- Reports Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileReports"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="@color/home_tile_background"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/home_tile_border"
+                    app:strokeWidth="1dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="20dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="20dp">
 
-                    <FrameLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/home_icon_bg_blue"
-                        android:layout_marginBottom="12dp">
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/home_icon_bg_green"
+                            android:layout_marginBottom="12dp">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/link_24px"
-                            android:tint="#1B4F7C"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/analytics_24px"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_linking"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/home_tile_title" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_reports"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/home_tile_title" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            <!-- Assets Tile -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tileAssets"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardBackgroundColor="@color/home_tile_background"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="@color/home_tile_border"
-                app:strokeWidth="1dp">
+                <!-- Settings Tile -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tileSettings"
+                    android:layout_width="0dp"
+                    android:layout_height="140dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardBackgroundColor="@color/home_tile_background"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/home_tile_border"
+                    app:strokeWidth="1dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="20dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="20dp">
 
-                    <FrameLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/home_icon_bg_peach"
-                        android:layout_marginBottom="12dp">
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/home_icon_bg_grey"
+                            android:layout_marginBottom="12dp">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/package_2_24px"
-                            android:tint="#D4851A"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/settings_24px"
+                                android:tint="#616161"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null" />
+                        </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_assets"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/home_tile_title" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_settings"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/home_tile_title" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
         </LinearLayout>
-
-        <!-- Row 2: Reports and Settings -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="80dp"
-            android:baselineAligned="false">
-
-            <!-- Reports Tile -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tileReports"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardBackgroundColor="@color/home_tile_background"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="@color/home_tile_border"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="20dp">
-
-                    <FrameLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/home_icon_bg_green"
-                        android:layout_marginBottom="12dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/analytics_24px"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_reports"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/home_tile_title" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Settings Tile -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tileSettings"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardBackgroundColor="@color/home_tile_background"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="@color/home_tile_border"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="20dp">
-
-                    <FrameLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/home_icon_bg_grey"
-                        android:layout_marginBottom="12dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/settings_24px"
-                            android:tint="#616161"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_settings"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/home_tile_title" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

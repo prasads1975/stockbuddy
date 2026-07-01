@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>StockBuddy RFID - Inventory Scan</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <!-- Shared Tailwind Config -->
 <script id="tailwind-config">
       tailwind.config = {
@@ -133,21 +131,19 @@
 <!-- Top Navigation Bar -->
 <header class="w-full top-0 sticky z-40 bg-surface border-b border-border-subtle flex items-center px-margin-mobile h-14">
 <div class="flex items-center gap-4 w-full">
-<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full active:scale-95 duration-100">
-                arrow_back
-            </button>
+
 <h1 class="font-headline-page text-headline-page-mobile text-primary">Inventory Scan</h1>
 </div>
 </header>
 <!-- Hardware Status Bar (Persistent/Slim) -->
 <div class="bg-surface-container-lowest border-b border-border-subtle px-4 py-1.5 flex items-center justify-between">
 <div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-full bg-status-available"></span>
-<span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-wider">Reader Connected</span>
+<span class="material-symbols-outlined text-[16px] text-status-available">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-wider">Reader Disconnected</span>
 </div>
 <div class="flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px] text-on-surface-variant">battery_charging_full</span>
-<span class="font-label-caption text-label-caption text-on-surface-variant">88%</span>
+
+
 </div>
 </div>
 <main class="flex flex-col min-h-[calc(100vh-112px)] pb-32">
@@ -175,8 +171,8 @@
 <div class="absolute -left-8 -bottom-8 w-32 h-32 bg-secondary-container/20 rounded-full blur-3xl"></div>
 <span class="relative z-10 font-label-cta text-label-cta uppercase tracking-widest opacity-80 mb-2">Unique Tags Scanned</span>
 <div class="relative z-10 flex items-baseline gap-2">
-<span class="font-display-count text-display-count transition-all duration-300 transform scale-110 text-white" id="tag-counter">42</span>
-<span class="material-symbols-outlined text-primary-fixed-dim scanning-active" style="font-variation-settings: 'FILL' 1;">sensors</span>
+<span class="font-display-count text-display-count transition-all duration-300 transform text-white scale-100" id="tag-counter">124</span>
+<span class="material-symbols-outlined text-primary-fixed-dim scanning-active" style="font-variation-settings: &quot;FILL&quot; 1;">sensors</span>
 </div>
 <!-- Scanning Progress Visualizer -->
 <div class="absolute bottom-0 left-0 w-full h-1.5 bg-primary/20">
@@ -184,63 +180,33 @@
 </div>
 </div>
 <!-- Recent Activity/Log -->
-<div class="flex flex-col gap-2 mt-4">
-<div class="flex items-center justify-between px-1">
-<span class="font-label-cta text-label-cta text-on-surface-variant">Recent Detections</span>
-<span class="font-label-caption text-label-caption text-primary">Live View</span>
-</div>
-<!-- Activity List -->
-<div class="space-y-2">
-<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-3 flex items-center gap-3">
-<div class="w-1 bg-status-available self-stretch rounded-full"></div>
-<div class="flex-1">
-<h4 class="font-title-card text-title-card">RFID_TAG_9921_X</h4>
-<p class="font-body-metadata text-body-metadata text-on-surface-variant">Men's Apparel • Warehouse A</p>
-</div>
-<div class="text-right">
-<span class="font-label-caption text-label-caption text-on-surface-variant">Just now</span>
-</div>
-</div>
-<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-3 flex items-center gap-3 opacity-80">
-<div class="w-1 bg-status-available self-stretch rounded-full"></div>
-<div class="flex-1">
-<h4 class="font-title-card text-title-card">RFID_TAG_8812_B</h4>
-<p class="font-body-metadata text-body-metadata text-on-surface-variant">Footwear • Warehouse A</p>
-</div>
-<div class="text-right">
-<span class="font-label-caption text-label-caption text-on-surface-variant">2s ago</span>
-</div>
-</div>
-<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-3 flex items-center gap-3 opacity-60">
-<div class="w-1 bg-status-excess self-stretch rounded-full"></div>
-<div class="flex-1">
-<h4 class="font-title-card text-title-card">RFID_TAG_4401_M</h4>
-<p class="font-body-metadata text-body-metadata text-on-surface-variant">Accessories • Uncategorized</p>
-</div>
-<div class="text-right">
-<span class="font-label-caption text-label-caption text-on-surface-variant">5s ago</span>
-</div>
-</div>
-</div>
-</div>
+
+</section><section class="px-margin-mobile mt-4">
+    <div class="grid grid-cols-3 gap-3">
+        <!-- Available Card -->
+        <div class="bg-surface-container-low p-4 rounded-xl border-t-4 border-status-available shadow-sm flex flex-col items-center">
+            <span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-wider mb-1">Available</span>
+            <span class="font-title-card text-headline-page-mobile text-status-available">38</span>
+        </div>
+        <!-- Missing Card -->
+        <div class="bg-surface-container-low p-4 rounded-xl border-t-4 border-status-missing shadow-sm flex flex-col items-center">
+            <span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-wider mb-1">Missing</span>
+            <span class="font-title-card text-headline-page-mobile text-status-missing">4</span>
+        </div>
+        <!-- Excess Card -->
+        <div class="bg-surface-container-low p-4 rounded-xl border-t-4 border-status-excess shadow-sm flex flex-col items-center">
+            <span class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-wider mb-1">Excess</span>
+            <span class="font-title-card text-headline-page-mobile text-status-excess">1</span>
+        </div>
+    </div>
 </section>
 </main>
 <!-- Scanning Overlay / Visualization Placeholder -->
-<div class="fixed bottom-32 left-0 w-full px-margin-mobile pointer-events-none">
-<div class="h-16 overflow-hidden flex items-end justify-center gap-1">
-<!-- Simulated Waveform -->
-<div class="w-2 bg-primary rounded-full animate-[bounce_0.8s_infinite]" style="height: 20%"></div>
-<div class="w-2 bg-primary rounded-full animate-[bounce_1.2s_infinite]" style="height: 50%"></div>
-<div class="w-2 bg-primary rounded-full animate-[bounce_0.6s_infinite]" style="height: 80%"></div>
-<div class="w-2 bg-primary rounded-full animate-[bounce_1.5s_infinite]" style="height: 40%"></div>
-<div class="w-2 bg-primary rounded-full animate-[bounce_0.9s_infinite]" style="height: 60%"></div>
-<div class="w-2 bg-primary rounded-full animate-[bounce_1.1s_infinite]" style="height: 30%"></div>
-</div>
-</div>
+
 <!-- Primary Action Panel (Thumb-Zone) -->
 <div class="fixed bottom-0 w-full bg-surface-container-lowest p-margin-mobile border-t border-border-subtle z-50">
-<button class="w-full h-14 bg-error text-on-error rounded-xl font-label-cta text-[16px] uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg active:shadow-none">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">stop_circle</span>
+<button class="w-full h-14 bg-error text-on-error rounded-xl font-label-cta text-[16px] uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg active:shadow-none" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_15}}'">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">stop_circle</span>
             STOP SCANNING
         </button>
 </div>
@@ -285,4 +251,14 @@
             50% { transform: translateY(-10px); }
         }
     </style>
+
+
+
+
+
+
+
+
+
+
 </body></html>
