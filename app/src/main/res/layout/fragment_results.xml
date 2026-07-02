@@ -1,42 +1,459 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/md_theme_background">
 
-    <TextView
-        android:id="@+id/tvSessionTitle"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Spinner
-        android:id="@+id/spinnerCategoryFilter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp" />
+        <!-- Top App Bar (fixed-like positioning via header) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@android:color/transparent">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabIndicatorColor="?attr/colorPrimary" />
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="@string/action_back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:tint="@color/md_theme_onSurface" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerResults"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="@string/results_title"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_onSurface"
+                android:lineHeight="32sp" />
+        </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnExport"
-        style="@style/Widget.StockBuddy.PrimaryActionButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/export_title" />
+        <!-- Hardware Status Bar with border-bottom -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/transparent">
 
-</LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/readerStatusIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/sensors_24px"
+                    android:tint="@color/status_available"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/tvReaderStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:letterSpacing="0.05"
+                    android:lineHeight="16sp" />
+
+                <TextView
+                    android:id="@+id/tvReaderVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:alpha="0.7"
+                    android:lineHeight="16sp" />
+            </LinearLayout>
+
+            <!-- Border divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/md_theme_outline" />
+        </LinearLayout>
+
+        <!-- Scrollable Content Area -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Session Info Section (pt-4 = 16dp top padding) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="0dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_session"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:textColor="@color/md_theme_onSurfaceVariant"
+                        android:letterSpacing="0.05"
+                        android:lineHeight="16sp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipSessionCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="12dp"
+                        android:textSize="12sp"
+                        android:textColor="@color/md_theme_primary"
+                        android:checkable="false"
+                        app:chipBackgroundColor="@android:color/transparent"
+                        app:chipCornerRadius="12dp"
+                        app:chipMinHeight="24dp"
+                        app:chipStrokeWidth="0dp"
+                        app:ensureMinTouchTargetSize="false"
+                        tools:text="June 3 Morning" />
+                </LinearLayout>
+
+                <!-- KPI Cards Grid (pt-4 = 16dp top padding, gap-stack-gap = 8dp) -->
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="3"
+                    android:rowCount="1"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="24dp">
+
+                    <!-- Available Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_row="0"
+                        android:layout_column="0"
+                        android:layout_marginEnd="4dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/md_theme_outline"
+                        app:cardBackgroundColor="@color/md_theme_surfaceContainerLowest">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <!-- Status indicator -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@color/status_available"
+                                    android:layout_marginEnd="8dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/tab_available"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/md_theme_onSurfaceVariant"
+                                    android:lineHeight="16sp" />
+                            </LinearLayout>
+
+                            <!-- Count -->
+                            <TextView
+                                android:id="@+id/tvAvailableCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="48sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/status_available"
+                                android:letterSpacing="-0.05"
+                                android:lineHeight="56sp"
+                                tools:text="38" />
+
+                            <!-- Label with icon -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginTop="8dp">
+
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/check_circle_24px"
+                                    android:tint="@color/md_theme_onSurfaceVariant"
+                                    android:contentDescription="@null"
+                                    android:scaleType="fitXY" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_matched"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/md_theme_onSurfaceVariant"
+                                    android:layout_marginStart="4dp"
+                                    android:lineHeight="16sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Missing Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_row="0"
+                        android:layout_column="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/md_theme_outline"
+                        app:cardBackgroundColor="@color/md_theme_surfaceContainerLowest">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@color/status_missing"
+                                    android:layout_marginEnd="8dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/tab_missing"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/md_theme_onSurfaceVariant"
+                                    android:lineHeight="16sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvMissingCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="48sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/status_missing"
+                                android:letterSpacing="-0.05"
+                                android:lineHeight="56sp"
+                                tools:text="4" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginTop="8dp">
+
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/report_24px"
+                                    android:tint="@color/md_theme_onSurfaceVariant"
+                                    android:contentDescription="@null"
+                                    android:scaleType="fitXY" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_in_system"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/md_theme_onSurfaceVariant"
+                                    android:layout_marginStart="4dp"
+                                    android:lineHeight="16sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Excess Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_row="0"
+                        android:layout_column="2"
+                        android:layout_marginStart="4dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/md_theme_outline"
+                        app:cardBackgroundColor="@color/md_theme_surfaceContainerLowest">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@color/status_excess"
+                                    android:layout_marginEnd="8dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/tab_excess"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/md_theme_onSurfaceVariant"
+                                    android:lineHeight="16sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvExcessCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="48sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/status_excess"
+                                android:letterSpacing="-0.05"
+                                android:lineHeight="56sp"
+                                tools:text="2" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginTop="8dp">
+
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/warning_24px"
+                                    android:tint="@color/md_theme_onSurfaceVariant"
+                                    android:contentDescription="@null"
+                                    android:scaleType="fitXY" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_unregistered"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/md_theme_onSurfaceVariant"
+                                    android:layout_marginStart="4dp"
+                                    android:lineHeight="16sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </GridLayout>
+
+                <!-- Tabs Section (mt-6 = 24dp top margin) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="24dp"
+                    android:paddingBottom="16dp">
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        app:tabIndicatorColor="@color/md_theme_primary"
+                        app:tabIndicatorHeight="2dp"
+                        app:tabMode="fixed"
+                        app:tabTextColor="@color/md_theme_onSurfaceVariant"
+                        app:tabSelectedTextColor="@color/md_theme_primary"
+                        app:tabRippleColor="?attr/colorSurfaceVariant"
+                        app:tabGravity="fill" />
+                </LinearLayout>
+
+                <!-- Results List (mt-4 = 16dp, px-margin-mobile = 16dp, space-y-4 = 16dp gaps) -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerResults"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="100dp"
+                    android:clipToPadding="false" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- Export FAB (fixed bottom-24 right-6 = fixed, bottom: 96dp, right: 24dp) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabExport"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="96dp"
+        android:contentDescription="@string/action_export"
+        app:srcCompat="@drawable/ic_share"
+        app:fabCustomSize="56dp"
+        app:elevation="8dp"
+        app:pressedTranslationZ="12dp" />
+
+</FrameLayout>

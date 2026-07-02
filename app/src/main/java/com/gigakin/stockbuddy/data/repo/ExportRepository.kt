@@ -1,12 +1,14 @@
 package com.gigakin.stockbuddy.data.repo
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.content.FileProvider
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.util.JsonAttributes
 import com.opencsv.CSVWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -69,4 +71,21 @@ class ExportRepository(private val context: Context) {
      * changing this repository's public contract.
      */
     fun downloadedFilePath(file: File): String = file.absolutePath
+
+    /** Write CSV content to a user-selected URI (via document picker / SAF). */
+    fun writeCsvFileToUri(uri: Uri, rows: List<Array<String>>): Boolean {
+        return try {
+            context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                OutputStreamWriter(outputStream).use { writer ->
+                    CSVWriter(writer).use { csvWriter ->
+                        csvWriter.writeAll(rows.toMutableList())
+                    }
+                }
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 }

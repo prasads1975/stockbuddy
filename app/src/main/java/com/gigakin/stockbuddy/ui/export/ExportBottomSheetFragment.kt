@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
@@ -43,20 +43,48 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.tvTitle.text = getString(R.string.export_title)
 
-        binding.btnShare.setOnClickListener { lifecycleScope.launch { exportThen { file -> startActivity(android.content.Intent.createChooser(app.exportRepository.shareIntentFor(file), "Share report")) } } }
-        binding.btnDownload.setOnClickListener { lifecycleScope.launch { exportThen { file ->
-            Snackbar.make(binding.root, getString(R.string.download_success_format, app.exportRepository.downloadedFilePath(file)), Snackbar.LENGTH_LONG).show()
-        } } }
-    }
+        binding.btnClose.setOnClickListener { dismiss() }
 
-    private suspend fun exportThen(action: (java.io.File) -> Unit) {
-        val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
-        val fieldDefs = app.fieldConfigRepository.getFields()
-        val rows = app.exportRepository.buildCsv(results, fieldDefs)
-        val fileName = app.exportRepository.buildFileName(sessionCode)
-        val file = app.exportRepository.writeCsvFile(fileName, rows)
-        action(file)
-        dismiss()
+        // Download: Save to Downloads folder
+        binding.btnDownload.setOnClickListener {
+            lifecycleScope.launch {
+                try {
+                    val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
+                    val fieldDefs = app.fieldConfigRepository.getFields()
+                    val rows = app.exportRepository.buildCsv(results, fieldDefs)
+                    val fileName = app.exportRepository.buildFileName(sessionCode)
+                    app.exportRepository.writeCsvFile(fileName, rows)
+
+                    // Show confirmation dialog with file location
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getString(R.string.download_success))
+                        .setMessage(getString(R.string.download_location_format, fileName))
+                        .setPositiveButton(getString(R.string.action_ok)) { _, _ -> dismiss() }
+                        .show()
+                } catch (e: Exception) {
+                    Snackbar.make(binding.root, getString(R.string.download_failed), Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        // Share: Export to temp file and share
+        binding.btnShare.setOnClickListener {
+            lifecycleScope.launch {
+                try {
+                    val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
+                    val fieldDefs = app.fieldConfigRepository.getFields()
+                    val rows = app.exportRepository.buildCsv(results, fieldDefs)
+                    val fileName = app.exportRepository.buildFileName(sessionCode)
+                    val file = app.exportRepository.writeCsvFile(fileName, rows)
+                    startActivity(android.content.Intent.createChooser(app.exportRepository.shareIntentFor(file), "Share report"))
+                    dismiss()
+                } catch (e: Exception) {
+                    Snackbar.make(binding.root, getString(R.string.export_failed), Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        binding.btnCancel.setOnClickListener { dismiss() }
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

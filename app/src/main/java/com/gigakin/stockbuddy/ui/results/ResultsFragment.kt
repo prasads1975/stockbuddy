@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +16,7 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.FragmentResultsBinding
 import com.gigakin.stockbuddy.ui.export.ExportBottomSheetFragment
+import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S13 — Results Summary: Available/Missing/Excess tabs (FR-43), grouped by Barcode (FR-45). */
@@ -37,7 +38,28 @@ class ResultsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.tvSessionTitle.text = getString(R.string.results_title_format, args.sessionCode, "")
+        binding.tvTitle.text = getString(R.string.results_title)
+        binding.chipSessionCode.text = args.sessionCode
+
+        binding.btnBack.setOnClickListener { findNavController().navigateUp() }
+
+        app.scannerManager.status.observe(viewLifecycleOwner) { status ->
+            binding.readerStatusIcon.setColorFilter(
+                requireContext().getColor(
+                    when (status) {
+                        ReaderStatus.CONNECTED -> R.color.status_available
+                        ReaderStatus.NOT_CONNECTED -> android.R.color.holo_orange_light
+                        ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
+                    }
+                )
+            )
+            binding.tvReaderStatus.text = when (status) {
+                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
+                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
+                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
+            }
+            binding.tvReaderVersion.text = "UHF Reader v2.4"
+        }
 
         adapter = ResultGroupAdapter(requireContext())
         binding.recyclerResults.layoutManager = LinearLayoutManager(requireContext())
@@ -48,18 +70,6 @@ class ResultsFragment : Fragment() {
         binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_missing))
         binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tab_excess))
 
-        viewModel.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
-            val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
-            binding.spinnerCategoryFilter.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, names)
-            binding.spinnerCategoryFilter.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: android.widget.AdapterView<*>?, v: View?, position: Int, id: Long) {
-                    viewModel.setCategoryFilter(if (position == 0) null else names[position])
-                    renderCurrentTab()
-                }
-                override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
-            }
-        }
-
         binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) = renderCurrentTab()
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -69,7 +79,7 @@ class ResultsFragment : Fragment() {
         viewModel.filteredResults.observe(viewLifecycleOwner) { renderCurrentTab() }
         viewModel.load(args.sessionId)
 
-        binding.btnExport.setOnClickListener {
+        binding.fabExport.setOnClickListener {
             ExportBottomSheetFragment.newInstance(args.sessionId, args.sessionCode)
                 .show(parentFragmentManager, "export")
         }
@@ -78,10 +88,13 @@ class ResultsFragment : Fragment() {
     private fun renderCurrentTab() {
         val results = viewModel.currentResults()
 
-        // Update tab labels with counts
         val availableCount = results.count { it.status == InventoryRepository.Status.AVAILABLE }
         val missingCount = results.count { it.status == InventoryRepository.Status.MISSING }
         val excessCount = results.count { it.status == InventoryRepository.Status.EXCESS }
+
+        binding.tvAvailableCount.text = availableCount.toString()
+        binding.tvMissingCount.text = missingCount.toString()
+        binding.tvExcessCount.text = excessCount.toString()
 
         binding.tabs.getTabAt(0)?.text = "${getString(R.string.tab_available)} ($availableCount)"
         binding.tabs.getTabAt(1)?.text = "${getString(R.string.tab_missing)} ($missingCount)"

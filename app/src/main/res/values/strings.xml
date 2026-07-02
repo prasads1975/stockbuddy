@@ -62,16 +62,30 @@
     <string name="view_past_reports">View Past Reports</string>
 
     <!-- Results -->
+    <string name="results_title">Inventory Results</string>
+    <string name="label_session">SESSION</string>
     <string name="tab_available">Available</string>
     <string name="tab_missing">Missing</string>
     <string name="tab_excess">Excess</string>
+    <string name="label_matched">Matched</string>
+    <string name="label_in_system">In System</string>
+    <string name="label_unregistered">Unregistered</string>
     <string name="results_title_format">%1$s — %2$s</string>
     <string name="unrecognized_tag">(Unrecognized tag)</string>
 
     <!-- Export -->
     <string name="export_title">Export Report</string>
+    <string name="action_export">Export</string>
     <string name="action_share">Share</string>
     <string name="action_download">Download</string>
+    <string name="action_close">Close</string>
+    <string name="action_ok">OK</string>
+    <string name="export_download_desc">Save to local device storage</string>
+    <string name="export_share_desc">Send via email, WhatsApp, etc.</string>
+    <string name="download_success">Download Saved</string>
+    <string name="download_location_format">File saved to Downloads folder:\n%1$s</string>
+    <string name="download_failed">Failed to save file</string>
+    <string name="export_failed">Failed to export file</string>
     <string name="download_success_format">Saved to %1$s</string>
 
     <!-- Assets -->
