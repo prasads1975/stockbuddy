@@ -349,7 +349,7 @@
         android:layout_marginBottom="16dp"
         android:text="@string/action_start" />
 
-    <!-- STOP Button (shown when scanning) -->
+    <!-- STOP Button (shown when scanning) - Full width, centered layout -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStop"
         style="@style/Widget.Material3.Button"
@@ -363,6 +363,10 @@
         android:textColor="@color/md_theme_onError"
         android:text="@string/action_stop"
         app:icon="@drawable/stop_circle_24px"
-        app:iconTint="@color/md_theme_onError" />
+        app:iconTint="@color/md_theme_onError"
+        app:iconGravity="textStart"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:letterSpacing="0.05" />
 
 </LinearLayout>

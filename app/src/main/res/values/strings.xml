@@ -54,7 +54,8 @@
     <string name="action_start_scanning">START SCANNING</string>
     <string name="action_back">Back</string>
     <string name="action_start">START</string>
-    <string name="action_stop">STOP</string>
+    <string name="action_stop">STOP SCANNING</string>
+    <string name="action_create">CREATE</string>
     <string name="action_cancel">Cancel</string>
     <string name="scanned_count_format">%1$d tags scanned</string>
     <string name="filter_all_categories">All</string>
