@@ -1,6 +1,8 @@
 package com.gigakin.stockbuddy.ui.inventory
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentReportsListBinding
+import com.gigakin.stockbuddy.util.ReaderStatus
 import kotlinx.coroutines.launch
 
 private const val TAG = "ReportsListFragment"
@@ -21,6 +24,7 @@ class ReportsListFragment : Fragment() {
     private val binding get() = _binding!!
     private val app get() = requireActivity().application as StockBuddyApp
     private lateinit var adapter: SessionListAdapter
+    private var allSessions = emptyList<com.gigakin.stockbuddy.data.db.entity.InventorySessionEntity>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentReportsListBinding.inflate(inflater, container, false)
@@ -28,6 +32,28 @@ class ReportsListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Back button
+        binding.btnBack.setOnClickListener { findNavController().navigateUp() }
+
+        // Reader status bar
+        app.scannerManager.status.observe(viewLifecycleOwner) { status ->
+            binding.readerStatusIcon.setColorFilter(
+                requireContext().getColor(
+                    when (status) {
+                        ReaderStatus.CONNECTED -> com.gigakin.stockbuddy.R.color.status_available
+                        ReaderStatus.NOT_CONNECTED -> android.R.color.holo_orange_light
+                        ReaderStatus.NOT_AVAILABLE -> com.gigakin.stockbuddy.R.color.md_theme_onSurfaceVariant
+                    }
+                )
+            )
+            binding.tvReaderStatus.text = when (status) {
+                ReaderStatus.CONNECTED -> getString(com.gigakin.stockbuddy.R.string.reader_connected)
+                ReaderStatus.NOT_CONNECTED -> getString(com.gigakin.stockbuddy.R.string.reader_not_connected)
+                ReaderStatus.NOT_AVAILABLE -> getString(com.gigakin.stockbuddy.R.string.reader_not_available)
+            }
+        }
+
+        // Adapter setup
         adapter = SessionListAdapter { session ->
             findNavController().navigate(
                 ReportsListFragmentDirections.actionReportsToResults(session.id, session.code)
@@ -36,19 +62,38 @@ class ReportsListFragment : Fragment() {
         binding.recyclerSessions.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerSessions.adapter = adapter
 
-        // Debug: log all sessions in database
+        // Search functionality
+        binding.searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterSessions(s.toString())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        // Load sessions
         lifecycleScope.launch {
-            val allSessions = app.inventoryRepository.getAllSessions()
-            Log.d(TAG, "DEBUG: Total sessions in database = ${allSessions.size}")
+            val sessions = app.inventoryRepository.getAllSessions()
+            Log.d(TAG, "DEBUG: Total sessions in database = ${sessions.size}")
         }
 
         app.inventoryRepository.observeSessions().observe(viewLifecycleOwner) { sessions ->
             Log.d(TAG, "observeSessions callback: received ${sessions.size} sessions")
-            sessions.forEachIndexed { index, session ->
-                Log.d(TAG, "  [$index] Session(id=${session.id}, code=${session.code})")
-            }
-            adapter.submitList(sessions)
+            allSessions = sessions
+            filterSessions(binding.searchInput.text.toString())
+            binding.emptyState.visibility = if (sessions.isEmpty()) View.VISIBLE else View.GONE
         }
+    }
+
+    private fun filterSessions(query: String) {
+        val filtered = if (query.isBlank()) {
+            allSessions
+        } else {
+            allSessions.filter { session ->
+                session.code.contains(query, ignoreCase = true)
+            }
+        }
+        adapter.submitList(filtered)
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

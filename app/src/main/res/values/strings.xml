@@ -61,6 +61,12 @@
     <string name="filter_all_categories">All</string>
     <string name="view_past_reports">View Past Reports</string>
 
+    <!-- Reports List -->
+    <string name="reports_title">Inventory Reports</string>
+    <string name="search_reports_hint">Search reports by name or date...</string>
+    <string name="label_past_sessions">Past Sessions</string>
+    <string name="no_sessions_yet">No inventory sessions yet</string>
+
     <!-- Results -->
     <string name="results_title">Inventory Results</string>
     <string name="label_session">SESSION</string>

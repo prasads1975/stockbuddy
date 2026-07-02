@@ -1,5 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recyclerSessions"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/md_theme_background">
+
+    <!-- Top App Bar (sticky positioning via LinearLayout hierarchy) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@android:color/transparent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="@string/action_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:tint="@color/md_theme_primary" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="@string/reports_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_primary"
+            android:lineHeight="32sp" />
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+    </LinearLayout>
+
+    <!-- Reader Status Bar (sticky via layout hierarchy) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/surface_container_low">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/readerStatusIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/sensors_24px"
+                android:tint="@color/status_available"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/tvReaderStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:letterSpacing="0.05"
+                android:lineHeight="16sp"
+                android:text="@string/reader_connected" />
+        </LinearLayout>
+
+        <!-- Border divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/md_theme_outline" />
+    </LinearLayout>
+
+    <!-- Main Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+            <!-- Search Bar with Rounded Corners -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/surface_container_low">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center_vertical|start"
+                        android:layout_marginStart="16dp"
+                        android:src="@drawable/ic_search"
+                        android:tint="@color/md_theme_outline"
+                        android:contentDescription="@null" />
+
+                    <EditText
+                        android:id="@+id/searchInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/search_reports_hint"
+                        android:inputType="text"
+                        android:paddingStart="48dp"
+                        android:paddingEnd="16dp"
+                        android:textColor="@color/md_theme_onSurface"
+                        android:textColorHint="@color/md_theme_onSurfaceVariant"
+                        android:textSize="16sp"
+                        android:gravity="center_vertical"
+                        android:lines="1" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Past Sessions Label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_past_sessions"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:letterSpacing="0.05"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:lineHeight="16sp" />
+
+            <!-- Sessions RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSessions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty State Placeholder -->
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="48dp"
+                android:paddingBottom="48dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_sessions_yet"
+                    android:textSize="16sp"
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:alpha="0.6" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
