@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/inventory_scan_title"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/md_theme_primary" />
     </LinearLayout>
@@ -113,10 +113,20 @@
                 android:textColor="@color/md_theme_onSurfaceVariant"
                 android:layout_marginBottom="4dp" />
 
-            <Spinner
-                android:id="@+id/spinnerCategoryFilter"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCategoryFilter"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                android:text="@string/filter_all_categories"
+                android:textSize="14sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                app:strokeColor="@color/md_theme_onSurfaceVariant"
+                app:strokeWidth="1dp"
+                app:backgroundTint="@color/surface_container_low" />
         </LinearLayout>
     </LinearLayout>
 
@@ -202,6 +212,21 @@
                         android:contentDescription="@null" />
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- Progress bar at bottom -->
+            <View
+                android:id="@+id/progressBarBackground"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_gravity="bottom"
+                android:background="#1b3a5733" />
+
+            <View
+                android:id="@+id/progressBarFill"
+                android:layout_width="80dp"
+                android:layout_height="6dp"
+                android:layout_gravity="bottom"
+                android:background="@color/md_theme_primaryFixed" />
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -217,121 +242,94 @@
         android:spacing="12dp">
 
         <!-- Available Card -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
-            app:strokeWidth="4dp"
-            app:strokeColor="@color/status_available">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/shape_summary_card_available">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="12dp">
+                android:text="@string/tab_available"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="4dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/tab_available"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="@color/md_theme_onSurfaceVariant"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvAvailableCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/status_available"
-                    android:text="0" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvAvailableCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/status_available"
+                android:text="0" />
+        </LinearLayout>
 
         <!-- Missing Card -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
-            app:strokeWidth="4dp"
-            app:strokeColor="@color/md_theme_error">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/shape_summary_card_missing">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="12dp">
+                android:text="@string/tab_missing"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="4dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/tab_missing"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="@color/md_theme_onSurfaceVariant"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvMissingCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/md_theme_error"
-                    android:text="0" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvMissingCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_error"
+                android:text="0" />
+        </LinearLayout>
 
         <!-- Excess Card -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/md_theme_surfaceContainer"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
-            app:strokeWidth="4dp"
-            app:strokeColor="@color/status_excess">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="@drawable/shape_summary_card_excess">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="12dp">
+                android:text="@string/tab_excess"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="4dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/tab_excess"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="@color/md_theme_onSurfaceVariant"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvExcessCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/status_excess"
-                    android:text="0" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvExcessCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/status_excess"
+                android:text="0" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Spacer -->

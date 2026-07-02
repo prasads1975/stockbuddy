@@ -17,6 +17,7 @@
     <color name="md_theme_onPrimary">#FFFFFF</color>
     <color name="md_theme_primaryContainer">#1b3a57</color>
     <color name="md_theme_onPrimaryContainer">#87a4c6</color>
+    <color name="md_theme_primaryFixed">#acc9ed</color>                    <!-- Light blue for progress bar -->
 
     <!-- SECONDARY: Slate — accent for secondary actions -->
     <color name="md_theme_secondary">#496177</color>
@@ -39,6 +40,7 @@
     <color name="md_theme_onSurfaceVariant">#4F616E</color>
     <color name="md_theme_surfaceContainer">#EEF0EE</color>
     <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
+    <color name="surface_container_low">#f4f3f6</color>        <!-- Light container for summary cards -->
 
     <!-- OUTLINE: For borders and dividers — professional grey -->
     <color name="md_theme_outline">#7F8B87</color>

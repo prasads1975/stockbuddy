@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -14,7 +14,6 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentScanningBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /** S12 — Inventory Scanning: START/STOP (FR-33/36), real-time count (FR-34), category filter (FR-35). */
 class ScanningFragment : Fragment() {
@@ -27,6 +26,8 @@ class ScanningFragment : Fragment() {
         ViewModelFactory { ScanningViewModel(app.inventoryRepository, app.categoryRepository, app.scannerManager) }
     }
 
+    private var categories: List<String> = emptyList()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentScanningBinding.inflate(inflater, container, false)
         return binding.root
@@ -36,8 +37,7 @@ class ScanningFragment : Fragment() {
         binding.tvSessionCode.text = args.sessionCode
 
         viewModel.categories.observe(viewLifecycleOwner) { cats ->
-            val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
-            binding.spinnerCategoryFilter.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, names)
+            categories = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
         }
 
         viewModel.scanCount.observe(viewLifecycleOwner) { count ->
@@ -57,10 +57,15 @@ class ScanningFragment : Fragment() {
                 binding.btnStart.visibility = View.GONE
                 binding.btnStop.visibility = View.VISIBLE
                 binding.summaryCardsContainer.visibility = View.VISIBLE
+                // Start progress bar animation
+                startProgressBarAnimation()
             } else {
                 binding.btnStart.visibility = View.VISIBLE
                 binding.btnStop.visibility = View.GONE
                 binding.summaryCardsContainer.visibility = View.GONE
+                // Cancel progress bar animation
+                binding.progressBarFill.animate().cancel()
+                binding.progressBarFill.translationX = 0f
             }
         }
 
@@ -90,11 +95,17 @@ class ScanningFragment : Fragment() {
         binding.btnStart.setOnClickListener {
             viewModel.start(args.sessionId)
         }
+
         binding.btnStop.setOnClickListener {
             viewModel.stop(args.sessionId)
             findNavController().navigate(
                 ScanningFragmentDirections.actionScanningToResults(args.sessionId, args.sessionCode)
             )
+        }
+
+        // Category filter dropdown
+        binding.btnCategoryFilter.setOnClickListener { button ->
+            showCategoryDropdown(button)
         }
 
         // Auto-start scanning if coming from InventoryStartFragment
@@ -103,7 +114,37 @@ class ScanningFragment : Fragment() {
         }
     }
 
+    private fun showCategoryDropdown(anchorView: View) {
+        val popup = PopupMenu(requireContext(), anchorView)
+        categories.forEachIndexed { index, category ->
+            popup.menu.add(0, index, index, category)
+        }
+        popup.setOnMenuItemClickListener { item ->
+            binding.btnCategoryFilter.text = categories[item.itemId]
+            true
+        }
+        popup.show()
+    }
+
+    private fun startProgressBarAnimation() {
+        // Only animate if binding still exists
+        _binding?.let {
+            it.progressBarFill.animate()
+                .translationX(it.summaryCardsContainer.width.toFloat())
+                .setDuration(2000)
+                .withEndAction {
+                    // Check if binding still exists before recursing
+                    if (_binding != null) {
+                        _binding?.progressBarFill?.translationX = 0f
+                        startProgressBarAnimation()
+                    }
+                }
+                .start()
+        }
+    }
+
     override fun onDestroyView() {
+        _binding?.progressBarFill?.animate()?.cancel()
         super.onDestroyView()
         _binding = null
     }
