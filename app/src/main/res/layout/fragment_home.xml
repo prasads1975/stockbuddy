@@ -6,6 +6,57 @@
     android:orientation="vertical"
     android:background="@color/home_background">
 
+    <!-- Toolbar with StockBuddy Title -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/md_theme_surface">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <!-- App Icon -->
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/stockbuddy_app_icon"
+                android:contentDescription="@null"
+                android:scaleType="centerInside"
+                android:layout_marginEnd="12dp" />
+
+            <!-- App Name -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/app_name"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_onSurface" />
+
+            <!-- Notifications Icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_notifications"
+                android:tint="@color/md_theme_onSurfaceVariant"
+                android:contentDescription="@null"
+                android:scaleType="centerInside" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/md_theme_outline" />
+    </LinearLayout>
+
     <!-- Hardware Status Bar -->
     <LinearLayout
         android:layout_width="match_parent"

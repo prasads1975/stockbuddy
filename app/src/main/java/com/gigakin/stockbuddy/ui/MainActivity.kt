@@ -2,6 +2,7 @@ package com.gigakin.stockbuddy.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.findNavController
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.databinding.ActivityMainBinding
@@ -15,6 +16,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Suppress splash screen (install and immediately dismiss)
+        installSplashScreen().setKeepOnScreenCondition { false }
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
