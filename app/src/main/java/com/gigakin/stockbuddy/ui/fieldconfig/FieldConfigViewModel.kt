@@ -12,13 +12,14 @@ class FieldConfigViewModel(private val repository: FieldConfigRepository) : View
 
     val fields: LiveData<List<FieldDefinitionEntity>> = repository.observeFields()
 
-    fun applyTemplate(template: List<FieldDefinitionEntity>) = viewModelScope.launch {
-        repository.saveFields(template)
-    }
-
     fun addField(field: FieldDefinitionEntity) = viewModelScope.launch {
         val current = repository.getFields()
         repository.saveFields(current + field)
+    }
+
+    fun updateField(old: FieldDefinitionEntity, new: FieldDefinitionEntity) = viewModelScope.launch {
+        val current = repository.getFields()
+        repository.saveFields(current.map { if (it.key == old.key) new else it })
     }
 
     fun removeField(field: FieldDefinitionEntity) = viewModelScope.launch {

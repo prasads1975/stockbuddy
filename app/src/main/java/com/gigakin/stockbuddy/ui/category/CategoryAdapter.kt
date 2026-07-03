@@ -6,20 +6,42 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.databinding.ItemCategoryBinding
 
-class CategoryAdapter(private val onDelete: (CategoryEntity) -> Unit) : RecyclerView.Adapter<CategoryAdapter.VH>() {
+class CategoryAdapter(
+    private val onEdit: (CategoryEntity) -> Unit = {},
+    private val onDelete: (CategoryEntity) -> Unit = {}
+) : RecyclerView.Adapter<CategoryAdapter.VH>() {
     private var items: List<CategoryEntity> = emptyList()
-    fun submitList(list: List<CategoryEntity>) { items = list; notifyDataSetChanged() }
+    private var filteredItems: List<CategoryEntity> = emptyList()
 
-    inner class VH(val b: ItemCategoryBinding) : RecyclerView.ViewHolder(b.root)
+    fun submitList(list: List<CategoryEntity>) {
+        items = list
+        filteredItems = list
+        notifyDataSetChanged()
+    }
+
+    fun filter(query: String) {
+        filteredItems = if (query.isEmpty()) {
+            items
+        } else {
+            items.filter { it.name.contains(query, ignoreCase = true) }
+        }
+        notifyDataSetChanged()
+    }
+
+    inner class VH(val b: ItemCategoryBinding) : RecyclerView.ViewHolder(b.root) {
+        init {
+            b.btnEdit.setOnClickListener { onEdit(filteredItems[adapterPosition]) }
+            b.btnDelete.setOnClickListener { onDelete(filteredItems[adapterPosition]) }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         VH(ItemCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val cat = items[position]
+        val cat = filteredItems[position]
         holder.b.tvName.text = cat.name
-        holder.b.btnDelete.setOnClickListener { onDelete(cat) }
     }
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = filteredItems.size
 }

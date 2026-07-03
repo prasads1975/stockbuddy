@@ -114,14 +114,34 @@
 
     <!-- Categories -->
     <string name="categories_title">Categories</string>
+    <string name="categories_description">Manage inventory categories and hierarchies</string>
+    <string name="search_categories_hint">Search categories...</string>
     <string name="action_add_category">Add Category</string>
     <string name="error_demo_categories_limit">Demo limit reached (%1$d categories). Edit or delete an existing category to add a new one.</string>
     <string name="error_category_not_found_title">Category not in the system list</string>
     <string name="action_add_and_continue">Add &amp; Continue</string>
     <string name="action_pick_existing">Pick Existing</string>
+    <string name="dialog_add_category_title">Add New Category</string>
+    <string name="dialog_edit_category_title">Edit Category</string>
+    <string name="dialog_category_name_label">Category Name *</string>
+    <string name="dialog_category_hint">e.g., Plush Toys</string>
+    <string name="dialog_add_category_save">Add Category</string>
+    <string name="dialog_delete_category_title">Delete Category?</string>
+    <string name="dialog_delete_category_message">Are you sure you want to delete this category? This action cannot be undone.</string>
 
     <!-- Field Configuration -->
     <string name="field_config_title">Field Configuration</string>
+    <string name="field_config_fixed_fields">Fixed System Fields</string>
+    <string name="field_config_domain_fields">Domain-Specific Fields</string>
+    <string name="field_config_add_field">Add Custom Field</string>
+    <string name="field_config_edit_field">Edit Field</string>
+    <string name="action_add">Add Field</string>
+    <string name="action_save">Save</string>
+    <string name="field_config_system_label">System Label</string>
+    <string name="field_config_label_hint">Field Label (e.g., Retail Price)</string>
+    <string name="field_config_data_type">Data Type</string>
+    <string name="field_config_dropdown_values">Dropdown Values (comma-separated)</string>
+    <string name="field_config_mandatory">Mandatory field</string>
     <string name="template_toy_retail">Toy Retail: Price</string>
     <string name="template_jewellery">Jewellery: Net/Gross Weight, Purity</string>
     <string name="template_generic">Generic: none</string>
@@ -132,7 +152,14 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_categories">Categories</string>
+    <string name="settings_categories">Category Management</string>
+    <string name="settings_categories_desc">Organize inventory hierarchies and rules</string>
     <string name="settings_field_config">Field Configuration</string>
+    <string name="settings_field_config_desc">Define custom UHF data fields and labels</string>
+    <string name="settings_admin_section">Administrative Settings</string>
+    <string name="settings_app_section">Application Details</string>
     <string name="settings_app_info">App Info</string>
+    <string name="settings_license_status">License Status</string>
+    <string name="settings_license_status_placeholder">Active: MVP Demo Edition</string>
+    <string name="settings_license_verified">VERIFIED</string>
 </resources>
