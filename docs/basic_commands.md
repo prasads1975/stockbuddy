@@ -233,7 +233,7 @@ adb shell am start -n com.gigakin.stockbuddy/.ui.MainActivity
 ./gradlew -refresh-dependencies
 
 # 3. If Java version is wrong:
-export JAVA_HOME="/path/to/jdk17"
+export JAVA_HOME="C:\Users\prasa\.jdks\temurin-17.0.18"
 
 # 4. Check Java version
 java -version

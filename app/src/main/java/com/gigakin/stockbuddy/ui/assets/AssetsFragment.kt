@@ -8,11 +8,12 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
+import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 import com.gigakin.stockbuddy.databinding.FragmentAssetsBinding
+import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S09 — Assets: flat list (FR-61), search (FR-63), category filter (FR-67), live count (FR-64). */
@@ -32,10 +33,24 @@ class AssetsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = AssetsAdapter()
+        binding.btnBack.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
+
+        app.scannerManager.status.observe(viewLifecycleOwner) { status ->
+            val (colorRes, textRes) = when (status) {
+                ReaderStatus.CONNECTED -> R.color.status_available to R.string.reader_connected
+                ReaderStatus.NOT_CONNECTED -> R.color.status_excess to R.string.reader_not_connected
+                ReaderStatus.NOT_AVAILABLE -> R.color.reader_not_available to R.string.reader_not_available
+            }
+            binding.readerStatusIcon.setTint(requireContext().getColor(colorRes))
+            binding.tvReaderStatus.text = getString(textRes)
+        }
+
+        adapter = AssetsAdapter(
+            onEditClick = { item -> showEditDialog(item) },
+            onDeleteClick = { item -> confirmAndDeleteItem(item) }
+        )
         binding.recyclerAssets.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerAssets.adapter = adapter
-        binding.recyclerAssets.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
 
         binding.editSearch.addTextChangedListener { text -> viewModel.setQuery(text?.toString().orEmpty()) }
 
@@ -54,6 +69,22 @@ class AssetsFragment : Fragment() {
             adapter.submitList(items)
             binding.tvCount.text = getString(R.string.assets_count_format, items.size)
         }
+    }
+
+    private fun showEditDialog(item: LinkedItemEntity) {
+        val dialog = EditAssetDialogFragment.newInstance(item)
+        dialog.show(childFragmentManager, "edit_asset")
+    }
+
+    private fun confirmAndDeleteItem(item: LinkedItemEntity) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.action_delete)
+            .setMessage(R.string.delete_asset_confirm)
+            .setNegativeButton(R.string.action_cancel) { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton(R.string.action_delete) { _, _ ->
+                viewModel.deleteItem(item.rfidTagId)
+            }
+            .show()
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

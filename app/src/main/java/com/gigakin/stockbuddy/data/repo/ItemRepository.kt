@@ -21,7 +21,9 @@ class ItemRepository(
     fun search(query: String, category: String?): LiveData<List<LinkedItemEntity>> =
         linkedItemDao.search(query, category)
     suspend fun getAll(): List<LinkedItemEntity> = linkedItemDao.getAll()
+    suspend fun getByRfid(rfid: String): LinkedItemEntity? = linkedItemDao.getByRfid(rfid)
     suspend fun delete(item: LinkedItemEntity) = linkedItemDao.delete(item)
+    suspend fun update(item: LinkedItemEntity) = linkedItemDao.update(item)
 
     sealed class SaveResult {
         object Success : SaveResult()
@@ -63,6 +65,12 @@ class ItemRepository(
         // Demo item cap (Section 4, MVP Scope doc) — applies to manual Linking saves.
         if (linkedItemDao.count() >= DemoLimits.MAX_ITEMS) return SaveResult.DemoLimitReached
 
+        // FR-21: auto-upsert Product Master FIRST (before item insert) to satisfy FK constraint.
+        productRepository.upsertFromLinkedItem(
+            barcode, productName, category,
+            com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
+        )
+
         linkedItemDao.insert(
             LinkedItemEntity(
                 rfidTagId = rfidTagId,
@@ -71,12 +79,6 @@ class ItemRepository(
                 category = category,
                 attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
             )
-        )
-
-        // FR-21: auto-upsert Product Master, keyed by Barcode.
-        productRepository.upsertFromLinkedItem(
-            barcode, productName, category,
-            com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
         )
 
         return SaveResult.Success

@@ -4,16 +4,139 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:minHeight="48dp">
+    android:background="@android:color/white"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
 
-    <TextView android:id="@+id/tvName" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textSize="16sp" android:textStyle="bold" tools:text="Hot Wheels Track Set" />
-    <TextView android:id="@+id/tvBarcode" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textSize="13sp" android:textColor="?attr/colorOutline" tools:text="Barcode: 0000265423514" />
-    <TextView android:id="@+id/tvRfid" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textSize="13sp" android:fontFamily="monospace" tools:text="RFID: E28003241B4D419B1B673BD4" />
-    <TextView android:id="@+id/tvArticleId" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textSize="13sp" android:textColor="?attr/colorOutline" tools:text="Article ID: ART0001" />
+    <!-- Title + Edit/Delete Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_onSurface"
+            tools:text="Ergonomic Office Chair V2" />
+
+        <ImageButton
+            android:id="@+id/btnEdit"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="@string/action_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:tint="@color/md_theme_primary" />
+
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="@string/action_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:tint="@color/status_missing" />
+    </LinearLayout>
+
+    <!-- Barcode Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_barcode"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:letterSpacing="0.05" />
+
+        <TextView
+            android:id="@+id/tvBarcode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            tools:text="8801234567890" />
+    </LinearLayout>
+
+    <!-- Category + Price Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_category"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:letterSpacing="0.05" />
+
+        <TextView
+            android:id="@+id/tvCategory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            tools:text="Office Furniture" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="•"
+            android:textSize="14sp"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_price"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:letterSpacing="0.05" />
+
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            tools:text="$299.00" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/md_theme_outlineVariant"
+        android:layout_marginTop="12dp" />
 
 </LinearLayout>
