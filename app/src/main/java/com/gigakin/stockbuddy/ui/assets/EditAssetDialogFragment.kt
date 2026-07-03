@@ -29,11 +29,11 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
     private var editingItem: LinkedItemEntity? = null
 
     companion object {
-        private const val ARG_ITEM = "item"
+        private const val ARG_RFID = "rfid"
 
         fun newInstance(item: LinkedItemEntity) = EditAssetDialogFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(ARG_ITEM, item)
+                putString(ARG_RFID, item.rfidTagId)
             }
         }
     }
@@ -44,8 +44,13 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        editingItem = arguments?.getParcelable(ARG_ITEM)
-        editingItem?.let { populateForm(it) }
+        val rfidTagId = arguments?.getString(ARG_RFID)
+        if (rfidTagId != null) {
+            lifecycleScope.launch {
+                editingItem = app.itemRepository.getByRfid(rfidTagId)
+                editingItem?.let { populateForm(it) }
+            }
+        }
 
         // Load categories for dropdown
         viewModel.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
@@ -58,24 +63,25 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
         binding.btnCancelDialog.setOnClickListener { dismiss() }
 
         binding.btnSaveChanges.setOnClickListener {
-            val updated = captureFormData(editingItem!!)
-            viewModel.updateItem(updated)
-            dismiss()
+            editingItem?.let { item ->
+                val updated = captureFormData(item)
+                viewModel.updateItem(updated)
+                dismiss()
+            }
         }
     }
 
     private fun populateForm(item: LinkedItemEntity) {
         binding.editAssetName.setText(item.productName)
         binding.editAssetBarcode.setText(item.barcode)
-        binding.editAssetCategory.setText(item.categoryName)
+        binding.editAssetCategory.setText(item.category)
 
-        val attrs = item.attributesJson?.let { JsonAttributes.fromMap(it) } ?: emptyMap()
-        binding.editAssetPrice.setText(attrs["Price"]?.toString() ?: "")
-        binding.editAssetArticleId.setText(item.articleId ?: "")
+        val attrs = JsonAttributes.toMap(item.attributesJson)
+        binding.editAssetPrice.setText(attrs["Price"] ?: "")
     }
 
     private fun captureFormData(original: LinkedItemEntity): LinkedItemEntity {
-        val attrs = original.attributesJson?.let { JsonAttributes.fromMap(it) } ?: mutableMapOf()
+        val attrs = JsonAttributes.toMap(original.attributesJson).toMutableMap()
         val price = binding.editAssetPrice.text?.toString()
         if (!price.isNullOrBlank()) {
             attrs["Price"] = price
@@ -84,9 +90,8 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
         return original.copy(
             productName = binding.editAssetName.text?.toString() ?: original.productName,
             barcode = binding.editAssetBarcode.text?.toString() ?: original.barcode,
-            categoryName = binding.editAssetCategory.text?.toString() ?: original.categoryName,
-            articleId = binding.editAssetArticleId.text?.toString().takeIf { !it.isNullOrBlank() },
-            attributesJson = JsonAttributes.toMap(attrs)
+            category = binding.editAssetCategory.text?.toString() ?: original.category,
+            attributesJson = JsonAttributes.fromMap(attrs)
         )
     }
 

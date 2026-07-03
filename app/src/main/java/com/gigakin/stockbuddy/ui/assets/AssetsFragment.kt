@@ -41,7 +41,10 @@ class AssetsFragment : Fragment() {
                 ReaderStatus.NOT_CONNECTED -> R.color.status_excess to R.string.reader_not_connected
                 ReaderStatus.NOT_AVAILABLE -> R.color.reader_not_available to R.string.reader_not_available
             }
-            binding.readerStatusIcon.setTint(requireContext().getColor(colorRes))
+            androidx.core.widget.ImageViewCompat.setImageTintList(
+                binding.readerStatusIcon,
+                androidx.core.content.res.ResourcesCompat.getColorStateList(requireContext().resources, colorRes, null)
+            )
             binding.tvReaderStatus.text = getString(textRes)
         }
 
@@ -82,7 +85,7 @@ class AssetsFragment : Fragment() {
             .setMessage(R.string.delete_asset_confirm)
             .setNegativeButton(R.string.action_cancel) { dialog, _ -> dialog.dismiss() }
             .setPositiveButton(R.string.action_delete) { _, _ ->
-                viewModel.deleteItem(item.rfidTagId)
+                viewModel.deleteItem(item)
             }
             .show()
     }

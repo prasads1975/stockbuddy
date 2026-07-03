@@ -170,6 +170,9 @@ class IndividualLinkingFragment : Fragment() {
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.DemoLimitReached -> {
                 Snackbar.make(binding.root, getString(R.string.error_demo_items_limit, com.gigakin.stockbuddy.util.DemoLimits.MAX_ITEMS), Snackbar.LENGTH_LONG).show()
             }
+            is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.DatabaseError -> {
+                Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
+            }
             null -> {}
         }
         viewModel.consumeSaveResult()

@@ -1,6 +1,7 @@
 package com.gigakin.stockbuddy.ui.assets
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
@@ -15,8 +16,8 @@ class AssetsViewModel(
     val categoryRepository: CategoryRepository
 ) : ViewModel() {
 
-    private val query = androidx.lifecycle.MutableLiveData("")
-    private val category = androidx.lifecycle.MutableLiveData<String?>(null)
+    private val query = MutableLiveData("")
+    private val category = MutableLiveData<String?>(null)
 
     val items: LiveData<List<LinkedItemEntity>> =
         query.switchMap { q -> itemRepository.search(q, category.value) }
@@ -24,15 +25,15 @@ class AssetsViewModel(
     fun setQuery(q: String) { query.value = q }
     fun setCategory(c: String?) { category.value = c; query.value = query.value }
 
-    fun deleteItem(rfidTagId: String) {
+    fun deleteItem(item: LinkedItemEntity) {
         viewModelScope.launch {
-            itemRepository.deleteItem(rfidTagId)
+            itemRepository.delete(item)
         }
     }
 
     fun updateItem(item: LinkedItemEntity) {
         viewModelScope.launch {
-            itemRepository.updateLinkedItem(item)
+            itemRepository.update(item)
         }
     }
 }

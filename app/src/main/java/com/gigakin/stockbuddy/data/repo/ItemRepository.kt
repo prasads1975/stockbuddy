@@ -30,6 +30,7 @@ class ItemRepository(
         data class ValidationError(val fieldErrors: Map<String, String>) : SaveResult()
         object DuplicateRfid : SaveResult()
         object DemoLimitReached : SaveResult()
+        data class DatabaseError(val message: String) : SaveResult()
     }
 
     /**
@@ -65,23 +66,27 @@ class ItemRepository(
         // Demo item cap (Section 4, MVP Scope doc) — applies to manual Linking saves.
         if (linkedItemDao.count() >= DemoLimits.MAX_ITEMS) return SaveResult.DemoLimitReached
 
-        // FR-21: auto-upsert Product Master FIRST (before item insert) to satisfy FK constraint.
-        productRepository.upsertFromLinkedItem(
-            barcode, productName, category,
-            com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
-        )
-
-        linkedItemDao.insert(
-            LinkedItemEntity(
-                rfidTagId = rfidTagId,
-                productName = productName,
-                barcode = barcode,
-                category = category,
-                attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
+        return try {
+            // FR-21: auto-upsert Product Master FIRST (before item insert) to satisfy FK constraint.
+            productRepository.upsertFromLinkedItem(
+                barcode, productName, category,
+                com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
             )
-        )
 
-        return SaveResult.Success
+            linkedItemDao.insert(
+                LinkedItemEntity(
+                    rfidTagId = rfidTagId,
+                    productName = productName,
+                    barcode = barcode,
+                    category = category,
+                    attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
+                )
+            )
+
+            SaveResult.Success
+        } catch (e: Exception) {
+            SaveResult.DatabaseError("Failed to save link: ${e.message ?: "Unknown error"}")
+        }
     }
 
     data class BulkImportResult(val inserted: Int, val updated: Int, val rejected: Int, val reasons: List<String>)

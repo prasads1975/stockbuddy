@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 import com.gigakin.stockbuddy.databinding.ItemAssetBinding
+import com.gigakin.stockbuddy.util.JsonAttributes
 
 /** FR-62: item cards show fixed fields (including mandatory Article ID) + domain-specific fields. */
 class AssetsAdapter(
@@ -28,14 +29,14 @@ class AssetsAdapter(
         val item = items[position]
         holder.b.tvName.text = item.productName
         holder.b.tvBarcode.text = item.barcode
-        holder.b.tvCategory.text = item.categoryName
-        holder.b.tvPrice.text = item.attributesJson?.let { extractPrice(it) } ?: "—"
+        holder.b.tvCategory.text = item.category
+        holder.b.tvPrice.text = extractPrice(item.attributesJson)
     }
 
     private fun extractPrice(attributesJson: String): String {
         return try {
-            val map = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributesJson)
-            map["Price"]?.toString() ?: "—"
+            val map = JsonAttributes.toMap(attributesJson)
+            map["Price"] ?: "—"
         } catch (e: Exception) {
             "—"
         }
