@@ -58,7 +58,7 @@
         android:layout_marginBottom="4dp">
 
         <TextView
-            android:layout_width="56dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:text="@string/label_barcode"
             android:textSize="10sp"
@@ -78,22 +78,25 @@
             tools:text="8801234567890" />
     </LinearLayout>
 
-    <!-- Category + Price Row -->
+    <!-- Category Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
 
         <TextView
-            android:layout_width="56dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:text="@string/label_category"
             android:textSize="10sp"
             android:textStyle="bold"
             android:textAllCaps="true"
             android:textColor="@color/md_theme_onSurfaceVariant"
-            android:letterSpacing="0.05" />
+            android:letterSpacing="0.05"
+            android:ellipsize="end"
+            android:maxLines="1" />
 
         <TextView
             android:id="@+id/tvCategory"
@@ -103,34 +106,14 @@
             android:textSize="14sp"
             android:textColor="@color/md_theme_onSurfaceVariant"
             tools:text="Office Furniture" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="•"
-            android:textSize="14sp"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
-
-        <TextView
-            android:layout_width="56dp"
-            android:layout_height="wrap_content"
-            android:text="@string/label_price"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            android:letterSpacing="0.05" />
-
-        <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            tools:text="$299.00" />
     </LinearLayout>
+
+    <!-- Dynamic Custom Fields Container -->
+    <LinearLayout
+        android:id="@+id/dynamicFieldsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
     <!-- Divider -->
     <View

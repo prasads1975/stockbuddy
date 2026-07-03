@@ -145,12 +145,11 @@
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Total Items Label -->
+            <!-- Total Items Count + Category Filter Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
                 <TextView
@@ -164,10 +163,28 @@
                     android:textAllCaps="false"
                     tools:text="Total: 42 Items" />
 
-                <Spinner
-                    android:id="@+id/spinnerCategoryFilter"
+                <!-- Category Label + Dropdown Column -->
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_category"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:textColor="@color/md_theme_onSurfaceVariant"
+                        android:letterSpacing="0.05"
+                        android:layout_marginBottom="4dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerCategoryFilter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Asset List -->

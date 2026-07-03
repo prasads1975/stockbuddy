@@ -47,6 +47,11 @@ class ItemRepository(
         rfidTagId: String,
         attributes: Map<String, String>
     ): SaveResult {
+        android.util.Log.d("ItemRepository", "saveLinkedItem called with ${attributes.size} attributes")
+        attributes.forEach { (k, v) ->
+            android.util.Log.d("ItemRepository", "  Attribute: '$k' = '$v'")
+        }
+
         val errors = mutableMapOf<String, String>()
         if (productName.isBlank()) errors["name"] = "Required"
         if (barcode.isBlank()) errors["barcode"] = "Required"
@@ -68,21 +73,25 @@ class ItemRepository(
         if (linkedItemDao.count() >= DemoLimits.MAX_ITEMS) return SaveResult.DemoLimitReached
 
         return try {
+            val attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
+            android.util.Log.d("ItemRepository", "Converted attributes to JSON: $attributesJson")
+
             // FR-21: auto-upsert Product Master FIRST (before item insert) to satisfy FK constraint.
             productRepository.upsertFromLinkedItem(
-                barcode, productName, category,
-                com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
+                barcode, productName, category, attributesJson
             )
+            android.util.Log.d("ItemRepository", "Product upserted successfully")
 
-            linkedItemDao.insert(
-                LinkedItemEntity(
-                    rfidTagId = rfidTagId,
-                    productName = productName,
-                    barcode = barcode,
-                    category = category,
-                    attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
-                )
+            val entity = LinkedItemEntity(
+                rfidTagId = rfidTagId,
+                productName = productName,
+                barcode = barcode,
+                category = category,
+                attributesJson = attributesJson
             )
+            android.util.Log.d("ItemRepository", "Inserting LinkedItemEntity with attributesJson: ${entity.attributesJson}")
+            linkedItemDao.insert(entity)
+            android.util.Log.d("ItemRepository", "LinkedItem inserted successfully")
 
             SaveResult.Success
         } catch (e: android.database.sqlite.SQLiteConstraintException) {

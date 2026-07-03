@@ -96,7 +96,7 @@
 
     <!-- Assets -->
     <string name="assets_title">Assets</string>
-    <string name="search_hint">Name, Barcode, RFID, or Article ID</string>
+    <string name="search_hint">Name, Barcode, or RFID</string>
     <string name="assets_count_format">Total: %1$d items</string>
     <string name="label_barcode">Barcode</string>
     <string name="label_category">Category</string>

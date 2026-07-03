@@ -48,14 +48,21 @@ class AssetsFragment : Fragment() {
             binding.tvReaderStatus.text = getString(textRes)
         }
 
-        adapter = AssetsAdapter(
-            onEditClick = { item -> showEditDialog(item) },
-            onDeleteClick = { item -> confirmAndDeleteItem(item) }
-        )
         binding.recyclerAssets.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerAssets.adapter = adapter
-
         binding.editSearch.addTextChangedListener { text -> viewModel.setQuery(text?.toString().orEmpty()) }
+
+        // Set up adapter with dynamic field definitions
+        app.fieldConfigRepository.observeFields().observe(viewLifecycleOwner) { fieldDefs ->
+            adapter = AssetsAdapter(
+                fieldDefs = fieldDefs,
+                onEditClick = { item -> showEditDialog(item) },
+                onDeleteClick = { item -> confirmAndDeleteItem(item) }
+            )
+            binding.recyclerAssets.adapter = adapter
+
+            // Submit current items when adapter changes
+            viewModel.items.value?.let { adapter.submitList(it) }
+        }
 
         viewModel.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
             val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
@@ -69,7 +76,9 @@ class AssetsFragment : Fragment() {
         }
 
         viewModel.items.observe(viewLifecycleOwner) { items ->
-            adapter.submitList(items)
+            if (::adapter.isInitialized) {
+                adapter.submitList(items)
+            }
             binding.tvCount.text = getString(R.string.assets_count_format, items.size)
         }
     }

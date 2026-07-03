@@ -37,6 +37,7 @@
 
     <!-- Product Name -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutAssetName"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,6 +52,7 @@
 
     <!-- Barcode -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutAssetBarcode"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,6 +68,7 @@
 
     <!-- Category -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutAssetCategory"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -79,64 +82,38 @@
             android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Price & Article ID (2-column grid) -->
+    <!-- Dynamic Custom Fields Container -->
+    <LinearLayout
+        android:id="@+id/dynamicFieldsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Buttons (Side by Side) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:baselineAligned="false">
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:hint="@string/edit_asset_price_label">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editAssetPrice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/edit_asset_article_id_label">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editAssetArticleId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <!-- Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSaveChanges"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="@string/action_save_changes"
-            android:layout_marginBottom="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelDialog"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
             android:text="@string/action_cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveChanges"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="@string/action_save" />
     </LinearLayout>
 
 </LinearLayout>

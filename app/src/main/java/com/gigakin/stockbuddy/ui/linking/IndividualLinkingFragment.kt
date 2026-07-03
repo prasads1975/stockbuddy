@@ -103,6 +103,26 @@ class IndividualLinkingFragment : Fragment() {
         binding.btnSaveLink.setOnClickListener { attemptSave() }
 
         viewModel.saveResult.observe(viewLifecycleOwner) { result -> handleSaveResult(result) }
+
+        observeReaderStatus()
+    }
+
+    private fun observeReaderStatus() {
+        app.scannerManager.status.observe(viewLifecycleOwner) { status ->
+            val statusText = when (status) {
+                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
+                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
+                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
+            }
+            binding.tvReaderStatus.text = statusText
+
+            val statusColor = when (status) {
+                ReaderStatus.CONNECTED -> R.color.status_available
+                ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
+                ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
+            }
+            binding.iconReaderStatus.setColorFilter(requireContext().getColor(statusColor))
+        }
     }
 
     private fun renderDynamicFields(defs: List<FieldDefinitionEntity>) {
@@ -169,10 +189,28 @@ class IndividualLinkingFragment : Fragment() {
             return
         }
 
+        // Check mandatory custom fields
+        var hasMissingMandatory = false
+        currentFieldDefs.filter { it.mandatory && it.showOnLinking }.forEach { def ->
+            val view = dynamicFieldViews[def.key]
+            val value = view?.text?.toString()?.trim().orEmpty()
+            if (value.isBlank()) {
+                (view?.parent as? TextInputLayout)?.error = "Required"
+                hasMissingMandatory = true
+            }
+        }
+
+        if (hasMissingMandatory) {
+            return
+        }
+
         val attributes = mutableMapOf<String, String>()
         dynamicFieldViews.forEach { (key, view) ->
-            attributes[key] = view.text?.toString()?.trim().orEmpty()
+            val value = view.text?.toString()?.trim().orEmpty()
+            attributes[key] = value
+            android.util.Log.d("IndividualLinking", "Custom field '$key' = '$value'")
         }
+        android.util.Log.d("IndividualLinking", "Total custom fields collected: ${attributes.size}")
 
         viewModel.save(name, barcode, category, rfid, attributes)
     }
