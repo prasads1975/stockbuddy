@@ -84,8 +84,17 @@ class ItemRepository(
             )
 
             SaveResult.Success
+        } catch (e: android.database.sqlite.SQLiteConstraintException) {
+            val userMessage = when {
+                e.message?.contains("FOREIGN KEY", ignoreCase = true) == true ->
+                    "The category doesn't exist. Please create it in Settings → Categories first."
+                e.message?.contains("UNIQUE", ignoreCase = true) == true ->
+                    "This RFID tag is already linked to another item."
+                else -> "Unable to save item. Please check all fields are filled correctly."
+            }
+            SaveResult.DatabaseError(userMessage)
         } catch (e: Exception) {
-            SaveResult.DatabaseError("Failed to save link: ${e.message ?: "Unknown error"}")
+            SaveResult.DatabaseError("Unable to save item. Please try again.")
         }
     }
 
