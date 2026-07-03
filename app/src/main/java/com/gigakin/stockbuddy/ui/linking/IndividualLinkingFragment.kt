@@ -64,12 +64,17 @@ class IndividualLinkingFragment : Fragment() {
 
         viewModel.categories.observe(viewLifecycleOwner) { cats ->
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, cats.map { it.name })
-            (binding.layoutCategory.editText as? AutoCompleteTextView)?.setAdapter(adapter)
+            val autoComplete = binding.layoutCategory.editText as? AutoCompleteTextView
+            if (autoComplete?.adapter == null) {
+                autoComplete?.setAdapter(adapter)
+            }
         }
 
         viewModel.fieldDefs.observe(viewLifecycleOwner) { defs ->
-            currentFieldDefs = defs
-            renderDynamicFields(defs)
+            if (defs != currentFieldDefs) {
+                currentFieldDefs = defs
+                renderDynamicFields(defs)
+            }
         }
 
         // RFID scan button
@@ -101,27 +106,34 @@ class IndividualLinkingFragment : Fragment() {
     }
 
     private fun renderDynamicFields(defs: List<FieldDefinitionEntity>) {
+        val visibleDefs = defs.filter { it.showOnLinking }
+
+        // Only rebuild if the field count or keys have changed
+        if (dynamicFieldViews.size == visibleDefs.size &&
+            dynamicFieldViews.keys == visibleDefs.map { it.key }.toSet()) {
+            return
+        }
+
         binding.dynamicFieldsContainer.removeAllViews()
         dynamicFieldViews.clear()
-        defs.filter { it.showOnLinking }.forEach { def ->
+
+        visibleDefs.forEach { def ->
             if (def.type == "DROPDOWN") {
-                // FR-77i/NFR-52: DROPDOWN fields render as ExposedDropdownMenu (spinner-like)
-                val til = TextInputLayout(requireContext(), null, com.google.android.material.R.attr.textInputFilledStyle).apply {
+                val til = TextInputLayout(requireContext()).apply {
                     hint = def.label + if (def.mandatory) " *" else ""
                     layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                     setPadding(0, 8, 0, 8)
-                    setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_FILLED)
+                    boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
                 }
                 val options = def.dropdownOptionsCsv?.split(",")?.map { it.trim() } ?: emptyList()
                 val autoComplete = AutoCompleteTextView(requireContext()).apply {
-                    inputType = android.text.InputType.TYPE_NULL  // Prevent keyboard; dropdown only
+                    inputType = android.text.InputType.TYPE_NULL
                     setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options))
                 }
                 til.addView(autoComplete)
                 binding.dynamicFieldsContainer.addView(til)
                 dynamicFieldViews[def.key] = autoComplete
             } else {
-                // TEXT, NUMBER, DATE types: standard TextInputEditText
                 val til = TextInputLayout(requireContext()).apply {
                     hint = def.label + if (def.mandatory) " *" else ""
                     layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -149,8 +161,18 @@ class IndividualLinkingFragment : Fragment() {
         val category = (binding.layoutCategory.editText?.text?.toString() ?: "").trim()
         val rfid = binding.editRfid.text?.toString()?.trim().orEmpty()
 
-        // All domain-specific fields (from field_definitions)
-        val attributes = dynamicFieldViews.mapValues { (_, v) -> v.text?.toString()?.trim().orEmpty() }
+        if (name.isBlank() || barcode.isBlank() || category.isBlank() || rfid.isBlank()) {
+            if (name.isBlank()) binding.layoutName.error = "Required"
+            if (barcode.isBlank()) binding.layoutBarcode.error = "Required"
+            if (category.isBlank()) binding.layoutCategory.error = "Required"
+            if (rfid.isBlank()) binding.layoutRfid.error = "Required"
+            return
+        }
+
+        val attributes = mutableMapOf<String, String>()
+        dynamicFieldViews.forEach { (key, view) ->
+            attributes[key] = view.text?.toString()?.trim().orEmpty()
+        }
 
         viewModel.save(name, barcode, category, rfid, attributes)
     }
@@ -160,22 +182,28 @@ class IndividualLinkingFragment : Fragment() {
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.Success -> {
                 Snackbar.make(binding.root, "Item saved", Snackbar.LENGTH_SHORT).show()
                 clearForm()
+                viewModel.consumeSaveResult()
             }
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.ValidationError -> {
                 applyFieldErrors(result.fieldErrors)
+                viewModel.consumeSaveResult()
             }
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.DuplicateRfid -> {
                 binding.layoutRfid.error = getString(R.string.error_rfid_duplicate)
+                viewModel.consumeSaveResult()
             }
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.DemoLimitReached -> {
                 Snackbar.make(binding.root, getString(R.string.error_demo_items_limit, com.gigakin.stockbuddy.util.DemoLimits.MAX_ITEMS), Snackbar.LENGTH_LONG).show()
+                viewModel.consumeSaveResult()
             }
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.DatabaseError -> {
                 Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
+                viewModel.consumeSaveResult()
             }
-            null -> {}
+            null -> {
+                // Result already consumed, do nothing
+            }
         }
-        viewModel.consumeSaveResult()
     }
 
     private fun applyFieldErrors(errors: Map<String, String>) {
@@ -199,10 +227,20 @@ class IndividualLinkingFragment : Fragment() {
     }
 
     private fun clearForm() {
-        binding.editName.text?.clear(); binding.editBarcode.text?.clear()
-        (binding.layoutCategory.editText)?.text?.clear()
-        binding.editRfid.text?.clear()
-        dynamicFieldViews.values.forEach { it.text?.clear() }
+        try {
+            binding.editName.text?.clear()
+            binding.editBarcode.text?.clear()
+            binding.editRfid.text?.clear()
+            (binding.layoutCategory.editText)?.text?.clear()
+
+            // Clear dynamic fields (with defensive null checks)
+            dynamicFieldViews.forEach { (_, view) ->
+                view.text?.clear()
+            }
+        } catch (e: Exception) {
+            // Log but don't crash if there's any issue clearing
+            android.util.Log.e("IndividualLinking", "Error clearing form", e)
+        }
     }
 
     override fun onDestroyView() {

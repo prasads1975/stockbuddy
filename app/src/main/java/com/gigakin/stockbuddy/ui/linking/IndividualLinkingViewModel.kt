@@ -11,7 +11,9 @@ import com.gigakin.stockbuddy.data.repo.FieldConfigRepository
 import com.gigakin.stockbuddy.data.repo.ItemRepository
 import com.gigakin.stockbuddy.hardware.RfidScanResult
 import com.gigakin.stockbuddy.hardware.ScannerManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** FR-05-10, FR-09a-c, NFR-51-56: backs the Individual Linking form. */
 class IndividualLinkingViewModel(
@@ -37,16 +39,20 @@ class IndividualLinkingViewModel(
 
     /** FR-06: imager scan into the Barcode field. */
     fun scanBarcode(onResult: (String?) -> Unit) = viewModelScope.launch {
-        onResult(scannerManager.scanBarcode())
+        val result = withContext(Dispatchers.IO) {
+            scannerManager.scanBarcode()
+        }
+        onResult(result)
     }
 
     fun save(
         productName: String, barcode: String, category: String, rfid: String,
         attributes: Map<String, String>
     ) = viewModelScope.launch {
-        _saveResult.value = itemRepository.saveLinkedItem(
-            productName, barcode, category, rfid, attributes
-        )
+        val result = withContext(Dispatchers.IO) {
+            itemRepository.saveLinkedItem(productName, barcode, category, rfid, attributes)
+        }
+        _saveResult.value = result
     }
 
     fun consumeSaveResult() { _saveResult.value = null }
