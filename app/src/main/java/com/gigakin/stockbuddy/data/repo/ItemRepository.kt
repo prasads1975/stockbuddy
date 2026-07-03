@@ -1,5 +1,6 @@
 package com.gigakin.stockbuddy.data.repo
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.gigakin.stockbuddy.data.db.dao.FieldDefinitionDao
 import com.gigakin.stockbuddy.data.db.dao.LinkedItemDao
@@ -85,6 +86,7 @@ class ItemRepository(
 
             SaveResult.Success
         } catch (e: android.database.sqlite.SQLiteConstraintException) {
+            Log.e("ItemRepository", "Database constraint violation while saving linked item", e)
             val userMessage = when {
                 e.message?.contains("FOREIGN KEY", ignoreCase = true) == true ->
                     "The category doesn't exist. Please create it in Settings → Categories first."
@@ -94,6 +96,7 @@ class ItemRepository(
             }
             SaveResult.DatabaseError(userMessage)
         } catch (e: Exception) {
+            Log.e("ItemRepository", "Unexpected error while saving linked item", e)
             SaveResult.DatabaseError("Unable to save item. Please try again.")
         }
     }
