@@ -18,6 +18,12 @@ interface CategoryDao {
     @Query("SELECT COUNT(*) FROM categories WHERE name = :name COLLATE NOCASE")
     suspend fun countByName(name: String): Int
 
+    @Query("SELECT id FROM categories WHERE name = :name COLLATE NOCASE LIMIT 1")
+    suspend fun findIdByName(name: String): Long?
+
+    @Query("SELECT * FROM categories WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): CategoryEntity?
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(category: CategoryEntity): Long
 

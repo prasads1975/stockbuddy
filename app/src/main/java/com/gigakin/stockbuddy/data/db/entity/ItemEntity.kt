@@ -8,12 +8,10 @@ import androidx.room.PrimaryKey
 
 /**
  * Linked item (FR-18/21): one row per physical tagged unit.
- * PK: rfid_tag_id (String) — the RFID tag is the unique identifier for each physical item.
- * Product link: FK to product_master via barcode.
- * Denormalized columns: product_name, category (cached from product_master for O(1) scan-time lookup).
- * Optimization: Denormalization eliminates JOIN overhead during rapid RFID scanning (~50-60% perf gain).
- * Trade-off: Update anomalies on product edits (acceptable; updates are rare, scans are frequent).
- * Domain-specific fields: stored in attributes JSON.
+ * PK: rfid_tag_id (String) — the RFID tag uniquely identifies each physical unit (NFR-18),
+ * so a tag maps to exactly one barcode. This subsumes RFID+barcode uniqueness (System Design §4.0.6).
+ * Normalized (v2): holds NO product data — product_name/category/attributes live on product_master
+ * and are reached via the barcode FK. The scan hot path only needs RFID-set membership (no join).
  */
 @Entity(
     tableName = "linked_items",
@@ -26,8 +24,7 @@ import androidx.room.PrimaryKey
         )
     ],
     indices = [
-        Index(value = ["barcode"]),                          // For product lookups
-        Index(value = ["category"])                          // For category filtering
+        Index(value = ["barcode"])                           // FK lookup; cascade/count on product delete
     ]
 )
 data class LinkedItemEntity(
@@ -36,10 +33,7 @@ data class LinkedItemEntity(
     val rfidTagId: String,                                   // RFID tag is the primary identifier
 
     val barcode: String,                                     // FK to product_master (the business key)
-    @ColumnInfo(name = "product_name") val productName: String,  // Denormalized from product_master
-    val category: String,                                    // Denormalized from product_master
-    @ColumnInfo(name = "attributes") val attributesJson: String = "{}",  // Domain-specific fields
 
     val linkedAt: Long = System.currentTimeMillis(),
-    val linkedByRole: String? = null
+    val linkedByRole: String? = null                         // aspirational (RBAC); unused in MVP
 )

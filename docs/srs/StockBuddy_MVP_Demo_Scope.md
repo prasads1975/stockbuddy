@@ -27,9 +27,10 @@
 ### 1.2 Category Management
 | FR | Requirement |
 |----|-------------|
-| FR-12, FR-12a | Category master list; dropdown validation on the Linking form |
+| FR-12, FR-12a | Category master list; dropdown validation on the Linking form. Category is an **FK** on products (v2) — linking/import reject an unknown category ("add it in Settings first"), no auto-create |
 | FR-72 | Category Management screen accessible from Settings |
 | FR-73 | Add / edit / delete a category |
+| FR-74 | Delete a referenced category → **block + warn** with impact count; on confirm, cascade-delete its products and their linked units (v2) |
 
 ### 1.3 Individual Linking (manual entry only)
 | FR | Requirement |
@@ -48,10 +49,10 @@
 ### 1.4 Bulk Linking
 | FR | Requirement |
 |----|-------------|
-| FR-15, FR-16 | Bulk Linking screen; CSV column schema (dynamic, Article ID conditional) |
-| FR-17 | Upsert on import |
-| FR-18 | Import result summary |
-| FR-19 | Reject blank/duplicate RFID rows, continue processing |
+| FR-15, FR-16 | Bulk Linking screen; CSV column schema (dynamic domain columns) |
+| FR-17 | **Append-only** import (v2): product insert-or-reject-on-name-mismatch; unit insert if RFID new, else skip |
+| FR-18 | Import result summary — **Inserted / Skipped / Rejected** with per-row reasons |
+| FR-19 | Reject blank/duplicate-RFID/unknown-category rows, continue processing the rest |
 
 ### 1.5 Inventory Session
 | FR | Requirement |
@@ -67,12 +68,14 @@
 ### 1.6 Results Summary
 | FR | Requirement |
 |----|-------------|
-| FR-40, FR-41 | Available / Missing definitions |
-| FR-43 | Available and Missing tabs |
-| FR-44 | Item cards show fixed fields + Article ID (if enabled) + domain-specific fields |
-| FR-45 | Grouped by Barcode; RFID Tag ID is the unit-level identifier in the expanded view |
+| FR-40, FR-41, FR-42 | Available / Missing / **Excess** definitions |
+| FR-43, FR-48 | Available, Missing, **and Excess** tabs |
+| FR-44 | Item cards show fixed fields + domain-specific fields |
+| FR-45 | Grouped by Barcode with per-group count **per tab** (same barcode can appear in Available and Missing with different counts); tap to expand the individual RFID units in that status |
 | FR-46 | Category filter carries over from scan screen, re-appliable without re-scanning |
 | FR-47 | Session name + STOP timestamp shown |
+
+*v2 note: results are read from the immutable `session_result_items` snapshot written at STOP (System Design §4.0.5), so a reopened historical session shows what products looked like at scan time — it does not drift when master data is later edited.*
 
 *Build note: simplify FR-39's KPI card to a single count row reflecting the active filter, rather than the full dual-row (unfiltered + filtered) version.*
 
@@ -84,13 +87,14 @@
 | FR-52 | Android share sheet delivery |
 | FR-52a | Download (save to device): location picker, save confirmation with file path, option to chain into Share |
 
-### 1.8 Assets
+### 1.8 Assets (product-level, v2)
 | FR | Requirement |
 |----|-------------|
-| FR-61 | Flat list of all linked items |
-| FR-62 | Item cards show fixed fields + Article ID (if enabled) + domain-specific fields |
-| FR-63 | Search bar |
+| FR-61 | Flat list of all **products** (one row per barcode) with a linked-unit count — this is the product UI (supersedes a separate Product Master screen) |
+| FR-62 | Product cards show name, barcode, category, unit count + domain-specific fields |
+| FR-63 | Search bar (name / barcode / category) |
 | FR-64 | Total count, updates live with search/filter |
+| FR-65, FR-66 | **Edit** a product (name, category, attributes — barcode is the PK, read-only); **delete** a product → block + warn, then cascade-delete its linked units |
 | FR-67 | Category filter |
 
 ### 1.9 Settings (minimal shell)
@@ -195,13 +199,12 @@ What still stays deferred, unchanged from Section 2: load testing, query tuning 
 | Backup & Restore | NFR-39–50, Section 5.9 | No production data at risk yet |
 | Authentication / RBAC | NFR-20a–o, Section 5.5, FR-77e–h, screen S02 | Login screens slow down a live demo |
 | QR Scan linking mode | FR-01–04, FR-11 | Requires a label-printing dependency; manual entry suffices for live demo |
-| Product Master screen | FR-22–28 | Auto-upsert (FR-21) keeps it in sync without a dedicated UI |
+| Standalone Product Master screen | FR-22–28 | The product-level **Assets** screen (v2, §1.8) is the product UI — list/edit/delete; no separate screen needed |
 | API / LAN export channels | FR-53–56 | No real endpoint/server to demo against |
 | Non-skippable First-Run Wizard | FR-77, FR-77a–h, FR-78, FR-78a, FR-79 | Replaced by direct Settings access to Field Config + Categories |
 | Delivery history, re-export, dual-CSV export | FR-57–60 | Polish features, not demo-critical |
-| Excess tab | FR-42, FR-48 | Stretch goal — data is already collected, cheap to add later |
-| Assets delete / sort / detail view | FR-65, 66, 68 | Stretch goal |
-| Category delete-warning, bulk upload, operator read-only | FR-74, 75, 76 | Only Admin will touch this in a demo |
+| Assets sort / detail view | FR-68 | Stretch goal (edit/delete FR-65/66 are now **in scope** — see §1.8) |
+| Category bulk upload, operator read-only | FR-75, 76 | Only Admin will touch this in a demo (delete-warning FR-74 is now **in scope** — see §1.2) |
 | Session delete | FR-32 | Not needed for a short-lived demo dataset |
 | Performance/storage at scale, session retention, crash recovery, training-time target | NFR-02–05, 07, 14, 16, 17, 19a–b, 25, 29, 30 | Data-volume and lifecycle concerns — revisit before a real pilot, not demo-blocking |
 
@@ -229,11 +232,13 @@ What still stays deferred, unchanged from Section 2: load testing, query tuning 
 
 A demo device that's been used for a dozen customer visits shouldn't visibly groan under the weight of stale data — and it shouldn't be possible to mistake it for a production deployment either. These caps are a **build-time configuration for the demo app only** (e.g. a `BuildConfig` constant) — they don't belong in the customer-facing SRS, since a real pilot deployment would have these limits removed or raised. Worth flagging to whoever builds this so the values live in one place and are trivial to change or strip out later.
 
+These are `BuildConfig` constants in `app/build.gradle.kts` (`DEMO_MAX_ITEMS` / `DEMO_MAX_CATEGORIES` / `DEMO_MAX_SESSIONS`), read via `DemoLimits.kt`. **Current values: 200 / 50 / 100** (raised from the original 50 / 10 / 25 to support fuller demo datasets).
+
 | Resource | Cap | Behaviour at cap | Enforced at |
 |----------|-----|-------------------|-------------|
-| **Linked items (Assets)** | 50 | Manual Linking save and Bulk Linking import are blocked once the cap is reached. Inline message: *"Demo limit reached (50 items). Delete an item to add a new one."* A Bulk Linking CSV that would exceed the cap imports rows up to the remaining headroom, then rejects the rest with reason "Demo item limit reached" in the import summary (same summary mechanism as any other rejection). | Individual Linking save; Bulk Linking import |
-| **Categories** | 10 | Adding an 11th category is blocked — both from the Category Management screen and from the inline "category not found, add new?" quick-add prompt during Linking. Message: *"Demo limit reached (10 categories). Edit or delete an existing category to add a new one."* | Category Management add; inline category quick-add during Linking |
-| **Inventory sessions** | 25 | **Rolling retention, not a hard block** — when a 26th session is started, the oldest existing session is automatically purged to keep the 25 most recent. This keeps a demo device usable indefinitely across many customer visits without anyone remembering to clean it up. A one-time toast on first auto-purge is a nice touch: *"Oldest demo session removed to stay within demo limits."* | Inventory session creation |
+| **Linked items (Assets)** | 200 | Manual Linking save and Bulk Linking import are blocked once the cap is reached. Inline message: *"Demo limit reached (200 items). Delete an item to add a new one."* A Bulk Linking CSV that would exceed the cap imports rows up to the remaining headroom, then rejects the rest with reason "Demo item limit reached" in the import summary. | Individual Linking save; Bulk Linking import |
+| **Categories** | 50 | Adding a category past the cap is blocked from the Category Management screen. Message: *"Demo limit reached (50 categories). Edit or delete an existing category to add a new one."* | Category Management add |
+| **Inventory sessions** | 100 | **Rolling retention, not a hard block** — when the cap is exceeded, the oldest existing session is automatically purged to keep the 100 most recent. This keeps a demo device usable indefinitely across many customer visits. | Inventory session creation |
 
 A demo with a 5-minute live walkthrough (per the script in Section 3) never gets close to these numbers in a single sitting — they exist to stop *cumulative* buildup across repeated demos on the same device, not to constrain any single demo run.
 

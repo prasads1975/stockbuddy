@@ -9,8 +9,9 @@ import com.gigakin.stockbuddy.data.db.entity.*
 
 /**
  * NFR-15: local-only SQLite via Room. NFR-18: RFID uniqueness enforced at the DB layer
- * via UNIQUE constraint on linked_items.rfid_tag_id. Article ID is the PK of product_master.
- * Schema version 2: aligned with finalized System Design document (§4).
+ * via PRIMARY KEY on linked_items.rfid_tag_id. Barcode is the PK of product_master.
+ * Schema version 3: v2 data model (normalized master + snapshot) per System Design §4.0.
+ * generated_reports / app_config are aspirational (not created in MVP — §4.0.1).
  */
 @Database(
     entities = [
@@ -20,11 +21,9 @@ import com.gigakin.stockbuddy.data.db.entity.*
         LinkedItemEntity::class,
         InventorySessionEntity::class,
         SessionTagEntity::class,
-        SessionResultItemEntity::class,
-        GeneratedReportEntity::class,
-        AppConfigEntity::class
+        SessionResultItemEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -35,8 +34,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun inventorySessionDao(): InventorySessionDao
     abstract fun sessionTagDao(): SessionTagDao
     abstract fun sessionResultItemDao(): SessionResultItemDao
-    abstract fun generatedReportDao(): GeneratedReportDao
-    abstract fun appConfigDao(): AppConfigDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

@@ -3,7 +3,11 @@
 **Platform:** Android (Java) · Chainway C72 Handheld UHF RFID Reader  
 **Client:** Crazy Hamster Toy Store, Yavatmal  
 **SRS Version:** 3.6 (Draft) · June 2026  
-**Design Version:** 1.0
+**Design Version:** 1.1 (2026-07-06 — added §4.0 MVP-active data model, redesign v2)
+
+**Changelog**
+- **v1.1** — Added **§4.0 MVP-Active Data Model (v2)**: normalized master (`linked_items` no longer denormalized; `category` now an FK) + immutable `session_result_items` snapshot wired at STOP. Reversed the v1 `linked_items` denormalization decision (§4.2.3 / §4.3.2 Decision 3, annotated). Marked `generated_reports`/`delivery_history`/`app_config`/`audit_log` as aspirational (not built in MVP). §4.1–§4.5 retained as the fuller aspirational design.
+- **v1.0** — Initial full-system design.
 
 ---
 
@@ -160,6 +164,7 @@ sealed class SaveResult {
   data class ValidationError(val fieldErrors: Map<String, String>) : SaveResult()
   object DuplicateRfid : SaveResult()
   object DemoLimitReached : SaveResult()
+  data class DatabaseError(val message: String) : SaveResult()   // v2: FK/constraint failures
 }
 
 fun saveLinkedItem(...): SaveResult {
@@ -167,32 +172,36 @@ fun saveLinkedItem(...): SaveResult {
 
   // Tier 1 — fixed mandatory fields (FR-09)
   val fixedFields = mapOf(
-    "productName" to productName,
-    "barcode" to barcode,
-    "category" to category,
-    "rfidTagId" to rfidTagId
+    "productName" to productName, "barcode" to barcode,
+    "category" to category, "rfidTagId" to rfidTagId
   )
-  fixedFields.forEach { (key, value) ->
-    if (value.isBlank()) errors[key] = "$key is required"
-  }
+  fixedFields.forEach { (key, value) -> if (value.isBlank()) errors[key] = "$key is required" }
 
   // Tier 2 — domain-specific mandatory fields (FR-09a)
   fieldDefinitions.filter { it.mandatory }.forEach { fieldDef ->
     if (attributes[fieldDef.key].isNullOrBlank())
       errors["attr_${fieldDef.key}"] = "${fieldDef.label} is required"
   }
-
   if (errors.isNotEmpty()) return SaveResult.ValidationError(errors)
-  
-  // Tier 3 — RFID uniqueness check
+
+  // Tier 3 — category must exist (v2: category is an FK, no auto-create)
+  val categoryId = categoryDao.findIdByName(category)
+    ?: return SaveResult.ValidationError(mapOf("category" to "Category doesn't exist — add it in Settings first"))
+
+  // Tier 4 — RFID uniqueness
   if (linkedItemDao.existsByRfid(rfidTagId)) return SaveResult.DuplicateRfid
-  
-  // Tier 4 — demo limit check
+
+  // Tier 5 — demo limit
   if (linkedItemDao.count() >= DemoLimits.MAX_ITEMS) return SaveResult.DemoLimitReached
-  
-  // All checks passed — insert
-  linkedItemDao.insert(LinkedItemEntity(...))
-  productDao.upsertFromLinkedItem(...)  // auto-upsert Product Master
+
+  // Persist (v2 order): product FIRST (FK parent), then the normalized unit row.
+  // Product is insert-or-reject-on-name-mismatch — never overwrite an existing product's name.
+  val existing = productDao.getByBarcode(barcode)
+  if (existing == null) productDao.insert(ProductMasterEntity(barcode, productName, categoryId, attributesJson))
+  else if (existing.productName != productName)
+    return SaveResult.ValidationError(mapOf("barcode" to "Barcode already exists as '${existing.productName}'"))
+
+  linkedItemDao.insert(LinkedItemEntity(rfidTagId = rfidTagId, barcode = barcode))  // no denormalized fields
   return SaveResult.Success
 }
 ```
@@ -233,25 +242,31 @@ Deduplication is done with an in-memory `HashSet<String>` per session. The raw t
 
 #### 3.2.3 Results Computation Engine (`:feature:inventory`)
 
-Computes Available / Missing / Excess after STOP. Runs on a background thread (< 3 seconds for 10,000 items per NFR-02).
+**v2 model:** results are computed **once, at STOP**, and written as an immutable snapshot into `session_result_items`. Every downstream read (Results tabs, Reports List reopen, Export) reads the snapshot — never a live recompute — so historical reports don't drift when master data is later edited. Live counts *during* scanning are handled separately by the in-memory sets in §4.0.4.
 
 ```
 ResultsComputationEngine
-  fun computeResults(sessionId: String, categoryFilter: String?): List<ResultItem>
+  fun computeAndPersistSnapshot(sessionId: String)   // called once at STOP
 
-Algorithm:
-  1. Load all scanned tags from session_tags table → Set<String>
-  2. Load all LinkedItem records from DB → List<LinkedItem>
-  3. For each LinkedItem in master:
-     - If rfid_tag_id in scanned → Status.AVAILABLE (check category filter)
-     - Else                      → Status.MISSING (check category filter)
-  4. For each scanned tag not in master → synthetic LinkedItem, Status.EXCESS
-  5. Category filter applied at display time; raw scan set never discarded (FR-46)
+Algorithm (at STOP):
+  1. scanned  = SELECT rfid_tag_id FROM session_tags WHERE session_id = ?   → Set<String>
+  2. master   = SELECT li.rfid_tag_id, li.barcode, pm.product_name, c.name AS category, pm.attributes
+                FROM linked_items li
+                JOIN product_master pm ON pm.barcode = li.barcode
+                JOIN categories c ON c.id = pm.category_id          // one-time join, not on hot path
+  3. For each master unit:
+       status = (rfid_tag_id ∈ scanned) ? AVAILABLE : MISSING
+       INSERT session_result_items(status, rfid_tag_id, product_name, barcode, category, attributes)  // denormalized copy
+  4. For each scanned tag ∉ master:
+       INSERT session_result_items(status = EXCESS, rfid_tag_id, product_name=NULL, barcode=NULL, category=NULL)
+  5. Write KPI counts onto inventory_sessions (full + filtered scope).
 
-ResultItem
-  ├── item: LinkedItemEntity
-  └── status: Status  (AVAILABLE | MISSING | EXCESS)
+Reads (Results/Reports/Export):
+  SELECT * FROM session_result_items WHERE session_id = ? [AND status = ?] [AND category = ?]
+  — grouped by barcode in the UI (count per group); no join, no recompute (FR-46).
 ```
+
+> The category filter is a re-appliable read-side predicate over the frozen snapshot (`category` name string) — the full snapshot is never discarded or re-scanned (FR-46).
 
 #### 3.2.5 Single-Shot Scan Engine (`:feature:linking`)
 
@@ -319,20 +334,153 @@ File naming: {InventoryCode}_{yyyyMMdd}_{HHmm}.csv  (spaces → underscores)
 
 ## 4. Data Model
 
+> **Reading guide (Design v1.1).** §4.0 below is the **authoritative MVP-active data model** (redesign v2, 2026-07-06). Subsections §4.1–§4.5 describe the **fuller aspirational system** (multi-device, auth, licensing, backup, report/delivery history). Where the two differ, **§4.0 governs the MVP build.** Aspirational subsections that diverge carry an *"MVP delta"* callout pointing back here.
+
+---
+
+### 4.0 MVP-Active Data Model (v2 — Redesign)
+
+**Design principle — two layers, opposite normalization strategies:**
+
+- **Master / live data is fully normalized** (single source of truth; renaming a product or category never leaves stale copies).
+- **Session results are a denormalized, immutable snapshot** (a completed stock-take freezes what products looked like *at scan time*, even if edited later).
+
+This is the standard operational-vs-reporting split. It reverses the v1 decision to denormalize `linked_items` (see §4.2.3 / §4.3.2 Decision 3, retained below with a correction note).
+
+#### 4.0.1 Entity scope — what the MVP build actually creates
+
+| Entity | MVP? | Role in MVP |
+|--------|------|-------------|
+| `categories` | ✅ Active | Category master; **FK-referenced** by `product_master` |
+| `field_definitions` | ✅ Active | Dynamic domain-field metadata (the headline feature) |
+| `product_master` | ✅ Active | Canonical product record; holds product-level `attributes` JSON |
+| `linked_items` | ✅ Active | One row per physical RFID unit; **normalized** (FK to product only) |
+| `inventory_sessions` | ✅ Active | Stock-take session + KPI snapshot counts |
+| `session_tags` | ✅ Active | Per-session scanned-tag crash buffer |
+| `session_result_items` | ✅ Active | **Immutable denormalized results snapshot** (now wired at STOP) |
+| `generated_reports` | ⬜ Aspirational | Export persists nothing in MVP — **not created** |
+| `delivery_history` | ⬜ Aspirational | API/LAN export out of scope — **not created** |
+| `app_config` | ⬜ Aspirational | Owned by `AppPrefs` (SharedPreferences) in MVP — **not created** |
+| `audit_log` | ⬜ Aspirational | Auth/audit out of scope — **not created** |
+
+#### 4.0.2 MVP Entity-Relationship Diagram
+
+```
+┌────────────────────┐        ┌──────────────────────┐        ┌────────────────────────┐
+│  categories        │ 1 ───< │  product_master      │ 1 ───< │   linked_items         │
+│────────────────────│        │──────────────────────│        │────────────────────────│
+│ id (PK)            │        │ barcode (PK)         │        │ rfid_tag_id (PK)       │
+│ name (UNIQUE)      │        │ product_name         │        │ barcode (FK→product,   │
+└────────────────────┘        │ category_id (FK ───┐ │        │           CASCADE)     │
+                              │   →categories.id)  │ │        │ linked_at              │
+                              │ attributes JSON    │ │        └────────────────────────┘
+                              │ created_at         │ │         (NO product_name,
+                              │ updated_at         │ │          category, or attributes —
+                              └──────────────────────┘          reached via the product)
+
+┌────────────────────┐        ┌───────────────────────────────┐
+│  session_tags      │ >─── 1 │  inventory_sessions           │
+│────────────────────│        │───────────────────────────────│
+│ session_id (FK,    │        │ id (PK, UUID)                 │
+│   CASCADE)         │        │ inventory_code                │
+│ rfid_tag_id        │        │ started_at / stopped_at       │
+│ (crash buffer)     │        │ category_filter               │
+└────────────────────┘        │ total_in_master, total_scanned│
+                              │ available/missing/excess_count │
+┌────────────────────────┐    │ filtered_available/missing/    │
+│ session_result_items   │>─1 │   excess                      │
+│────────────────────────│    └───────────────────────────────┘
+│ id (PK)                │
+│ session_id (FK,CASCADE)│    Denormalized SNAPSHOT written at STOP:
+│ status (A/M/E)         │    product_name, barcode, category (name string),
+│ rfid_tag_id            │    attributes JSON are copied in — frozen, never
+│ product_name  ┐ null   │    joined back to master. NULL for EXCESS rows.
+│ barcode       ├ for    │
+│ category      │ EXCESS  │
+│ attributes    ┘        │
+└────────────────────────┘
+```
+
+#### 4.0.3 Key changes from the v1 design
+
+| # | Change | Rationale |
+|---|--------|-----------|
+| C1 | **`linked_items` loses `product_name`, `category`, `attributes`.** Keeps only `rfid_tag_id` (PK), `barcode` (FK), `linked_at`. | Product data belongs to the product, not the unit. Reversing denormalization removes the drift risk and the maintenance contract (§4.2.3). |
+| C2 | **`product_master.category` → `category_id` (FK → `categories.id`).** | True normalization; category rename is a single-row update with no fan-out. |
+| C3 | **Attributes are product-level only.** No per-unit custom fields. | All units of a barcode share Price/Weight/Purity etc. |
+| C4 | **`session_result_items` is populated** (was defined but never written). | Freezes historical reports; Results/Reports/Export read the snapshot, not a live recompute. |
+| C5 | **`generated_reports`, `delivery_history`, `app_config`, `audit_log` not created in MVP.** | Export persists nothing; config lives in `AppPrefs`; auth/audit out of scope. |
+
+**Why reversing denormalization does not hurt scan performance (corrects v1 §4.2.3):**
+The scan hot path never reads product fields — it only needs to know whether each scanned RFID is *in the master set*. That membership check uses `linked_items.rfid_tag_id` alone (no join). Product details are assembled **once, at STOP**, then frozen into `session_result_items`. So the join the v1 design tried to avoid was never on the hot path. The snapshot's immutability is independent of `linked_items` normalization (the snapshot copies product data at STOP regardless).
+
+#### 4.0.4 Live scanning computation (in-memory, O(1) per tag)
+
+At **Start Scanning**, load the master RFID set once: `masterRfids = SELECT rfid_tag_id FROM linked_items` (a `Set<String>`; `totalMaster = masterRfids.size`). Per scanned tag:
+
+```
+tag ∈ masterRfids ?  → available.add(tag)   : excess.add(tag)
+available = available.size
+excess    = excess.size
+missing   = totalMaster − available          // pure subtraction; no "missing set"
+uniqueScanned = available + excess
+```
+
+Memory is ~100 bytes/RFID (only the id column, not entities): ~20 KB at the 200-item demo cap, ~10 MB at 100k. No OOM risk at retail scale. Fallback for 500k+ units: per-tag indexed PK lookup (`SELECT 1 FROM linked_items WHERE rfid_tag_id=?`) — repository-internal, no model change.
+
+#### 4.0.5 Snapshot write at STOP
+
+For the session's master scope (optionally category-filtered), write one `session_result_items` row per unit:
+- unit RFID ∈ scanned → `AVAILABLE`; else → `MISSING`. Copy denormalized `product_name`, `barcode`, `category` (resolved name string), `attributes`.
+- scanned RFID ∉ master → `EXCESS`. Product columns NULL, only `rfid_tag_id` set.
+
+KPI counts are written onto `inventory_sessions`.
+
+**Per-barcode grouping (per tab).** Each tab filters `session_result_items` by `status` **first**, then groups by `barcode` and shows the group count. Because one barcode spans many unit rows, the **same barcode can appear in more than one tab** with different counts. Tapping a group expands to the individual RFIDs in that status.
+
+*Worked example — `BC1` has 5 linked units (RFID1–RFID5); RFID1, RFID2, RFID3 are scanned:*
+
+| Tab | Query | Group shown | Count | Expand shows |
+|-----|-------|-------------|-------|--------------|
+| Available | `status='AVAILABLE'` grouped by barcode | "Product Name · BC1" | **3** | RFID1, RFID2, RFID3 |
+| Missing | `status='MISSING'` grouped by barcode | "Product Name · BC1" | **2** | RFID4, RFID5 |
+
+The Excess tab lists scanned tags with no master row (grouping not applicable — no barcode). This works because each unit is one snapshot row with its own `rfid_tag_id` and `status`; grouping/counting is a pure `GROUP BY barcode` over the status-filtered rows — no recompute.
+
+#### 4.0.6 Write-path rules (MVP)
+
+| Operation | Behaviour |
+|-----------|-----------|
+| **Link (individual/bulk)** | Resolve category by name → reject row if not in `categories` ("add it in Settings first"; no auto-create). Insert product if barcode new; if barcode exists with a **different product name**, reject (don't overwrite). Insert `linked_items` row if RFID new; skip if it already exists. |
+| **Edit product (Assets)** | Update `product_master` only — no fan-out needed (nothing denormalized to propagate). |
+| **Delete product (Assets)** | If linked units exist: block + warn; on confirm, CASCADE-delete the units. |
+| **Delete category** | If referenced by any product: block + warn; on confirm, CASCADE-delete products **and** their linked units. |
+| **`linked_items`** | Not directly editable — the RFID↔barcode binding is fixed; rows disappear only via product CASCADE. |
+
+**Uniqueness / keys (NFR-18).** `rfid_tag_id` is the **primary key** of `linked_items`, so every RFID appears at most once table-wide and is therefore bound to exactly **one** barcode. This subsumes "RFID+barcode uniqueness" — the pair is unique by construction, and the same tag can never map to two products. A composite `UNIQUE(rfid_tag_id, barcode)` is intentionally **not** used, as it would be weaker (it would permit one RFID under multiple barcodes). Re-linking an RFID to a different product therefore requires deleting the existing unit row first (the RFID↔barcode binding is immutable in place).
+
+#### 4.0.7 Migration policy (dev phase)
+
+MVP is pre-release: `fallbackToDestructiveMigration` is in use, no versioned `Migration` objects yet. Schema changes wipe the local DB (acceptable — dev only). The forward-only migration discipline in §4.3.1 applies **before first production/pilot release**, not during MVP iteration.
+
+---
+
 ### 4.1 Entity Relationship Diagram
+
+> **Scope note:** this is the **full-system** ERD — it includes tables the MVP does not build (`generated_reports`, `app_config`, and the aspirational `linked_by_role` RBAC column). The MVP-active subset is **§4.0.2**. Both diagrams use the **normalized** master shape agreed in v2: `linked_items` carries no denormalized product columns, and `category` is an FK.
 
 ```
 ┌──────────────────────┐          ┌────────────────────────┐
 │  product_master      │ 1 ─────< │    linked_items        │
 │──────────────────────│          │────────────────────────│
 │ barcode (PK)         │          │ rfid_tag_id (PK)       │
-│ product_name         │          │ barcode (FK)           │
-│ category             │          │ product_name (denorm)  │
-│ attributes JSON      │          │ category (denorm)      │
-│ created_at           │          │ attributes JSON        │
-│ updated_at           │          │ linked_at              │
-└──────────────────────┘          │ linked_by_role         │
-                                  └────────┬───────────────┘
+│ product_name         │          │ barcode (FK, CASCADE)  │
+│ category_id (FK ───┐ │          │ linked_at              │
+│   →categories.id)  │ │          │ linked_by_role (aspir.)│
+│ attributes JSON    │ │          └────────┬───────────────┘
+│ created_at         │ │                   │
+│ updated_at         │ │                   │
+└──────────────────────┘                   │
                                            │
                                            │ (via session_tags)
                                   ┌────────▼──────────────┐
@@ -416,19 +564,22 @@ File naming: {InventoryCode}_{yyyyMMdd}_{HHmm}.csv  (spaces → underscores)
 
 Constraints are declared in Room via `@Entity(foreignKeys = […], indices = […])` and column-level annotations. The table below is the authoritative specification; the Room `@Entity` code must match it exactly.
 
+Rows marked *(aspirational)* are not created by the MVP build (§4.0.1).
+
 | Table | PK | Foreign Keys (ON DELETE) | UNIQUE | NOT NULL columns |
 |-------|----|--------------------------|--------|-----------------|
-| `product_master` | `barcode` (TEXT) | — | — | `barcode`, `product_name`, `category` |
-| `linked_items` | `rfid_tag_id` (TEXT) | `barcode → product_master(barcode)` CASCADE | — | `rfid_tag_id`, `barcode`, `product_name`, `category` |
+| `product_master` | `barcode` (TEXT) | `category_id → categories(id)` CASCADE | — | `barcode`, `product_name`, `category_id` |
+| `linked_items` | `rfid_tag_id` (TEXT) | `barcode → product_master(barcode)` CASCADE | — | `rfid_tag_id`, `barcode` |
 | `inventory_sessions` | `id` (TEXT, UUID) | — | — | `id`, `inventory_code`, `started_at` |
 | `session_tags` | composite (`session_id`, `rfid_tag_id`) | `session_id → inventory_sessions(id)` CASCADE | — | `session_id`, `rfid_tag_id` |
 | `session_result_items` | `id` (INTEGER, autoincrement) | `session_id → inventory_sessions(id)` CASCADE | — | `session_id`, `status`, `rfid_tag_id` |
 | `categories` | `id` (INTEGER, autoincrement) | — | `name` | `name` |
 | `field_definitions` | `id` (INTEGER, autoincrement) | — | — | `id` |
-| `generated_reports` | `id` (INTEGER, autoincrement) | `session_id → inventory_sessions(id)` CASCADE | — | `session_id`, `export_scope`, `generated_at` |
-| `app_config` | `key` (TEXT) | — | — | `key` |
+| `generated_reports` *(aspirational)* | `id` (INTEGER, autoincrement) | `session_id → inventory_sessions(id)` CASCADE | — | `session_id`, `export_scope`, `generated_at` |
+| `app_config` *(aspirational)* | `key` (TEXT) | — | — | `key` |
 
 **Notes on FK behaviour choices:**
+- `product_master.category_id` uses CASCADE: deleting a category removes its products (and, transitively, their linked units). The application layer enforces the block-and-warn confirmation dialog before deletion; the DB CASCADE then removes the dependent rows atomically (§4.0.6).
 - `linked_items.barcode` uses CASCADE: because `barcode` is a mandatory (NOT NULL) column, SET NULL is not permitted. The application layer enforces the confirmation dialog before deletion; the DB CASCADE then removes the linked units atomically in the same transaction.
 - All child tables of `inventory_sessions` use CASCADE so a session delete (FR-20[SM], G-09) removes all associated rows in one operation without requiring application-layer cleanup loops.
 
@@ -465,9 +616,9 @@ Every index below is declared in the `indices` array of the relevant `@Entity` a
 
 | # | Table | Column(s) | Type | Access Pattern | Requirement |
 |---|-------|-----------|------|----------------|-------------|
-| I-01 | `linked_items` | `rfid_tag_id` | PK | Scan-time tag lookup during results computation; RFID uniqueness enforcement on save/import | NFR-18; FR-08 |
-| I-02 | `linked_items` | `barcode` | — | Group results by barcode in inventory summary (FR-33); propagate product edits to all linked units | FR-33; FR-26 |
-| I-03 | `linked_items` | `category` | — | Category filter on Assets screen; category filter for filtered KPIs in results | FR-55; FR-23 |
+| I-01 | `linked_items` | `rfid_tag_id` | PK | Scan-time master-membership check; RFID uniqueness enforcement on save/import | NFR-18; FR-08 |
+| I-02 | `linked_items` | `barcode` | — | FK lookup to product; count/cascade linked units on product delete | FR-33; FR-26 |
+| I-03 | `product_master` | `category_id` | — | Category filter on Assets screen; count products per category for delete-impact warning | FR-55; FR-23 |
 | I-04 | `inventory_sessions` | `stopped_at` | — | Reverse-chronological session list (`ORDER BY CASE WHEN stopped_at IS NULL THEN 0 ELSE 1 END ASC, stopped_at DESC`) | FR-19[SM] |
 | I-05 | `session_tags` | `session_id` | — | Load all buffered tags for a session on crash recovery; used during `stopSession()` to retrieve the full tag set | NFR-07 |
 | I-06 | `session_result_items` | `session_id` | — | Load all result rows for a session when opening historical summary | FR-32 |
@@ -489,8 +640,7 @@ Every index below is declared in the `indices` array of the relevant `@Entity` a
     )
   ],
   indices = [
-    Index(value = ["barcode"]),      // I-02: FK lookup; product edits propagation
-    Index(value = ["category"])      // I-03: category filtering
+    Index(value = ["barcode"])       // I-02: FK lookup; cascade/count on product delete
   ]
 )
 data class LinkedItemEntity(
@@ -499,15 +649,11 @@ data class LinkedItemEntity(
   val rfidTagId: String,             // PK: RFID tag is the unique physical item identifier
 
   val barcode: String,               // FK to product_master (business identifier)
-  @ColumnInfo(name = "product_name")
-  val productName: String,           // Denormalized from product_master for scan-time O(1) lookup
-  val category: String,              // Denormalized from product_master for filtering
-
-  @ColumnInfo(name = "attributes")
-  val attributesJson: String = "{}",  // Domain-specific fields (JSON)
+  // Normalized (v2): product_name, category, and attributes are NOT stored here —
+  // they belong to product_master and are reached via the barcode FK. See §4.0.3 (C1).
 
   val linkedAt: Long = System.currentTimeMillis(),
-  val linkedByRole: String? = null
+  val linkedByRole: String? = null   // aspirational (RBAC); nullable, unused in MVP
 )
 ```
 
@@ -517,7 +663,9 @@ All other `@Entity` classes follow the same pattern: declare `foreignKeys` and `
 
 #### 4.2.3 Design Decision — Denormalized Columns in `linked_items`
 
-**Decision:** `linked_items` stores `product_name` and `category` as direct columns (keyed by barcode FK) rather than deriving them from `product_master` via JOIN at query time. This is **intentional and justified for MVP performance** — later revisable if storage becomes a constraint.
+> **⚠️ REVERSED in MVP v2 — see §4.0.3 (C1).** This decision no longer holds. The scan hot path never reads product fields (only RFID-set membership), so the JOIN this section optimizes away was never on the hot path. Snapshot immutability is provided independently by `session_result_items`, not by denormalizing `linked_items`. In the MVP-active model `linked_items` keeps only `rfid_tag_id`, `barcode`, `linked_at`. The section below is retained for historical context and the aspirational multi-device design.
+
+**Decision (v1 — superseded):** `linked_items` stores `product_name` and `category` as direct columns (keyed by barcode FK) rather than deriving them from `product_master` via JOIN at query time. This is **intentional and justified for MVP performance** — later revisable if storage becomes a constraint.
 
 **Primary rationale: Scan-time performance optimization**
 
@@ -548,7 +696,9 @@ Denormalization is safe only if every write path that changes catalogue data als
 - 50 linked items × (string product_name ~20 bytes + string category ~15 bytes) = ~1.75 KB additional overhead
 - Well within SQLite limits; revisit if dataset scales to 10k+ items
 
-#### 4.2.5 Report File Lifecycle
+#### 4.2.5 Report File Lifecycle *(aspirational — not built in MVP)*
+
+> **MVP delta (§4.0.1):** the MVP does **not** persist exports. `generated_reports` and `delivery_history` are not created; export writes the CSV to disk and hands it to the Android share/download flow with no DB record. The lifecycle below applies only to the aspirational re-export / delivery-history / auto-purge features.
 
 When the user exports a report (S14), `CsvEngine` writes the CSV to `{app_private_dir}/exports/{filename}.csv` and inserts one row into `generated_reports` recording the path, scope, and row count. Each delivery attempt (share, API, LAN) adds one row to `delivery_history` linked to that report record. This enables:
 
@@ -559,21 +709,23 @@ When the user exports a report (S14), `CsvEngine` writes the CSV to `{app_privat
 
 ### 4.3 Room Database
 
+MVP-active `@Database` (v2 model — 7 entities). The two aspirational entities are shown commented; add them (with migrations) only when their features are built.
+
 ```kotlin
 @Database(
   entities = [
     CategoryEntity::class,
     FieldDefinitionEntity::class,
-    ProductMasterEntity::class,
-    LinkedItemEntity::class,
+    ProductMasterEntity::class,       // category_id FK; attributes JSON (product-level)
+    LinkedItemEntity::class,          // normalized: rfid_tag_id (PK) + barcode (FK) + linked_at
     InventorySessionEntity::class,
     SessionTagEntity::class,
-    SessionResultItemEntity::class,
-    GeneratedReportEntity::class,
-    AppConfigEntity::class
+    SessionResultItemEntity::class,   // immutable snapshot, written at STOP
+    // GeneratedReportEntity::class,  // aspirational — export persists nothing in MVP (§4.0.1)
+    // AppConfigEntity::class         // aspirational — config lives in AppPrefs/SharedPreferences
   ],
   version = 2,
-  exportSchema = false
+  exportSchema = false                // dev phase — see §4.0.7 / §4.3.1
 )
 abstract class AppDatabase : RoomDatabase() {
   abstract fun categoryDao(): CategoryDao
@@ -583,16 +735,18 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun inventorySessionDao(): InventorySessionDao
   abstract fun sessionTagDao(): SessionTagDao
   abstract fun sessionResultItemDao(): SessionResultItemDao
-  abstract fun generatedReportDao(): GeneratedReportDao
-  abstract fun appConfigDao(): AppConfigDao
+  // abstract fun generatedReportDao(): GeneratedReportDao   // aspirational
+  // abstract fun appConfigDao(): AppConfigDao               // aspirational
 }
 ```
 
 **Schema version history:**
 - **v1** (initial): Included audit_log and delivery_history (out of MVP scope)
-- **v2** (current MVP): Finalized data model with barcode-keyed product_master, RFID PK on linked_items, denormalized scan fields, UUID session IDs
+- **v2** (current MVP): Normalized master (barcode-keyed `product_master` with `category_id` FK; RFID-PK `linked_items` with no denormalized columns), UUID session IDs, immutable `session_result_items` snapshot. `generated_reports`/`app_config` deferred to aspirational scope (§4.0.1).
 
 ### 4.3.1 Schema Management Strategy
+
+> **MVP delta (§4.0.7):** the discipline below is the **pre-production** policy — it applies from the first pilot/release onward. During MVP development the app uses `exportSchema = false` and `fallbackToDestructiveMigration` (schema changes wipe the local dev DB). Do **not** treat the "never use `fallbackToDestructiveMigration`" / `exportSchema = true` rules below as active during MVP iteration.
 
 **Tooling choice: Room's built-in migration framework**
 
@@ -670,7 +824,19 @@ Room.databaseBuilder(context, StockBuddyDatabase.class, "stockbuddy.db")
 
 ---
 
-### 4.3.2 MVP Data Model Finalization — Key Design Decisions
+### 4.3.2 Data Model Finalization — Key Design Decisions (v1, partially superseded)
+
+> **⚠️ Superseded in part by §4.0 (MVP v2).** This section records the *v1* finalization. Current status of each decision below:
+>
+> | Decision | v1 → MVP v2 status |
+> |----------|--------------------|
+> | 1 — Barcode as `product_master` PK | ✅ **Still current** |
+> | 2 — RFID as `linked_items` PK | ✅ **Still current** |
+> | 3 — Denormalized columns in `linked_items` | ❌ **Reversed** — `linked_items` is now normalized (§4.0.3 C1) |
+> | 4 — UUID session IDs | ✅ **Still current** |
+> | 5 — Out-of-MVP tables removed | 🔄 **Expanded** — MVP also drops `generated_reports`, `app_config` (§4.0.1) |
+>
+> Not captured in v1 but part of the finalized MVP v2 model (see §4.0.3): **category is now an FK** (`product_master.category_id`), **attributes are product-level only**, and **`session_result_items` is wired at STOP**.
 
 **Context:** The MVP data model underwent significant revision during implementation to align business domain concepts with database architecture. Below are the critical decisions made and their rationale.
 
@@ -705,6 +871,8 @@ Room.databaseBuilder(context, StockBuddyDatabase.class, "stockbuddy.db")
 
 #### Decision 3: Denormalized Columns in linked_items (product_name, category)
 
+> **⚠️ REVERSED in MVP v2 — see §4.0.3 (C1) and the note on §4.2.3.** `linked_items` is now normalized (FK to product only). Retained below for historical context.
+
 **What changed:** `linked_items` stores copies of `product_name` and `category` from `product_master` in the same row.
 
 **Rationale:**
@@ -734,19 +902,16 @@ Room.databaseBuilder(context, StockBuddyDatabase.class, "stockbuddy.db")
 - Cannot rely on `AUTOINCREMENT` to guarantee sequential IDs.
 - Session ordering now uses `ORDER BY CASE WHEN stopped_at IS NULL THEN 0 ELSE 1 END ASC, stopped_at DESC` to put active (stopped_at IS NULL) sessions first, then reverse-chronological.
 
-#### Decision 5: Out-of-MVP Tables Removed
+#### Decision 5: Out-of-MVP Tables Removed *(expanded in v2)*
 
-**What changed:** `delivery_history`, `audit_log` removed from `@Database` entities.
+**What changed (v2):** the MVP `@Database` entity list excludes **`delivery_history`, `audit_log`, `generated_reports`, and `app_config`** (§4.0.1). v1 dropped only the first two; v2 also drops `generated_reports` (export persists nothing) and `app_config` (configuration lives in `AppPrefs`/SharedPreferences).
 
 **Rationale:**
-- **Scope clarity:** FR-53–56 (API/LAN export) and FR-48 (audit logging) are explicitly post-MVP in `StockBuddy_MVP_Demo_Scope.md`.
-- **Reduced complexity:** Removing unused tables cuts migration and test burden for MVP release.
-- **Easy to add later:** Tables can be added in v3+ schema without breaking existing data.
+- **Scope clarity:** FR-53–56 (API/LAN export) and FR-48 (audit logging) are explicitly post-MVP in `StockBuddy_MVP_Demo_Scope.md`; report/delivery history and a DB-backed config store add no demo value.
+- **Reduced complexity:** Fewer tables → less schema, DAO, and test surface for the MVP.
+- **Easy to add later:** All four are additive and can be introduced in a future schema version without disturbing existing data.
 
-**Future migration (when needed):**
-```kotlin
-@AutoMigration(from = 2, to = 3)  // when audit_log is added in v3
-```
+**Reintroduction path (post-MVP):** when these tables return, they ship with forward-only `Migration` objects per §4.3.1. During MVP dev, schema changes are handled by `fallbackToDestructiveMigration` (§4.0.7) — no versioned migration is written yet.
 
 ### 4.4 Sample Data
 
@@ -788,31 +953,32 @@ Domain-specific field metadata (one row per field). Defines the schema for the `
 
 #### `product_master`
 
-| barcode (PK) | product_name              | category   | attributes JSON         | created_at          | updated_at          |
-|--------------|--------------------------|-----------|------------------------|---------------------|---------------------|
-| BC-HW-001    | Hot Wheels 5-Car Pack     | Hot Wheels | `{"price": "349.00"}`  | 2026-06-01 10:00:00 | 2026-06-01 10:00:00 |
-| BC-LG-002    | Ludo Classic Board Game   | Board Game | `{"price": "199.00"}`  | 2026-06-01 10:05:00 | 2026-06-01 10:05:00 |
-| BC-RC-003    | Champ Ride-On Car (Red)   | Ride-On    | `{"price": "4999.00"}` | 2026-06-01 10:10:00 | 2026-06-01 10:10:00 |
+| barcode (PK) | product_name              | category_id (FK) | attributes JSON         | created_at          | updated_at          |
+|--------------|--------------------------|------------------|------------------------|---------------------|---------------------|
+| BC-HW-001    | Hot Wheels 5-Car Pack     | 1 (Hot Wheels)   | `{"price": "349.00"}`  | 2026-06-01 10:00:00 | 2026-06-01 10:00:00 |
+| BC-LG-002    | Ludo Classic Board Game   | 2 (Board Game)   | `{"price": "199.00"}`  | 2026-06-01 10:05:00 | 2026-06-01 10:05:00 |
+| BC-RC-003    | Champ Ride-On Car (Red)   | 3 (Ride-On)      | `{"price": "4999.00"}` | 2026-06-01 10:10:00 | 2026-06-01 10:10:00 |
 
 > One product record per SKU (EAN-13 barcode) — shared across all physical units of the same variant.
+> `category_id` is an FK to `categories.id` (v2). `attributes` JSON holds the product-level domain fields — the single home for domain data (units inherit it via the barcode FK).
 
 ---
 
 #### `linked_items`
 
-Each row is one physical box/unit with its own RFID tag.
+Each row is one physical box/unit with its own RFID tag. **Normalized (v2):** the row holds no product data — name/category/attributes are reached through the `barcode` FK to `product_master`.
 
-| rfid_tag_id (PK) | barcode    | product_name            | category   | attributes JSON        | linked_at           |
-|------------------|-----------|------------------------|-----------|------------------------|---------------------|
-| E200001234567890A1 | BC-HW-001 | Hot Wheels 5-Car Pack   | Hot Wheels | `{"price": "349.00"}` | 2026-06-02 09:15:00 |
-| E200001234567890A2 | BC-HW-001 | Hot Wheels 5-Car Pack   | Hot Wheels | `{"price": "349.00"}` | 2026-06-02 09:16:00 |
-| E200001234567890B1 | BC-LG-002 | Ludo Classic Board Game | Board Game | `{"price": "199.00"}` | 2026-06-02 09:20:00 |
-| E200001234567890B2 | BC-LG-002 | Ludo Classic Board Game | Board Game | `{"price": "199.00"}` | 2026-06-02 09:21:00 |
-| E200001234567890C1 | BC-RC-003 | Champ Ride-On Car (Red) | Ride-On    | `{"price":"4999.00"}` | 2026-06-02 09:30:00 |
+| rfid_tag_id (PK) | barcode    | linked_at           |
+|--------------------|-----------|---------------------|
+| E200001234567890A1 | BC-HW-001 | 2026-06-02 09:15:00 |
+| E200001234567890A2 | BC-HW-001 | 2026-06-02 09:16:00 |
+| E200001234567890B1 | BC-LG-002 | 2026-06-02 09:20:00 |
+| E200001234567890B2 | BC-LG-002 | 2026-06-02 09:21:00 |
+| E200001234567890C1 | BC-RC-003 | 2026-06-02 09:30:00 |
 
-> **Key design change:** `rfid_tag_id` is the PK (not a UNIQUE column on an artificial id). This directly models the business reality: one RFID tag = one physical unit.
-> **Denormalization:** `product_name` and `category` are stored denormalized for ~50-60% faster RFID scan lookups (FK lookup to `product_master` would require a JOIN on every scan).
-> **Grouping:** Multiple rows share the same `barcode` (e.g. A1 and A2 both are BC-HW-001 units) for CSV export and results grouping.
+> **`rfid_tag_id` is the PK** — one RFID tag = one physical unit (no artificial surrogate id).
+> **No denormalization (v2):** product_name, category, and attributes live only on `product_master`; there is nothing to keep in sync. The scan path needs only RFID-set membership, so no per-scan JOIN is incurred (§4.0.3).
+> **Grouping:** Multiple rows share the same `barcode` (e.g. A1 and A2 are both BC-HW-001 units) — grouping/counting for results happens on the snapshot at STOP.
 
 ---
 
@@ -848,7 +1014,7 @@ Purged once `session_result_items` is populated successfully.
 
 #### `session_result_items`
 
-Immutable snapshot written at STOP time. Product fields copied from `linked_items` as they were at that moment.
+Immutable snapshot written at STOP time. Product fields are copied from `product_master` (resolving `category_id` to its name string) as they were at that moment — frozen thereafter.
 
 | id | session_id (UUID prefix) | status    | rfid_tag_id        | product_name            | barcode    | category   | attributes JSON        |
 |----|--------------------------|-----------|--------------------|-----------------------|-----------|-----------|------------------------|
@@ -889,14 +1055,14 @@ WHERE session_id = '550e8400...' AND status = 'MISSING' AND category = 'Hot Whee
 
 ---
 
-#### `generated_reports`
+#### `generated_reports`  *(aspirational — not created in MVP; §4.0.1)*
 
 | id | session_id (prefix) | file_name                          | file_path                                    | export_scope | category_filter | generated_at        | file_size_bytes | row_count |
 |----|--------------------|------------------------------------|----------------------------------------------|-------------|----------------|---------------------|----------------|----------|
 | 1  | 550e8400…          | 3_June_Morning_20260603_1030.csv   | /data/data/com.gigakin.stockbuddy/exports/…  | FULL        | NULL           | 2026-06-03 10:30:00 | 4096           | 6        |
 
 
-#### `app_config`  *(selected keys)*
+#### `app_config`  *(aspirational — not created in MVP; config lives in `AppPrefs`. §4.0.1)*
 
 | key                    | value                                          |
 |------------------------|------------------------------------------------|
@@ -931,6 +1097,8 @@ The following gaps (G-01 through G-14) were identified during traceability revie
 ---
 
 #### G-01 & G-02 — Category Management Logic (FR-61, FR-62)
+
+> **MVP delta (§4.0):** category is now an **FK** (`product_master.category_id`), not a denormalized string. Delete is **block + warn, then CASCADE** (delete products and their linked units on confirm) — the string `updateCategory(oldName, newName)` replacement flow below does not apply to the MVP model.
 
 ```java
 class CategoryRepository {
@@ -972,6 +1140,8 @@ ViewModel emits a `CategoryDeleteEvent` to the UI; UI shows the impact count and
 ---
 
 #### G-03 — Product Edit Propagation to Linked Items (FR-26)
+
+> **MVP delta (§4.0):** no propagation needed. `linked_items` no longer stores product fields, so editing a product updates `product_master` **only** — there is no `linkedItemDao.updateProductFieldsByBarcode(...)` leg in the MVP model. The transaction below collapses to a single-table update.
 
 ```kotlin
 class ProductRepository(
@@ -1026,6 +1196,8 @@ ViewModel flow: call `countLinkedItems(barcode)` → if > 0, emit `CascadeDelete
 
 #### G-05, G-06, G-07, G-08 — Assets ViewModel (FR-51, FR-52, FR-54, FR-55)
 
+> **v2 note (§4.0.6):** Assets is now **product-level** — it lists `product_master` rows (with a linked-unit count), not one row per RFID unit. Search/filter run over the product join (`product_master` ⋈ `categories`), and edit/delete act on the product (delete → block+warn → CASCADE units). The `List<LinkedItemEntity>` output below becomes `List<ProductMasterSummary>` (see G-18's query).
+
 ```java
 class AssetsViewModel extends ViewModel {
 
@@ -1034,22 +1206,24 @@ class AssetsViewModel extends ViewModel {
   private final MutableStateFlow<String>    categoryFilter  = new MutableStateFlow<>(null); // null = All
   private final MutableStateFlow<SortOrder> sortOrder       = new MutableStateFlow<>(SortOrder.NAME_ASC);
 
-  enum SortOrder { NAME_ASC, ARTICLE_ID_ASC, LINKED_AT_DESC }
+  enum SortOrder { NAME_ASC, LINKED_AT_DESC }
 
   // Outputs (observed by UI)
-  public final StateFlow<List<LinkedItemEntity>> items;       // FR-49, FR-51, FR-54, FR-55
-  public final StateFlow<Integer>                filteredCount; // FR-52
+  public final StateFlow<List<ProductMasterSummary>> items;   // product-level (v2); FR-49/51/54/55
+  public final StateFlow<Integer>                    filteredCount; // FR-52
 
-  AssetsViewModel(LinkedItemDao dao) {
-    // Combine all filters into a single reactive query
+  AssetsViewModel(ProductMasterDao dao) {
+    // Combine all filters into a single reactive query (product ⋈ categories, + linked-unit count)
     items = combine(searchQuery, categoryFilter, sortOrder, (q, cat, sort) -> {
       val like = "%$q%"
-      return dao.search(like, cat, sort.toSqlOrderBy())
-      // SELECT * FROM linked_items
-      //   WHERE (product_name LIKE :like OR barcode LIKE :like
-      //          OR rfid_tag_id LIKE :like)
-      //   AND (:cat IS NULL OR category = :cat)
-      //   ORDER BY <sort>
+      return dao.searchProducts(like, cat, sort.toSqlOrderBy())
+      // SELECT p.*, c.name AS category, COUNT(l.rfid_tag_id) AS linked_count
+      //   FROM product_master p
+      //   JOIN categories c ON c.id = p.category_id
+      //   LEFT JOIN linked_items l ON l.barcode = p.barcode
+      //   WHERE (p.product_name LIKE :like OR p.barcode LIKE :like OR c.name LIKE :like)
+      //     AND (:cat IS NULL OR p.category_id = :cat)
+      //   GROUP BY p.barcode  ORDER BY <sort>
     })
     filteredCount = items.map { it.size }  // FR-52: real-time count
   }
@@ -1154,12 +1328,15 @@ A shared toolbar component in the NavGraph's root layout observes `readerConnect
 
 ---
 
-#### G-13 — Auto-Upsert Product Master on Item Save (FR-21)
+#### G-13 — Product-First Save on Item Link (FR-21)
 
-```java
+> **MVP delta (§4.0):** in v2 there is no "auto-upsert with overwrite." The product is written **first** (FK parent) and is **insert-or-reject-on-name-mismatch** — an existing barcode with a different product name is rejected, never overwritten. The unit row is normalized (no product columns). See §3.2.1 for the full validation order.
+
+```kotlin
 class LinkedItemRepository(
   private val linkedItemDao: LinkedItemDao,
-  private val productMasterDao: ProductMasterDao
+  private val productMasterDao: ProductMasterDao,
+  private val categoryDao: CategoryDao
 ) {
 
   @Transaction
@@ -1167,35 +1344,28 @@ class LinkedItemRepository(
     productName: String, barcode: String, category: String,
     rfidTagId: String, attributesJson: String = "{}"
   ): SaveResult {
-    // 1. Validate RFID uniqueness (NFR-18)
-    if (linkedItemDao.existsByRfid(rfidTagId)) {
-      return SaveResult.DuplicateRfid
-    }
+    // 1. RFID uniqueness (NFR-18)
+    if (linkedItemDao.existsByRfid(rfidTagId)) return SaveResult.DuplicateRfid
 
-    // 2. Insert the linked item (RFID is the PK)
-    linkedItemDao.insert(LinkedItemEntity(
-      rfidTagId = rfidTagId,
-      barcode = barcode,
-      productName = productName,
-      category = category,
-      attributesJson = attributesJson
-    ))
+    // 2. Category must exist — FK, no auto-create (§4.0.6)
+    val categoryId = categoryDao.findIdByName(category)
+      ?: return SaveResult.ValidationError(mapOf("category" to "Category doesn't exist"))
 
-    // 3. Auto-upsert the Product Master (FR-21)
-    //    Insert if barcode not present; update name/category/attributes if it is
-    productMasterDao.upsert(ProductMasterEntity(
-      barcode = barcode,
-      productName = productName,
-      category = category,
-      attributesJson = attributesJson
-    ))
-    
+    // 3. Product FIRST (FK parent): insert if new, reject on name conflict, else leave as-is
+    val existing = productMasterDao.getByBarcode(barcode)
+    if (existing == null)
+      productMasterDao.insert(ProductMasterEntity(barcode, productName, categoryId, attributesJson))
+    else if (existing.productName != productName)
+      return SaveResult.ValidationError(mapOf("barcode" to "Barcode already exists as '${existing.productName}'"))
+
+    // 4. Normalized unit row — no product_name/category/attributes
+    linkedItemDao.insert(LinkedItemEntity(rfidTagId = rfidTagId, barcode = barcode))
     return SaveResult.Success
   }
 }
 ```
 
-Both operations share a single `@Transaction` — the product master is always in sync with linked items after every save. This maintains the denormalization invariant (§4.2.3).
+Both writes share one `@Transaction` — either the product (if new) and the unit both persist, or neither does. No cross-table denormalization to keep in sync (v2).
 
 ---
 
@@ -1275,6 +1445,8 @@ The UI displays a summary card (inserted / updated / rejected counts) and an exp
 ---
 
 #### G-18 — Product Master View Query (FR-25)
+
+> **v2 note:** `product_master.category` is now `category_id` (FK). The query must `JOIN categories c ON c.id = p.category_id` and select `c.name` as the display category (and filter/`LIKE` on `c.name`). In the MVP this query backs the **product-level Assets screen** (§4.0.6), which supersedes a separate Product Master screen.
 
 The Product Master screen lists all products with a linked-unit count per product:
 

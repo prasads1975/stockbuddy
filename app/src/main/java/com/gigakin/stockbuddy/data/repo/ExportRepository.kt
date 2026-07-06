@@ -36,11 +36,11 @@ class ExportRepository(private val context: Context) {
 
         val rows = mutableListOf(header.toTypedArray())
         results.forEach { r ->
-            val attrs = JsonAttributes.toMap(r.item.attributesJson)
-            val row = mutableListOf(r.status.name, r.item.productName, r.item.barcode, r.item.category)
+            val attrs = JsonAttributes.toMap(r.attributesJson)
+            val row = mutableListOf(r.status.name, r.productName, r.barcode, r.category)
             // Domain-specific fields
             fieldDefs.forEach { row.add(attrs[it.key] ?: "") }
-            row.add(r.item.rfidTagId)
+            row.add(r.rfidTagId)
             rows.add(row.toTypedArray())
         }
         return rows

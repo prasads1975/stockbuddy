@@ -5,20 +5,23 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.gigakin.stockbuddy.data.db.dao.ProductSummary
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
-import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 import com.gigakin.stockbuddy.databinding.ItemAssetBinding
 import com.gigakin.stockbuddy.util.JsonAttributes
 
-/** FR-62: item cards show fixed fields + dynamically rendered domain-specific fields based on showOnAssets. */
+/**
+ * FR-62 (v2, product-level): cards show one product with its barcode, category, linked-unit count,
+ * and the domain-specific fields (showOnAssets) from the product's attributes.
+ */
 class AssetsAdapter(
     private val fieldDefs: List<FieldDefinitionEntity> = emptyList(),
-    private val onEditClick: (LinkedItemEntity) -> Unit = {},
-    private val onDeleteClick: (LinkedItemEntity) -> Unit = {}
+    private val onEditClick: (ProductSummary) -> Unit = {},
+    private val onDeleteClick: (ProductSummary) -> Unit = {}
 ) : RecyclerView.Adapter<AssetsAdapter.VH>() {
-    private var items: List<LinkedItemEntity> = emptyList()
+    private var items: List<ProductSummary> = emptyList()
 
-    fun submitList(list: List<LinkedItemEntity>) { items = list; notifyDataSetChanged() }
+    fun submitList(list: List<ProductSummary>) { items = list; notifyDataSetChanged() }
 
     inner class VH(val b: ItemAssetBinding) : RecyclerView.ViewHolder(b.root) {
         init {
@@ -33,10 +36,9 @@ class AssetsAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = items[position]
         holder.b.tvName.text = item.productName
-        holder.b.tvBarcode.text = item.barcode
-        holder.b.tvCategory.text = item.category
+        holder.b.tvBarcode.text = "${item.barcode}  •  ${item.linkedCount} unit${if (item.linkedCount == 1) "" else "s"}"
+        holder.b.tvCategory.text = item.categoryName
 
-        // Render dynamic custom fields
         renderCustomFields(holder.b.dynamicFieldsContainer, item.attributesJson)
     }
 
@@ -64,7 +66,6 @@ class AssetsAdapter(
                 orientation = LinearLayout.HORIZONTAL
             }
 
-            // Label (with ellipsis for long names)
             val labelView = TextView(container.context).apply {
                 layoutParams = LinearLayout.LayoutParams(80, LinearLayout.LayoutParams.WRAP_CONTENT)
                 text = fieldDef.label
@@ -77,13 +78,8 @@ class AssetsAdapter(
                 maxLines = 1
             }
 
-            // Value
             val valueView = TextView(container.context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    1f
-                )
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 text = value
                 textSize = 14f
                 setTextColor(container.context.getColor(com.gigakin.stockbuddy.R.color.md_theme_onSurfaceVariant))

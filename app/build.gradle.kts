@@ -21,9 +21,9 @@ android {
         // BuildConfig fields for demo-mode limits (Section 4, MVP Scope doc).
         // These are deliberately build-time constants, not stored config, so they're
         // trivial to raise/strip out before a real pilot. See util/DemoLimits.kt.
-        buildConfigField("int", "DEMO_MAX_ITEMS", "50")
-        buildConfigField("int", "DEMO_MAX_CATEGORIES", "10")
-        buildConfigField("int", "DEMO_MAX_SESSIONS", "25")
+        buildConfigField("int", "DEMO_MAX_ITEMS", "200")
+        buildConfigField("int", "DEMO_MAX_CATEGORIES", "50")
+        buildConfigField("int", "DEMO_MAX_SESSIONS", "100")
     }
 
     buildTypes {

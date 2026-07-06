@@ -34,6 +34,11 @@ class ScanningViewModel(
     private val _scanning = MutableLiveData(false)
     val scanning: LiveData<Boolean> get() = _scanning
 
+    /** Emits the session id once STOP has finished writing the results snapshot (safe to open Results). */
+    private val _stopped = MutableLiveData<String?>(null)
+    val stopped: LiveData<String?> get() = _stopped
+    fun consumeStopped() { _stopped.value = null }
+
     private val _scanStats = MutableLiveData(ScanStats())
     val scanStats: LiveData<ScanStats> get() = _scanStats
 
@@ -80,7 +85,8 @@ class ScanningViewModel(
         simulationJob = null
         scannerManager.stopContinuousScan()
         _scanning.value = false
-        inventoryRepository.stopSession(sessionId)
+        inventoryRepository.stopSession(sessionId)   // writes the immutable results snapshot
+        _stopped.value = sessionId                    // signal Results is safe to open
     }
 
     private fun updateScanStats(sessionId: String) = viewModelScope.launch {

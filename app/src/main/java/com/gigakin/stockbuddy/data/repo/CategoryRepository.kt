@@ -19,8 +19,15 @@ class CategoryRepository(private val dao: CategoryDao) {
                 "Demo limit reached (${DemoLimits.MAX_CATEGORIES} categories). Edit or delete an existing category to add a new one."
             )
         }
-        dao.insert(CategoryEntity(name = name))
-        return LimitCheck.Ok
+        try {
+            android.util.Log.d("CategoryRepository", "Inserting category: $name")
+            dao.insert(CategoryEntity(name = name))
+            android.util.Log.d("CategoryRepository", "Category inserted successfully: $name")
+            return LimitCheck.Ok
+        } catch (e: Exception) {
+            android.util.Log.e("CategoryRepository", "Failed to insert category: $name", e)
+            return LimitCheck.Exceeded("Failed to add category: ${e.message}")
+        }
     }
 
     suspend fun update(category: CategoryEntity) = dao.update(category)

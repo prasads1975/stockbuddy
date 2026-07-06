@@ -23,8 +23,8 @@ class ResultGroupAdapter(
     private val expanded = mutableSetOf<String>()
 
     fun submitList(items: List<InventoryRepository.ResultItem>) {
-        groups = items.groupBy { it.item.barcode }.map { (barcode, units) ->
-            Group(barcode, units.first().item.productName, units.first().item.category, units)
+        groups = items.groupBy { it.barcode }.map { (barcode, units) ->
+            Group(barcode, units.first().productName, units.first().category, units)
         }
         notifyDataSetChanged()
     }
@@ -73,7 +73,7 @@ class ResultGroupAdapter(
 
     inner class UnitVH(val b: ItemResultUnitBinding) : RecyclerView.ViewHolder(b.root) {
         internal fun bind(item: InventoryRepository.ResultItem) {
-            b.tvRfid.text = "RFID: ${item.item.rfidTagId}"
+            b.tvRfid.text = "RFID: ${item.rfidTagId}"
 
             // Article ID field hidden (barcode is the primary business identifier)
             b.tvArticleId.visibility = android.view.View.GONE

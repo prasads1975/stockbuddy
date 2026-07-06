@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.DialogAddCategoryBinding
+import com.gigakin.stockbuddy.util.LimitCheck
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 class AddCategoryDialogFragment : BottomSheetDialogFragment() {
@@ -17,7 +19,7 @@ class AddCategoryDialogFragment : BottomSheetDialogFragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: CategoryViewModel by viewModels {
-        ViewModelFactory { CategoryViewModel(app.categoryRepository) }
+        ViewModelFactory { CategoryViewModel(app.categoryRepository, app.productRepository) }
     }
 
     override fun onCreateView(
@@ -33,11 +35,27 @@ class AddCategoryDialogFragment : BottomSheetDialogFragment() {
         binding.btnClose.setOnClickListener { dismiss() }
         binding.btnCancel.setOnClickListener { dismiss() }
 
+        // Observe add result to handle success/error — consume ONLY after processing, not in the callback
+        viewModel.addResult.observe(viewLifecycleOwner) { result ->
+            if (result == null) return@observe
+
+            when (result) {
+                is LimitCheck.Exceeded -> {
+                    Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
+                }
+                is LimitCheck.Ok -> {
+                    dismiss()
+                }
+            }
+
+            // Consume AFTER the when block completes and dismiss/snackbar are fully queued
+            viewModel.consumeAddResult()
+        }
+
         binding.btnSave.setOnClickListener {
             val name = binding.editCategoryName.text?.toString()?.trim().orEmpty()
             if (name.isNotBlank()) {
                 viewModel.add(name)
-                dismiss()
             } else {
                 binding.editCategoryName.error = "Category name is required"
             }

@@ -3,7 +3,7 @@
 ## What this project is
 
 Android RFID Inventory Management app for the Chainway C72 handheld scanner.
-Package: `com.gigakin.stockbuddy` | SRS: `RFID_App_SRS_C72.md` v3.14 | Scope: `StockBuddy_MVP_Demo_Scope.md`
+Package: `com.gigakin.stockbuddy` | SRS: `RFID_App_SRS_C72.md` v3.15 | Scope: `StockBuddy_MVP_Demo_Scope.md` | Data model: `docs/design/StockBuddy_System_Design.md` §4.0 (v2)
 
 The core sales pitch: **one APK, reconfigured in 30 seconds for any retail industry** (toy store, jewellery, pharma, etc.) by switching domain-specific field configuration at runtime — no code changes, no APK update. This is the headline feature. Every architecture decision serves it.
 
@@ -22,8 +22,9 @@ Current phase: **MVP/Demo only.** The app must build, run on an Android emulator
 - Implement licensing, authentication/RBAC, backup/restore, or the first-run wizard. These are explicitly out of scope.
 - Implement QR scan mode (FR-01–04). Cut from MVP.
 - Change `viewBinding = false` anywhere. ViewBinding is the codebase-wide pattern.
-- Simplify or remove the hybrid fixed-columns + JSON-attributes data model. It is the architectural foundation of the dynamic-field feature — see Data Model section below.
-- Change demo limits without explicit instruction. They are `BuildConfig` constants by design.
+- Remove the JSON-attributes column (`attributes` on `product_master`). It is the architectural foundation of the dynamic-field feature. Note (v2): attributes are **product-level only**, and `linked_items` is normalized (no denormalized product columns) — see Data Model section below.
+- Re-denormalize `linked_items` (adding product_name/category back). v2 deliberately normalized it; results immutability comes from the `session_result_items` snapshot, not from denormalization.
+- Change demo limits without explicit instruction. They are `BuildConfig` constants by design (currently 200 items / 50 categories / 100 sessions).
 
 ---
 
@@ -37,7 +38,7 @@ Current phase: **MVP/Demo only.** The app must build, run on an Android emulator
 | **Architecture** | MVVM: Fragment → ViewModel → Repository → Room DAO |
 | **DI** | Manual service locator in `StockBuddyApp.kt`. No framework. |
 | **Navigation** | Jetpack Navigation Component + Safe Args plugin |
-| **Database** | Room v1 + SQLite. Local-only. No migrations yet. |
+| **Database** | Room v3 + SQLite. Local-only. No migrations yet (`fallbackToDestructiveMigration` in dev). |
 | **Hardware** | Interface + 2 implementations (see Hardware section) |
 | **CSV** | OpenCSV 5.9 |
 | **Coroutines** | `viewModelScope` + suspend functions throughout |
@@ -94,37 +95,44 @@ app/src/main/res/
 
 ## Data model (critical — read carefully)
 
-### The hybrid design
+**Authoritative spec:** `docs/design/StockBuddy_System_Design.md` §4.0 (v2). Two layers with opposite
+normalization: **master data is normalized**; **session results are a denormalized immutable snapshot.**
 
-Every item record has two kinds of fields:
+### Master data (normalized)
 
-**Fixed columns** (Room DB columns, always present):
-- `rfidTagId: String` — `@PrimaryKey` on `items`. The guaranteed-unique per-unit identifier. NFR-18.
-- `barcode: String` — `@PrimaryKey` on `products`. The product-level grouping and matching key.
-- `name: String`, `categoryName: String`
-- `articleId: String?` — nullable; presence controlled by `ArticleIdMode` in `AppPrefs`
+- `product_master` — PK `barcode`; the canonical home for product data. `category_id: Long` is an
+  **FK → categories.id** (CASCADE). `attributes: String` JSON holds domain fields — **product-level only**
+  (all units of a barcode share them). Read/write via `JsonAttributes.toMap()` / `fromMap()`.
+- `linked_items` — PK `rfid_tag_id` (NFR-18: a tag maps to exactly one barcode, subsuming RFID+barcode
+  uniqueness). `barcode` FK → product_master (CASCADE). **No product columns** — name/category/attributes
+  are reached via the product. Scan hot path needs only RFID-set membership, so no per-scan join.
+- `categories` — PK `id` (autoGen), UNIQUE `name`.
+- `field_definitions` — PK `id` (autoGen); field schema + sortOrder (the dynamic-field feature).
 
-**Domain-specific JSON column** (the dynamic-field feature):
-- `attributesJson: String` — single JSON blob per item. Schema defined at runtime in `field_definitions` table. Read/write via `JsonAttributes.toMap()` / `JsonAttributes.fromMap()`.
+### Session data
 
-### Entities and tables
+- `inventory_sessions` — PK `id` (UUID), code, started/stopped, category_filter, KPI counts.
+- `session_tags` — composite PK (session_id, rfid_tag_id); FK→sessions CASCADE; scan crash buffer.
+- `session_result_items` — **immutable denormalized snapshot** written at STOP. One row per unit
+  (AVAILABLE/MISSING with copied product_name/barcode/category/attributes) + one per EXCESS tag
+  (product columns NULL). All Results/Reports/Export reads come from here, never a live recompute.
 
-```
-categories          CategoryEntity       PK: id (autoGen), UNIQUE: name
-field_definitions   FieldDefinitionEntity PK: id (autoGen) — field schema, sortOrder
-products            ProductEntity        PK: barcode — auto-upserted on every item save
-items               ItemEntity           PK: rfidTagId — one row per physical tagged unit
-inventory_sessions  InventorySessionEntity PK: id (autoGen), code, createdAt, stoppedAt?
-scanned_tags        ScannedTagEntity     PK: id, FK: sessionId→sessions CASCADE, UNIQUE(sessionId,rfidTagId)
-```
+### Dropped from MVP (aspirational only — not created)
+`generated_reports`, `app_config` (config lives in `AppPrefs`), `delivery_history`, `audit_log`.
+Entity count: **7 registered** (DB version 3).
 
 ### Key rules baked into the data layer
 
-- RFID uniqueness → DB-level (`@PrimaryKey`) + repo-level check before insert → returns `SaveResult.DuplicateRfid`
-- Scan dedup → `OnConflictStrategy.IGNORE` on `ScannedTagDao.insert()` — no app-level dedup needed
-- Product Master upsert → `OnConflictStrategy.REPLACE` keyed on `barcode`, called automatically after every item save
-- Session rolling purge → `InventoryRepository.startSession()` deletes the oldest session when count ≥ 25, then inserts
-- Demo item cap → checked in `ItemRepository.saveLinkedItem()` and `bulkImport()` before insert
+- RFID uniqueness → DB `@PrimaryKey` + repo-level check → `SaveResult.DuplicateRfid`.
+- Category is an FK, resolved by name in `ItemRepository` — **no auto-create**; unknown category rejects.
+- Product write is **insert-or-reject-on-name-mismatch** (never overwrite an existing barcode's name).
+- Linking is append-only: `linked_items` insert if RFID new, else skip. `linked_items` is not directly editable.
+- Product delete (Assets) / category delete → block + warn, then **FK CASCADE** removes dependents.
+- Scan dedup → `OnConflictStrategy.IGNORE` on `SessionTagDao.insert()`.
+- Live scan counts → in-memory master RFID set (`linkedItemDao.getAllRfids()`); missing = total − available.
+- Snapshot written in `InventoryRepository.stopSession()`; navigate to Results only after it completes.
+- Session rolling purge → `startSession()` deletes oldest when count ≥ MAX_SESSIONS, then inserts.
+- Demo item cap → checked in `saveLinkedItem()` and `bulkImport()` before insert.
 
 ---
 
@@ -196,28 +204,32 @@ When `status == NOT_AVAILABLE`, all scan-triggering buttons must be **disabled**
 
 ## Repository business logic summary
 
-### `ItemRepository.saveLinkedItem()` — validation order
+### `ItemRepository.saveLinkedItem()` — validation/write order (v2)
 1. Fixed mandatory fields blank check (name, barcode, category, rfidTagId)
-2. Article ID mode-dependent validation (required only when MANDATORY)
-3. Domain-specific mandatory fields (from `field_definitions` where `mandatory = true`)
+2. Domain-specific mandatory fields (from `field_definitions` where `mandatory && showOnLinking`)
+3. Category resolved by name → `ValidationError("category")` if it doesn't exist (no auto-create)
 4. RFID duplicate check → `SaveResult.DuplicateRfid`
 5. Demo cap check → `SaveResult.DemoLimitReached`
-6. DB insert + Product Master upsert (always called on success)
+6. Product FIRST (FK parent): insert if new; if barcode exists with a different name → `ValidationError("barcode")`
+7. Insert normalized `linked_items` row (rfid + barcode only)
 
-### `ItemRepository.SaveResult` sealed class
+### `ItemRepository.SaveResult` / `BulkImportResult`
 ```kotlin
-Success | ValidationError(fieldErrors: Map<String, String>) | DuplicateRfid | DemoLimitReached
+Success | ValidationError(fieldErrors) | DuplicateRfid | DemoLimitReached | DatabaseError(message)
+BulkImportResult(inserted, skipped, rejected, reasons)   // append-only: skipped = RFID already existed
 ```
-Field error keys: `"name"`, `"barcode"`, `"category"`, `"rfid"`, `"articleId"`, `"attr_{fieldKey}"`
+Field error keys: `"name"`, `"barcode"`, `"category"`, `"rfid"`, `"attr_{fieldKey}"`
 
-### `InventoryRepository.computeResults(sessionId, categoryFilter?)`
-- Available = scanned AND in item master (within filter scope)
-- Missing = in item master but NOT scanned (within filter scope)
-- Excess = scanned but NOT in item master → synthetic `ItemEntity(name="(Unrecognized tag)")`
-- Filter is applied to the master set at compute time — raw scanned_tags is never filtered or discarded (FR-46)
+### `InventoryRepository` — snapshot-based results (v2)
+- `stopSession()` writes the immutable `session_result_items` snapshot (join product_master ⋈ categories, once).
+- `computeResults(sessionId, categoryFilter?)` READS the snapshot (no recompute). Filter is a read-side
+  predicate over frozen rows; EXCESS always retained; raw `session_tags` never discarded (FR-46).
+- `computeSessionStats()` (live during scan) uses the in-memory master RFID set: available = scanned∩master,
+  missing = total − available, excess = scanned − master.
+- EXCESS display name falls back to `"(Unrecognized tag)"`.
 
-### `ExportRepository.buildCsv()` — column order
-`Status | Name | Barcode | Category | [ArticleId if enabled] | [domain fields in sortOrder] | RFID Tag ID`
+### `ExportRepository.buildCsv()` — column order (reads the snapshot)
+`Status | Name | Barcode | Category | [domain fields in sortOrder] | RFID Tag ID`
 
 ---
 
@@ -250,16 +262,16 @@ Defined as `BuildConfig` fields in `app/build.gradle.kts`. Read via `DemoLimits.
 
 | Resource | Limit | Enforcement | At-limit behaviour |
 |---|---|---|---|
-| Items | 50 | `ItemRepository` | Block save; return `DemoLimitReached`; bulk import skips remaining rows |
-| Categories | 10 | `CategoryRepository` | Block add; return `LimitCheck.Exceeded(message)` |
-| Sessions | 25 | `InventoryRepository` | Rolling purge — delete oldest, then insert |
+| Items | 200 | `ItemRepository` | Block save; return `DemoLimitReached`; bulk import rejects remaining rows |
+| Categories | 50 | `CategoryRepository` | Block add; return `LimitCheck.Exceeded(message)` |
+| Sessions | 100 | `InventoryRepository` | Rolling purge — delete oldest, then insert |
 
 ---
 
 ## Current state — what is and isn't done
 
 ### Done (all files exist and contain real logic)
-- Complete Room data layer: 6 entities, 6 DAOs, `AppDatabase`
+- Complete Room data layer (v2 model, DB v3): 7 entities, 7 DAOs, `AppDatabase`
 - All 6 repositories with full validation and demo-limit enforcement
 - Hardware abstraction layer (emulator + SDK placeholder)
 - All 12 screens: Home, LinkingOptions, IndividualLinking, BulkLinking, InventoryEntry, Scanning, ReportsList, Results, ExportBottomSheet, Assets, Category, FieldConfig, Settings
@@ -330,7 +342,7 @@ Defined as `BuildConfig` fields in `app/build.gradle.kts`. Read via `DemoLimits.
 ## Explicitly out of MVP scope — do not implement
 
 - QR Scan linking mode (FR-01–04, FR-11)
-- Product Master screen (FR-22–28) — auto-upsert handles it without a UI
+- Standalone Product Master screen (FR-22–28) — the product-level **Assets** screen (v2) is the product UI (list/edit/delete); no separate Product Master screen
 - API upload / LAN transfer export (FR-53–56)
 - Authentication / RBAC / login screen
 - Licensing screen

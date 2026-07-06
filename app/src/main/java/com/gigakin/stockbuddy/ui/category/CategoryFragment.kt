@@ -26,7 +26,7 @@ class CategoryFragment : Fragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: CategoryViewModel by viewModels {
-        ViewModelFactory { CategoryViewModel(app.categoryRepository) }
+        ViewModelFactory { CategoryViewModel(app.categoryRepository, app.productRepository) }
     }
     private lateinit var adapter: CategoryAdapter
 
@@ -43,7 +43,10 @@ class CategoryFragment : Fragment() {
         binding.recyclerCategories.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerCategories.adapter = adapter
 
-        viewModel.categories.observe(viewLifecycleOwner) { adapter.submitList(it) }
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+            android.util.Log.d("CategoryFragment", "Observer received ${categories.size} categories: ${categories.map { it.name }}")
+            adapter.submitList(categories)
+        }
 
         binding.btnBack.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
 
@@ -97,12 +100,20 @@ class CategoryFragment : Fragment() {
     }
 
     private fun showDeleteConfirmation(category: CategoryEntity) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.dialog_delete_category_title))
-            .setMessage(getString(R.string.dialog_delete_category_message))
-            .setNegativeButton(getString(R.string.action_cancel)) { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton(getString(R.string.action_delete)) { _, _ -> viewModel.delete(category) }
-            .show()
+        // Block + warn with cascade impact count (§4.0.6).
+        viewModel.productCount(category.id) { count ->
+            if (!isAdded) return@productCount
+            val message = if (count > 0)
+                getString(R.string.delete_category_confirm, category.name, count)
+            else
+                getString(R.string.dialog_delete_category_message)
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.dialog_delete_category_title))
+                .setMessage(message)
+                .setNegativeButton(getString(R.string.action_cancel)) { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton(getString(R.string.action_delete)) { _, _ -> viewModel.delete(category) }
+                .show()
+        }
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

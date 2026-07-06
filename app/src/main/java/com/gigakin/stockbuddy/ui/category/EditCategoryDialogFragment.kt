@@ -18,7 +18,7 @@ class EditCategoryDialogFragment : BottomSheetDialogFragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: CategoryViewModel by viewModels {
-        ViewModelFactory { CategoryViewModel(app.categoryRepository) }
+        ViewModelFactory { CategoryViewModel(app.categoryRepository, app.productRepository) }
     }
 
     companion object {

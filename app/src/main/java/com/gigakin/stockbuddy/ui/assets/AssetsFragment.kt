@@ -11,7 +11,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
-import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
+import com.gigakin.stockbuddy.data.db.dao.ProductSummary
+import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.databinding.FragmentAssetsBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
@@ -23,9 +24,10 @@ class AssetsFragment : Fragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: AssetsViewModel by viewModels {
-        ViewModelFactory { AssetsViewModel(app.itemRepository, app.categoryRepository) }
+        ViewModelFactory { AssetsViewModel(app.productRepository, app.categoryRepository) }
     }
     private lateinit var adapter: AssetsAdapter
+    private var filterCategories: List<CategoryEntity> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAssetsBinding.inflate(inflater, container, false)
@@ -65,11 +67,12 @@ class AssetsFragment : Fragment() {
         }
 
         viewModel.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
+            filterCategories = cats
             val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
             binding.spinnerCategoryFilter.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, names)
             binding.spinnerCategoryFilter.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: android.widget.AdapterView<*>?, v: View?, position: Int, id: Long) {
-                    viewModel.setCategory(if (position == 0) null else names[position])
+                    viewModel.setCategory(if (position == 0) null else filterCategories[position - 1].id)
                 }
                 override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
             }
@@ -83,18 +86,23 @@ class AssetsFragment : Fragment() {
         }
     }
 
-    private fun showEditDialog(item: LinkedItemEntity) {
-        val dialog = EditAssetDialogFragment.newInstance(item)
+    private fun showEditDialog(product: ProductSummary) {
+        val dialog = EditAssetDialogFragment.newInstance(product.barcode)
         dialog.show(childFragmentManager, "edit_asset")
     }
 
-    private fun confirmAndDeleteItem(item: LinkedItemEntity) {
+    private fun confirmAndDeleteItem(product: ProductSummary) {
+        // Block + warn: deleting a product cascades to its linked units (§4.0.6).
+        val msg = if (product.linkedCount > 0)
+            getString(R.string.delete_product_confirm, product.productName, product.linkedCount)
+        else
+            getString(R.string.delete_asset_confirm)
         com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.action_delete)
-            .setMessage(R.string.delete_asset_confirm)
+            .setMessage(msg)
             .setNegativeButton(R.string.action_cancel) { dialog, _ -> dialog.dismiss() }
             .setPositiveButton(R.string.action_delete) { _, _ ->
-                viewModel.deleteItem(item)
+                viewModel.deleteProduct(product.barcode)
             }
             .show()
     }

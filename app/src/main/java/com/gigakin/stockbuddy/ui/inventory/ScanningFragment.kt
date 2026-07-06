@@ -97,10 +97,18 @@ class ScanningFragment : Fragment() {
         }
 
         binding.btnStop.setOnClickListener {
-            viewModel.stop(args.sessionId)
-            findNavController().navigate(
-                ScanningFragmentDirections.actionScanningToResults(args.sessionId, args.sessionCode)
-            )
+            binding.btnStop.isEnabled = false
+            viewModel.stop(args.sessionId)   // navigation happens once the snapshot is written
+        }
+
+        // Navigate to Results only after STOP has persisted the results snapshot.
+        viewModel.stopped.observe(viewLifecycleOwner) { stoppedSessionId ->
+            if (stoppedSessionId != null) {
+                viewModel.consumeStopped()
+                findNavController().navigate(
+                    ScanningFragmentDirections.actionScanningToResults(args.sessionId, args.sessionCode)
+                )
+            }
         }
 
         // Category filter dropdown

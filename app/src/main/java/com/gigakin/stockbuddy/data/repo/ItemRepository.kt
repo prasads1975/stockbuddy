@@ -1,30 +1,30 @@
 package com.gigakin.stockbuddy.data.repo
 
 import android.util.Log
-import androidx.lifecycle.LiveData
+import com.gigakin.stockbuddy.data.db.dao.CategoryDao
 import com.gigakin.stockbuddy.data.db.dao.FieldDefinitionDao
 import com.gigakin.stockbuddy.data.db.dao.LinkedItemDao
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 import com.gigakin.stockbuddy.util.DemoLimits
+import com.gigakin.stockbuddy.util.JsonAttributes
 
 /**
- * Individual + Bulk Linking core logic (FR-05-10, FR-09a-c, FR-15-19), Assets (FR-61-67),
- * and the demo item cap (Section 4, MVP Scope doc).
- * Barcode is the primary business identifier and links to product_master.
+ * Individual + Bulk Linking core logic (FR-05-19) and the demo item cap.
+ * v2 (§4.0.6): normalized units. Product is written FIRST (FK parent) and is
+ * insert-or-reject-on-name-mismatch — never overwritten. Category is an FK (resolved by name,
+ * no auto-create). The unit row (linked_items) holds no product data.
  */
 class ItemRepository(
     private val linkedItemDao: LinkedItemDao,
     private val fieldDefDao: FieldDefinitionDao,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val categoryDao: CategoryDao
 ) {
-    fun observeAll(): LiveData<List<LinkedItemEntity>> = linkedItemDao.observeAll()
-    fun search(query: String, category: String?): LiveData<List<LinkedItemEntity>> =
-        linkedItemDao.search(query, category)
-    suspend fun getAll(): List<LinkedItemEntity> = linkedItemDao.getAll()
+    private companion object { const val TAG = "ItemRepository" }
+
     suspend fun getByRfid(rfid: String): LinkedItemEntity? = linkedItemDao.getByRfid(rfid)
-    suspend fun delete(item: LinkedItemEntity) = linkedItemDao.delete(item)
-    suspend fun update(item: LinkedItemEntity) = linkedItemDao.update(item)
+    suspend fun countLinkedForBarcode(barcode: String): Int = linkedItemDao.countByBarcode(barcode)
 
     sealed class SaveResult {
         object Success : SaveResult()
@@ -35,10 +35,8 @@ class ItemRepository(
     }
 
     /**
-     * FR-08/09/09a/09b/09c: full save-time validation for Individual Linking.
-     * Fixed mandatory fields: productName, barcode, category, rfidTagId.
-     * Configured-mandatory domain-specific fields from field_definitions.
-     * On success, auto-upserts the Product Master (FR-21).
+     * FR-08/09/09a: save-time validation for Individual Linking.
+     * Category must already exist (FK, no auto-create). Product written first; name conflict rejects.
      */
     suspend fun saveLinkedItem(
         productName: String,
@@ -47,11 +45,6 @@ class ItemRepository(
         rfidTagId: String,
         attributes: Map<String, String>
     ): SaveResult {
-        android.util.Log.d("ItemRepository", "saveLinkedItem called with ${attributes.size} attributes")
-        attributes.forEach { (k, v) ->
-            android.util.Log.d("ItemRepository", "  Attribute: '$k' = '$v'")
-        }
-
         val errors = mutableMapOf<String, String>()
         if (productName.isBlank()) errors["name"] = "Required"
         if (barcode.isBlank()) errors["barcode"] = "Required"
@@ -63,120 +56,123 @@ class ItemRepository(
         fieldDefs.filter { it.mandatory && it.showOnLinking }.forEach { f ->
             if (attributes[f.key].isNullOrBlank()) errors["attr_${f.key}"] = "Required"
         }
-
         if (errors.isNotEmpty()) return SaveResult.ValidationError(errors)
 
-        // FR-08: RFID uniqueness, DB-enforced (NFR-18) — checked here too for a clean error.
+        // Category must exist (FK) — no auto-create (§4.0.6).
+        val categoryId = categoryDao.findIdByName(category)
+            ?: return SaveResult.ValidationError(mapOf("category" to "Category doesn't exist — add it in Settings first"))
+
+        // FR-08: RFID uniqueness.
         if (linkedItemDao.getByRfid(rfidTagId) != null) return SaveResult.DuplicateRfid
 
-        // Demo item cap (Section 4, MVP Scope doc) — applies to manual Linking saves.
+        // Demo item cap.
         if (linkedItemDao.count() >= DemoLimits.MAX_ITEMS) return SaveResult.DemoLimitReached
 
         return try {
-            val attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attributes)
-            android.util.Log.d("ItemRepository", "Converted attributes to JSON: $attributesJson")
+            val attributesJson = JsonAttributes.fromMap(attributes)
 
-            // FR-21: auto-upsert Product Master FIRST (before item insert) to satisfy FK constraint.
-            productRepository.upsertFromLinkedItem(
-                barcode, productName, category, attributesJson
-            )
-            android.util.Log.d("ItemRepository", "Product upserted successfully")
+            // Product FIRST (FK parent): insert if new, reject on name conflict, else leave as-is.
+            val existingProduct = productRepository.getByBarcode(barcode)
+            if (existingProduct == null) {
+                productRepository.insert(barcode, productName, categoryId, attributesJson)
+            } else if (existingProduct.productName != productName) {
+                return SaveResult.ValidationError(
+                    mapOf("barcode" to "Barcode already exists as '${existingProduct.productName}'")
+                )
+            }
 
-            val entity = LinkedItemEntity(
-                rfidTagId = rfidTagId,
-                productName = productName,
-                barcode = barcode,
-                category = category,
-                attributesJson = attributesJson
-            )
-            android.util.Log.d("ItemRepository", "Inserting LinkedItemEntity with attributesJson: ${entity.attributesJson}")
-            linkedItemDao.insert(entity)
-            android.util.Log.d("ItemRepository", "LinkedItem inserted successfully")
-
+            // Normalized unit row — no product fields.
+            linkedItemDao.insert(LinkedItemEntity(rfidTagId = rfidTagId, barcode = barcode))
             SaveResult.Success
         } catch (e: android.database.sqlite.SQLiteConstraintException) {
-            Log.e("ItemRepository", "Database constraint violation while saving linked item", e)
-            val userMessage = when {
-                e.message?.contains("FOREIGN KEY", ignoreCase = true) == true ->
-                    "The category doesn't exist. Please create it in Settings → Categories first."
-                e.message?.contains("UNIQUE", ignoreCase = true) == true ->
-                    "This RFID tag is already linked to another item."
-                else -> "Unable to save item. Please check all fields are filled correctly."
-            }
-            SaveResult.DatabaseError(userMessage)
+            Log.e(TAG, "Constraint violation saving linked item", e)
+            SaveResult.DatabaseError("Unable to save item. Please check all fields are filled correctly.")
         } catch (e: Exception) {
-            Log.e("ItemRepository", "Unexpected error while saving linked item", e)
+            Log.e(TAG, "Unexpected error saving linked item", e)
             SaveResult.DatabaseError("Unable to save item. Please try again.")
         }
     }
 
-    data class BulkImportResult(val inserted: Int, val updated: Int, val rejected: Int, val reasons: List<String>)
+    /** inserted = new units; skipped = RFID already existed (append-only); rejected = errors. */
+    data class BulkImportResult(val inserted: Int, val skipped: Int, val rejected: Int, val reasons: List<String>)
 
     /**
-     * FR-15-19: Bulk Linking CSV upsert. Expected columns (in order): Name, Barcode,
-     * Category, RFID[, domain-specific field columns...].
-     * Mandatory columns: Name, Barcode, Category, RFID (FR-16).
-     * Demo cap applies here too (Section 4).
+     * FR-15-19: Bulk Linking CSV import (append-only, §4.0.6). Columns: Name, Barcode, Category, RFID
+     * [, domain field columns...]. Category must already exist; product insert-or-reject-on-name.
      */
     suspend fun bulkImport(
         rows: List<Array<String>>,
         fieldDefs: List<FieldDefinitionEntity>
     ): BulkImportResult {
         if (rows.isEmpty()) return BulkImportResult(0, 0, 0, emptyList())
+
         val header = rows.first().map { it.trim() }
         val dataRows = rows.drop(1)
-
         fun colIndex(name: String) = header.indexOfFirst { it.equals(name, ignoreCase = true) }
-        val iName = colIndex("Name")
-        val iBarcode = colIndex("Barcode")
-        val iCategory = colIndex("Category")
-        val iRfid = colIndex("RFID")
+        val iName = colIndex("Name"); val iBarcode = colIndex("Barcode")
+        val iCategory = colIndex("Category"); val iRfid = colIndex("RFID")
 
-        var inserted = 0; var updated = 0; var rejected = 0
+        var inserted = 0; var skipped = 0; var rejected = 0
         val reasons = mutableListOf<String>()
         val seenRfids = mutableSetOf<String>()
 
         for ((rowIdx, row) in dataRows.withIndex()) {
+            val lineNo = rowIdx + 2
             fun get(i: Int) = if (i in row.indices) row[i].trim() else ""
-            val name = get(iName)
-            val barcode = get(iBarcode)
-            val category = get(iCategory)
-            val rfid = get(iRfid)
+            val name = get(iName); val barcode = get(iBarcode)
+            val category = get(iCategory); val rfid = get(iRfid)
 
             if (name.isBlank() || barcode.isBlank() || category.isBlank() || rfid.isBlank()) {
-                rejected++; reasons.add("Row ${rowIdx + 2}: missing mandatory field"); continue
+                rejected++; reasons.add("Row $lineNo: missing mandatory field"); continue
             }
             if (rfid in seenRfids) {
-                rejected++; reasons.add("Row ${rowIdx + 2}: duplicate RFID within file"); continue
+                rejected++; reasons.add("Row $lineNo: duplicate RFID within file"); continue
             }
             seenRfids.add(rfid)
-
             if (linkedItemDao.count() >= DemoLimits.MAX_ITEMS) {
-                rejected++; reasons.add("Row ${rowIdx + 2}: demo item limit reached"); continue
+                rejected++; reasons.add("Row $lineNo: demo item limit reached"); continue
             }
 
-            val existing = linkedItemDao.getByRfid(rfid)
-            // Build attributes map from all configured field_definitions
-            val attrs = fieldDefs.associate { fd ->
-                val ci = colIndex(fd.label)
-                fd.key to (if (ci >= 0) get(ci) else "")
+            try {
+                val categoryId = categoryDao.findIdByName(category)
+                if (categoryId == null) {
+                    rejected++
+                    reasons.add("Row $lineNo: Category '$category' does not exist. Add it in Settings → Categories first.")
+                    continue
+                }
+
+                // Product: insert if new, reject on name conflict, else leave as-is.
+                val existingProduct = productRepository.getByBarcode(barcode)
+                if (existingProduct == null) {
+                    val attrs = fieldDefs.associate { fd ->
+                        val ci = colIndex(fd.label)
+                        fd.key to (if (ci >= 0) get(ci) else "")
+                    }
+                    productRepository.insert(barcode, name, categoryId, JsonAttributes.fromMap(attrs))
+                } else if (existingProduct.productName != name) {
+                    rejected++
+                    reasons.add("Row $lineNo: Barcode '$barcode' already exists as '${existingProduct.productName}' (uploaded: '$name')")
+                    continue
+                }
+
+                // Unit: insert if RFID new, else skip (append-only).
+                if (linkedItemDao.getByRfid(rfid) == null) {
+                    linkedItemDao.insert(LinkedItemEntity(rfidTagId = rfid, barcode = barcode))
+                    inserted++
+                } else {
+                    skipped++
+                }
+            } catch (e: android.database.sqlite.SQLiteConstraintException) {
+                rejected++
+                reasons.add("Row $lineNo: Database error - ${e.message}")
+                Log.e(TAG, "Row $lineNo constraint violation", e)
+            } catch (e: Exception) {
+                rejected++
+                reasons.add("Row $lineNo: Unexpected error - ${e.message ?: e.javaClass.simpleName}")
+                Log.e(TAG, "Row $lineNo error", e)
             }
-
-            val entity = LinkedItemEntity(
-                rfidTagId = rfid,
-                productName = name,
-                barcode = barcode,
-                category = category,
-                attributesJson = com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attrs)
-            )
-            if (existing == null) { linkedItemDao.insert(entity); inserted++ }
-            else { linkedItemDao.update(entity); updated++ }
-
-            productRepository.upsertFromLinkedItem(
-                barcode, name, category,
-                com.gigakin.stockbuddy.util.JsonAttributes.fromMap(attrs)
-            )
         }
-        return BulkImportResult(inserted, updated, rejected, reasons)
+        Log.d(TAG, "bulkImport: inserted=$inserted, skipped=$skipped, rejected=$rejected")
+        return BulkImportResult(inserted, skipped, rejected, reasons)
     }
 }
