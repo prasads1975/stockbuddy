@@ -60,11 +60,20 @@ class BulkLinkingFragment : Fragment() {
             binding.tvReaderStatus.text = getString(textRes)
         }
 
-        // Upload zone click
+        // Upload zone click — opens the Android system document picker (SAF).
         binding.uploadZone.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/*"
+                // Broad base type + explicit CSV MIME variants so a valid .csv is never greyed out
+                // (file managers/providers report CSVs under several different MIME types).
+                type = "*/*"
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                    "text/csv",
+                    "text/comma-separated-values",
+                    "text/plain",
+                    "application/vnd.ms-excel",
+                    "application/octet-stream"
+                ))
             }
             filePicker.launch(intent)
         }

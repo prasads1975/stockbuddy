@@ -45,7 +45,7 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.btnClose.setOnClickListener { dismiss() }
 
-        // Download: Save to Downloads folder
+        // Download: Save to the public Downloads folder (MediaStore)
         binding.btnDownload.setOnClickListener {
             lifecycleScope.launch {
                 try {
@@ -53,14 +53,17 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
                     val fieldDefs = app.fieldConfigRepository.getFields()
                     val rows = app.exportRepository.buildCsv(results, fieldDefs)
                     val fileName = app.exportRepository.buildFileName(sessionCode)
-                    app.exportRepository.writeCsvFile(fileName, rows)
+                    val location = app.exportRepository.saveCsvToDownloads(fileName, rows)
 
-                    // Show confirmation dialog with file location
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(getString(R.string.download_success))
-                        .setMessage(getString(R.string.download_location_format, fileName))
-                        .setPositiveButton(getString(R.string.action_ok)) { _, _ -> dismiss() }
-                        .show()
+                    if (location != null) {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(getString(R.string.download_success))
+                            .setMessage(getString(R.string.download_location_format, location))
+                            .setPositiveButton(getString(R.string.action_ok)) { _, _ -> dismiss() }
+                            .show()
+                    } else {
+                        Snackbar.make(binding.root, getString(R.string.download_failed), Snackbar.LENGTH_LONG).show()
+                    }
                 } catch (e: Exception) {
                     Snackbar.make(binding.root, getString(R.string.download_failed), Snackbar.LENGTH_LONG).show()
                 }

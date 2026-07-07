@@ -32,7 +32,8 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
     private var editingProduct: ProductMasterEntity? = null
     private var fieldDefs: List<FieldDefinitionEntity> = emptyList()
     private val dynamicFieldViews = mutableMapOf<String, TextInputLayout>()
-    private val dynamicEditTexts = mutableMapOf<String, TextInputEditText>()
+    // EditText supertype so both TextInputEditText (text/number) and AutoCompleteTextView (dropdown) fit.
+    private val dynamicEditTexts = mutableMapOf<String, android.widget.EditText>()
 
     companion object {
         private const val ARG_BARCODE = "barcode"
@@ -101,28 +102,49 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
 
         val attrs = JsonAttributes.toMap(product.attributesJson)
         val fieldsToShow = fieldDefs.filter { it.showOnLinking }
+        val fieldMargins = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply { bottomMargin = 16 }
 
         fieldsToShow.forEach { fieldDef ->
             val value = attrs[fieldDef.key] ?: ""
-            val inputLayout = TextInputLayout(requireContext(), null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
-                layoutParams = android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { bottomMargin = 16 }
-                hint = fieldDef.label
-                helperText = if (fieldDef.mandatory) "Required" else null
+            val input: android.widget.EditText
+            val inputLayout: TextInputLayout
+
+            if (fieldDef.type == "DROPDOWN") {
+                // Outlined exposed-dropdown-menu (box + chevron), matching the Linking form.
+                inputLayout = TextInputLayout(
+                    requireContext(), null,
+                    com.google.android.material.R.attr.textInputOutlinedExposedDropdownMenuStyle
+                ).apply {
+                    layoutParams = fieldMargins
+                    hint = fieldDef.label
+                    helperText = if (fieldDef.mandatory) "Required" else null
+                }
+                val options = fieldDef.dropdownOptionsCsv?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
+                input = AutoCompleteTextView(requireContext()).apply {
+                    inputType = android.text.InputType.TYPE_NULL
+                    keyListener = null
+                    setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options))
+                    setText(value, false)   // preselect current value without filtering
+                }
+            } else {
+                inputLayout = TextInputLayout(requireContext(), null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
+                    layoutParams = fieldMargins
+                    hint = fieldDef.label
+                    helperText = if (fieldDef.mandatory) "Required" else null
+                }
+                input = TextInputEditText(requireContext()).apply {
+                    inputType = if (fieldDef.type == "NUMBER") android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+                                else android.text.InputType.TYPE_CLASS_TEXT
+                    setText(value)
+                }
             }
-            val editText = TextInputEditText(requireContext()).apply {
-                layoutParams = android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                setText(value)
-            }
-            inputLayout.addView(editText)
+            inputLayout.addView(input)
             binding.dynamicFieldsContainer.addView(inputLayout)
             dynamicFieldViews[fieldDef.key] = inputLayout
-            dynamicEditTexts[fieldDef.key] = editText
+            dynamicEditTexts[fieldDef.key] = input
         }
     }
 

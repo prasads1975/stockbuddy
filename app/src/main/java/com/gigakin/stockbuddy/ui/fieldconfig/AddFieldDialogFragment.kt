@@ -10,6 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.DialogAddFieldBinding
+import com.gigakin.stockbuddy.util.FieldType
 
 class AddFieldDialogFragment(
     private val onFieldAdded: (FieldDefinitionEntity) -> Unit
@@ -28,12 +29,12 @@ class AddFieldDialogFragment(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val types = listOf("Text", "Number", "Dropdown", "Date", "Currency")
+        val types = FieldType.labels   // Text, Number, Dropdown, Date (single source of truth)
         val typeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, types)
         (binding.fieldTypeDropdown as? AutoCompleteTextView)?.setAdapter(typeAdapter)
 
         binding.fieldTypeDropdown.setOnItemClickListener { _, _, position, _ ->
-            if (types[position].equals("Dropdown", ignoreCase = true)) {
+            if (types[position].equals(FieldType.DROPDOWN.label, ignoreCase = true)) {
                 binding.layoutDropdownValues.visibility = View.VISIBLE
             } else {
                 binding.layoutDropdownValues.visibility = View.GONE
@@ -45,7 +46,8 @@ class AddFieldDialogFragment(
 
         binding.btnSave.setOnClickListener {
             val label = binding.editFieldLabel.text?.toString()?.trim().orEmpty()
-            val type = binding.fieldTypeDropdown.text?.toString() ?: "Text"
+            // Store the canonical enum value ("NUMBER"), not the picker label ("Number").
+            val type = FieldType.valueForLabel(binding.fieldTypeDropdown.text?.toString().orEmpty())
 
             if (label.isBlank()) {
                 binding.editFieldLabel.error = "Field label is required"
@@ -58,7 +60,7 @@ class AddFieldDialogFragment(
                 label = label,
                 type = type,
                 mandatory = binding.switchMandatory.isChecked,
-                dropdownOptionsCsv = if (type.equals("Dropdown", ignoreCase = true)) {
+                dropdownOptionsCsv = if (type == FieldType.DROPDOWN_VALUE) {
                     binding.editDropdownValues.text?.toString()
                 } else null
             )

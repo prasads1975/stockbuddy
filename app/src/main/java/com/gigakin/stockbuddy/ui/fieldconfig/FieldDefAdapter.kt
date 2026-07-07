@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.ItemFieldDefBinding
+import com.gigakin.stockbuddy.util.FieldType
 
 class FieldDefAdapter(
     private val onEditClick: (FieldDefinitionEntity) -> Unit = {},
@@ -26,7 +27,7 @@ class FieldDefAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) {
         val f = items[position]
         holder.b.tvLabel.text = f.label + if (f.mandatory) " *" else ""
-        holder.b.tvType.text = f.type
+        holder.b.tvType.text = FieldType.labelForValue(f.type)
     }
 
     override fun getItemCount() = items.size

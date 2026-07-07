@@ -138,26 +138,37 @@ class IndividualLinkingFragment : Fragment() {
         dynamicFieldViews.clear()
 
         visibleDefs.forEach { def ->
+            val margins = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 8; bottomMargin = 8 }
+
             if (def.type == "DROPDOWN") {
-                val til = TextInputLayout(requireContext()).apply {
+                // Outlined exposed-dropdown-menu style → matches the static Category field (box + chevron).
+                val til = TextInputLayout(
+                    requireContext(), null,
+                    com.google.android.material.R.attr.textInputOutlinedExposedDropdownMenuStyle
+                ).apply {
                     hint = def.label + if (def.mandatory) " *" else ""
-                    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    setPadding(0, 8, 0, 8)
-                    boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
+                    layoutParams = margins
                 }
-                val options = def.dropdownOptionsCsv?.split(",")?.map { it.trim() } ?: emptyList()
+                val options = def.dropdownOptionsCsv?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
                 val autoComplete = AutoCompleteTextView(requireContext()).apply {
                     inputType = android.text.InputType.TYPE_NULL
+                    keyListener = null
                     setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options))
                 }
                 til.addView(autoComplete)
                 binding.dynamicFieldsContainer.addView(til)
                 dynamicFieldViews[def.key] = autoComplete
             } else {
-                val til = TextInputLayout(requireContext()).apply {
+                // Outlined box style → matches the static Name/Barcode fields.
+                val til = TextInputLayout(
+                    requireContext(), null,
+                    com.google.android.material.R.attr.textInputOutlinedStyle
+                ).apply {
                     hint = def.label + if (def.mandatory) " *" else ""
-                    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    setPadding(0, 8, 0, 8)
+                    layoutParams = margins
                 }
                 val edit = TextInputEditText(requireContext()).apply {
                     inputType = if (def.type == "NUMBER") android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL

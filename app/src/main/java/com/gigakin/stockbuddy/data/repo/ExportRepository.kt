@@ -1,7 +1,11 @@
 package com.gigakin.stockbuddy.data.repo
 
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.util.JsonAttributes
@@ -65,11 +69,42 @@ class ExportRepository(private val context: Context) {
     }
 
     /**
-     * FR-52a: Download (save to device). For MVP, "location picker" is satisfied by saving to
-     * the app's external-files exports/ dir (already done in writeCsvFile) and surfacing the
-     * path to the user — a full SAF document-tree picker can be layered in later without
-     * changing this repository's public contract.
+     * FR-52a: Download (save to device). Writes the CSV to the **public Downloads collection** so
+     * the user can actually find it. API 29+ uses MediaStore (no storage permission needed); older
+     * devices fall back to the app's exports/ dir. Returns a user-facing location string, or null on
+     * failure.
      */
+    fun saveCsvToDownloads(fileName: String, rows: List<Array<String>>): String? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = context.contentResolver
+            val values = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, "text/csv")
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: return null
+            return try {
+                resolver.openOutputStream(uri)?.use { os ->
+                    OutputStreamWriter(os).use { w -> CSVWriter(w).use { it.writeAll(rows.toMutableList()) } }
+                } ?: run { resolver.delete(uri, null, null); return null }
+                values.clear()
+                values.put(MediaStore.Downloads.IS_PENDING, 0)
+                resolver.update(uri, values, null, null)
+                "Downloads/$fileName"
+            } catch (e: Exception) {
+                resolver.delete(uri, null, null)
+                null
+            }
+        }
+        // API 28 fallback: app-private exports dir (no permission needed); surface the real path.
+        return try {
+            writeCsvFile(fileName, rows).absolutePath
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun downloadedFilePath(file: File): String = file.absolutePath
 
     /** Write CSV content to a user-selected URI (via document picker / SAF). */
