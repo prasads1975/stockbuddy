@@ -17,12 +17,12 @@
 | FR-77l | Starter templates (e.g. "Toy Retail: Price", "Jewellery: Net/Gross Weight, Purity") — **the live domain-switch demo moment** |
 | FR-77m | Admin may proceed with zero domain-specific fields |
 | FR-77n | Field definitions persisted as metadata |
-| FR-77o | Article ID usage toggle (Not Used / Optional / Mandatory, default Optional) |
+| ~~FR-77o~~ | ~~Article ID usage toggle~~ — **dropped (v2).** Article ID is no longer a fixed field or a mode toggle; barcode is the sole business key. If needed, Article ID is added as an ordinary configurable domain field (FR-77j) stored in the product's `attributes`. |
 | FR-80a | Standalone Settings → Field Configuration screen, usable anytime (not gated behind a setup wizard) |
 | NFR-51–54 | Configurable fields, dynamic rendering across Linking/Assets/Inventory/CSV, null-handling, persisted storage |
-| NFR-56 | Article ID configurability |
+| ~~NFR-56~~ | ~~Article ID configurability~~ — superseded by the drop above; covered by the general configurable-field mechanism (NFR-51–54). |
 
-*Build note: implement FR-77i–o as a standalone screen reached directly from Settings — skip the non-skippable wizard framing (FR-77 itself) entirely.*
+*Build note: implement the domain-field configuration (FR-77i–n) as a standalone screen reached directly from Settings — skip the non-skippable wizard framing (FR-77 itself) and the dropped Article ID toggle entirely.*
 
 ### 1.2 Category Management
 | FR | Requirement |
@@ -35,14 +35,14 @@
 ### 1.3 Individual Linking (manual entry only)
 | FR | Requirement |
 |----|-------------|
-| FR-05 | Manual entry form: fixed fields + Article ID (if enabled) + domain-specific fields |
+| FR-05 | Manual entry form: fixed fields (Name, Barcode, Category, RFID) + domain-specific fields |
 | FR-06 | Barcode: type or imager scan |
 | FR-07, FR-07a | RFID Tag ID: type or UHF "Scan" button (single-tag enforcement) |
 | FR-08 | RFID uniqueness validation |
 | FR-09, FR-09a, FR-09b | Mandatory fixed fields + mandatory domain-specific fields + asterisk UI |
-| FR-09c | Article ID validation, mode-dependent |
+| ~~FR-09c~~ | ~~Article ID validation, mode-dependent~~ — dropped (v2); no Article ID field |
 | FR-10 | Save locally, immediately usable in scans |
-| FR-21 | Auto-upsert into Product Master on save (no dedicated Product Master screen needed) |
+| FR-21 | Product written first on save (insert-or-reject-on-name-mismatch); no dedicated Product Master screen |
 
 *UX note: the mode-switching concern (QR Scan vs. Manual Entry) is moot for this scope — QR mode (FR-01–04) is already cut, so there's only ever one form on screen, with Barcode and RFID Tag ID each carrying their own inline scan affordance (NFR-10f). Barcode scan is a compact inline icon next to the field; RFID Tag ID scan is a more prominent labelled "Scan" button, given it's the field the whole app's uniqueness logic hangs on and it has richer feedback states (success / no tag / multiple tags). Save Link stays the one true oversized, thumb-zone primary action (NFR-10c/d) — distinct from both scan buttons.*
 

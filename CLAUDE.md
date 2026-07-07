@@ -16,7 +16,7 @@ Current phase: **MVP/Demo only.** The app must build, run on an Android emulator
 **Never do these:**
 - Add Google Play Services or any GMS dependency. The C72 runs AOSP (NFR-26). Check every new library.
 - Add Hilt, Dagger, or any DI framework. Manual wiring in `StockBuddyApp.kt` is intentional.
-- Use Article ID as a uniqueness key, grouping key, or Product Master matching key. Only `rfidTagId` (uniqueness) and `barcode` (grouping/matching) have those roles. Article ID is always nullable supplementary data.
+- Reintroduce Article ID as a fixed field/column or an `ArticleIdMode` toggle. It was **dropped as a fixed field** — `barcode` is the sole business key. If a deployment needs Article ID, it is added as a normal configurable domain field via Field Configuration (stored in `attributes` JSON), never as a uniqueness/grouping/matching key. Only `rfidTagId` (uniqueness) and `barcode` (grouping/matching) have those roles.
 - Add internet permissions or outbound API calls. The app is fully offline in MVP (NFR-09, NFR-15).
 - Use `Bundle` directly for navigation arguments. Always use Safe Args typed Directions/Args classes.
 - Implement licensing, authentication/RBAC, backup/restore, or the first-run wizard. These are explicitly out of scope.
@@ -59,14 +59,14 @@ app/src/main/java/com/gigakin/stockbuddy/
 │   └── ScannerManagerProvider.kt ← Picks real vs emulator; catches init failures
 ├── data/
 │   ├── db/
-│   │   ├── AppDatabase.kt        ← Room singleton, version 1
-│   │   ├── entity/               ← 6 entities (see Data Model)
-│   │   └── dao/                  ← 6 DAOs
-│   ├── prefs/AppPrefs.kt         ← SharedPrefs: articleIdMode + fieldConfigCompleted
+│   │   ├── AppDatabase.kt        ← Room singleton, version 3
+│   │   ├── entity/               ← 7 entities (see Data Model)
+│   │   └── dao/                  ← 7 DAOs
+│   ├── prefs/AppPrefs.kt         ← SharedPrefs: fieldConfigCompleted
 │   └── repo/                     ← 6 repositories (all business logic lives here)
 ├── util/
-│   ├── FieldType.kt              ← Enums: FieldType, ArticleIdMode, ReaderStatus, LimitCheck
-│   ├── DemoLimits.kt             ← BuildConfig constants: MAX_ITEMS=50, CATEGORIES=10, SESSIONS=25
+│   ├── FieldType.kt              ← Enums: FieldType, ReaderStatus (LimitCheck sealed class in util/)
+│   ├── DemoLimits.kt             ← BuildConfig constants: MAX_ITEMS=200, CATEGORIES=50, SESSIONS=100
 │   ├── JsonAttributes.kt         ← toMap() / fromMap() for the JSON attributes column
 │   ├── CsvUtils.kt               ← OpenCSV wrapper
 │   └── ViewModelFactory.kt       ← Generic lambda factory
@@ -136,18 +136,21 @@ Entity count: **7 registered** (DB version 3).
 
 ---
 
-## Article ID mode rules
+## Article ID — dropped as a fixed field
 
-Article ID behaviour is controlled by `AppPrefs.articleIdMode: ArticleIdMode` (NOT_USED / OPTIONAL / MANDATORY, default OPTIONAL).
+There is **no `ArticleIdMode`, no mode toggle, and no Article ID column.** Barcode is the sole
+business identifier (grouping + Product Master matching); RFID is the sole uniqueness key. The
+earlier 3-mode (Not Used / Optional / Mandatory) design was never implemented and is superseded.
 
-| Where enforced | What happens |
-|---|---|
-| `IndividualLinkingFragment.onViewCreated()` | Sets `layoutArticleId.visibility` based on mode |
-| `ItemRepository.saveLinkedItem()` | Validates non-blank only when mode is MANDATORY |
-| `ItemRepository.bulkImport()` | Reads Article ID CSV column only when mode != NOT_USED |
-| `ExportRepository.buildCsv()` | Includes Article ID column only when `articleIdUsed = true` |
-| `AssetsAdapter`, `ResultGroupAdapter` | Shows Article ID only when `articleIdEnabled` constructor param is true |
-| `FieldConfigFragment` | Radio group maps to the three modes |
+Current reality in code:
+- The `layoutArticleId` view in `IndividualLinkingFragment` and the `tvArticleId` view in
+  `ResultGroupAdapter` are hard-set to `View.GONE` (vestigial layout views, safe to leave).
+- `AppPrefs` holds only `fieldConfigCompleted` — no `articleIdMode`.
+- `saveLinkedItem()` / `bulkImport()` / `buildCsv()` do not read, validate, or emit any Article ID.
+
+If a deployment wants an "Article ID"-style field, the admin adds it via **Field Configuration**
+like any other domain field (Price, Weight, etc.) — it then lives in the product's `attributes` JSON
+and flows through Linking/Assets/Results/CSV via the normal `field_definitions` visibility flags.
 
 ---
 
