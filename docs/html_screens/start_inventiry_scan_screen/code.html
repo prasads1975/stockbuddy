@@ -1,0 +1,247 @@
+<!DOCTYPE html><html class="light" lang="en" style="width: 390px; height: 884px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StockBuddy RFID - Inventory Scan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Shared Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001d35",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e3e2e5",
+                    "on-primary-container": "#87a4c6",
+                    "on-secondary-fixed": "#011d31",
+                    "on-tertiary-container": "#c19b63",
+                    "surface-dim": "#dad9dc",
+                    "secondary-container": "#c9e2fd",
+                    "inverse-primary": "#acc9ed",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#4d3304",
+                    "status-missing": "#C62828",
+                    "tertiary-fixed": "#ffddb0",
+                    "primary-container": "#1b3a57",
+                    "surface-container": "#eeedf0",
+                    "primary-fixed-dim": "#acc9ed",
+                    "secondary": "#496177",
+                    "on-error": "#ffffff",
+                    "border-subtle": "#E0E2E5",
+                    "on-background": "#1a1c1e",
+                    "background": "#faf9fc",
+                    "primary-fixed": "#d0e4ff",
+                    "inverse-surface": "#2f3033",
+                    "on-tertiary-fixed": "#291800",
+                    "surface-bright": "#faf9fc",
+                    "on-primary-fixed-variant": "#2b4967",
+                    "surface-container-low": "#f4f3f6",
+                    "tertiary": "#321f00",
+                    "secondary-fixed": "#cce5ff",
+                    "primary": "#002440",
+                    "on-secondary-container": "#4d657b",
+                    "surface-container-highest": "#e3e2e5",
+                    "surface": "#faf9fc",
+                    "on-tertiary-fixed-variant": "#5e4112",
+                    "surface-container-high": "#e9e8ea",
+                    "secondary-fixed-dim": "#b0c9e3",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1a1c1e",
+                    "on-secondary-fixed-variant": "#31495e",
+                    "inverse-on-surface": "#f1f0f3",
+                    "outline": "#73777e",
+                    "surface-industrial": "#F8F9FA",
+                    "status-available": "#2E7D32",
+                    "outline-variant": "#c3c7ce",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#e9c085",
+                    "surface-tint": "#446180",
+                    "status-excess": "#F9A825",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "on-surface-variant": "#43474d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "margin-mobile": "16px",
+                    "stack-gap": "8px",
+                    "action-height-primary": "56px",
+                    "thumb-zone-bottom": "40%",
+                    "touch-target-min": "48px"
+            },
+            "fontFamily": {
+                    "headline-page": ["Inter"],
+                    "display-count": ["Inter"],
+                    "label-cta": ["Inter"],
+                    "label-caption": ["Inter"],
+                    "title-card": ["Inter"],
+                    "body-metadata": ["Inter"],
+                    "body-data": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-page-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                    "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                    "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom pulse for the "scanning" state */
+        @keyframes broadcast-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .scanning-active {
+            animation: broadcast-pulse 1.5s infinite ease-in-out;
+        }
+        .blur-scrim {
+            backdrop-filter: blur(8px);
+            background: rgba(250, 249, 252, 0.8);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-data selection:bg-secondary-container">
+<!-- Top Navigation Bar -->
+<header class="w-full top-0 sticky z-40 bg-surface border-b border-border-subtle flex items-center px-margin-mobile h-14">
+<div class="flex items-center gap-4 w-full">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full active:scale-95 duration-100" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_18}}'">
+                arrow_back
+            </button>
+<h1 class="font-headline-page text-headline-page-mobile text-primary">Inventory Scan</h1>
+</div>
+</header>
+<!-- Hardware Status Bar (Persistent/Slim) -->
+<div class="px-margin-mobile py-2 bg-surface-container-low flex items-center border-b border-border-subtle">
+<div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-bold tracking-widest uppercase">READER CONNECTED</span>
+
+</div>
+</div>
+<main class="flex flex-col min-h-[calc(100vh-112px)] pb-32">
+<!-- Session Identity & Filter -->
+<section class="p-margin-mobile flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<div>
+<span class="font-label-caption text-label-caption text-on-surface-variant block uppercase mb-1">Session Code</span>
+<h2 class="font-title-card text-title-card text-on-surface">3 June Morning</h2>
+</div>
+<div class="relative min-w-[120px]">
+<span class="font-label-caption text-label-caption text-on-surface-variant block uppercase mb-1">Category</span>
+<button class="w-full flex items-center justify-between bg-surface-container-high px-3 py-2 rounded-lg text-on-surface-variant">
+<span class="font-body-metadata text-body-metadata">All</span>
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Real-time Unique Tag Counter (Bento Style) -->
+<section class="px-margin-mobile flex flex-col gap-stack-gap">
+<div class="relative bg-primary-container text-on-primary-container rounded-xl p-8 flex flex-col items-center justify-center overflow-hidden h-48 border border-primary/20">
+<!-- Atmospheric background element -->
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="absolute -left-8 -bottom-8 w-32 h-32 bg-secondary-container/20 rounded-full blur-3xl"></div>
+
+<div class="relative z-10 flex items-baseline gap-2">
+<span class="font-display-count text-display-count text-white scale-100" id="tag-counter">69</span>
+<span class="material-symbols-outlined text-primary-fixed-dim scanning-active" style="font-variation-settings: &quot;FILL&quot; 1;">sensors</span>
+</div>
+<!-- Scanning Progress Visualizer -->
+
+</div>
+<!-- Recent Activity/Log -->
+
+</section>
+</main>
+<!-- Scanning Overlay / Visualization Placeholder -->
+
+<!-- Primary Action Panel (Thumb-Zone) -->
+<div class="fixed bottom-0 w-full bg-surface-container-lowest p-margin-mobile border-t border-border-subtle z-50">
+<button class="w-full h-14 bg-status-available text-on-error rounded-xl font-label-cta text-[16px] uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg active:shadow-none" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_15}}'">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">play_arrow</span>
+            START SCANNING
+        </button>
+</div>
+<!-- Bottom Nav Shell (For Contextual Navigation) - Suppressed as per Task-Focused/Linear logic in prompt instructions, but here is the BottomNavBar structure if required by specific system logic. In this "Focused Scanning" state, we prioritize the STOP action. -->
+<script>
+        // Micro-interaction for the counter
+        let count = 42;
+        const counterEl = document.getElementById('tag-counter');
+        
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                count += Math.floor(Math.random() * 3) + 1;
+                counterEl.innerText = count;
+                counterEl.classList.remove('scale-100');
+                counterEl.classList.add('scale-110');
+                setTimeout(() => {
+                    counterEl.classList.remove('scale-110');
+                    counterEl.classList.add('scale-100');
+                }, 150);
+            }
+        }, 1200);
+
+        // Simple hardware status toggle simulation
+        document.querySelector('.uppercase.tracking-wider').addEventListener('click', function() {
+            const dot = this.previousElementSibling;
+            if (dot.classList.contains('bg-status-available')) {
+                dot.classList.replace('bg-status-available', 'bg-status-missing');
+                this.innerText = 'Reader Disconnected';
+            } else {
+                dot.classList.replace('bg-status-missing', 'bg-status-available');
+                this.innerText = 'Reader Connected';
+            }
+        });
+    </script>
+<style>
+        @keyframes progress {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html><html class="light" lang="en" style="width: 390px; height: 664px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StockBuddy - Home</title>
+<!-- Google Fonts: Inter for the defined typography tokens -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001d35",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e3e2e5",
+                    "on-primary-container": "#87a4c6",
+                    "on-secondary-fixed": "#011d31",
+                    "on-tertiary-container": "#c19b63",
+                    "surface-dim": "#dad9dc",
+                    "secondary-container": "#c9e2fd",
+                    "inverse-primary": "#acc9ed",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#4d3304",
+                    "status-missing": "#C62828",
+                    "tertiary-fixed": "#ffddb0",
+                    "primary-container": "#1b3a57",
+                    "surface-container": "#eeedf0",
+                    "primary-fixed-dim": "#acc9ed",
+                    "secondary": "#496177",
+                    "on-error": "#ffffff",
+                    "border-subtle": "#E0E2E5",
+                    "on-background": "#1a1c1e",
+                    "background": "#faf9fc",
+                    "primary-fixed": "#d0e4ff",
+                    "inverse-surface": "#2f3033",
+                    "on-tertiary-fixed": "#291800",
+                    "surface-bright": "#faf9fc",
+                    "on-primary-fixed-variant": "#2b4967",
+                    "surface-container-low": "#f4f3f6",
+                    "tertiary": "#321f00",
+                    "secondary-fixed": "#cce5ff",
+                    "primary": "#002440",
+                    "on-secondary-container": "#4d657b",
+                    "surface-container-highest": "#e3e2e5",
+                    "surface": "#faf9fc",
+                    "on-tertiary-fixed-variant": "#5e4112",
+                    "surface-container-high": "#e9e8ea",
+                    "secondary-fixed-dim": "#b0c9e3",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1a1c1e",
+                    "on-secondary-fixed-variant": "#31495e",
+                    "inverse-on-surface": "#f1f0f3",
+                    "outline": "#73777e",
+                    "surface-industrial": "#F8F9FA",
+                    "status-available": "#2E7D32",
+                    "outline-variant": "#c3c7ce",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#e9c085",
+                    "surface-tint": "#446180",
+                    "status-excess": "#F9A825",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "on-surface-variant": "#43474d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "margin-mobile": "16px",
+                    "stack-gap": "8px",
+                    "action-height-primary": "56dp",
+                    "thumb-zone-bottom": "40%",
+                    "touch-target-min": "48dp"
+            },
+            "fontFamily": {
+                    "headline-page": ["Inter"],
+                    "display-count": ["Inter"],
+                    "label-cta": ["Inter"],
+                    "label-caption": ["Inter"],
+                    "title-card": ["Inter"],
+                    "body-metadata": ["Inter"],
+                    "body-data": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-page-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                    "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                    "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-pill {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center px-4 h-14 bg-surface border-b border-border-subtle"><div class="flex items-center justify-between w-full">
+  <div class="flex items-center gap-4">
+    <button class="text-on-surface active:opacity-80 transition-colors" onclick="window.history.back()">
+      
+    </button>
+    <h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-on-surface font-bold">StockBuddy</h1>
+  </div>
+  <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95">
+    notifications
+  </button>
+</div></header><div class="mt-14 px-margin-mobile py-2 bg-surface-container-low flex items-center border-b border-border-subtle"><div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface font-bold tracking-widest uppercase">READER CONNECTED</span>
+<div class="flex-grow"></div>
+</div></div>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-4 py-6 pt-20">
+<!-- Welcome Section -->
+
+<!-- Bento Grid Menu -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-fr">
+<!-- Inventory Tile (Featured) -->
+<button class="col-span-2 bg-primary text-on-primary p-6 rounded-xl shadow-sm flex flex-col justify-between items-start active:scale-[0.98] transition-transform duration-100 h-44 relative overflow-hidden group" onclick="document.getElementById('inventory-modal').classList.remove('hidden'); document.getElementById('inventory-modal').classList.add('flex');">
+<div class="z-10">
+<span class="material-symbols-outlined text-4xl mb-4">inventory_2</span>
+<h3 class="font-title-card text-title-card">Inventory</h3>
+<p class="font-label-caption opacity-80">Full audit and stock check</p>
+</div>
+<div class="absolute bottom-4 right-4 bg-on-primary/10 rounded-full p-2 group-hover:bg-on-primary/20 transition-colors">
+
+</div>
+<!-- Subtle background visual -->
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+</button>
+<!-- Linking Tile -->
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_13}}'">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-3 group-hover:bg-secondary transition-colors group-hover:text-on-secondary">
+<span class="material-symbols-outlined">link</span>
+</div>
+<span class="font-title-card text-title-card text-on-surface">Linking</span>
+</button>
+<!-- Assets Tile -->
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group">
+<div class="w-12 h-12 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full flex items-center justify-center mb-3 group-hover:bg-tertiary transition-colors group-hover:text-on-tertiary">
+<span class="material-symbols-outlined">package_2</span>
+</div>
+<span class="font-title-card text-title-card text-on-surface">Assets</span>
+</button>
+<!-- Reports Tile -->
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_15}}'">
+<div class="w-12 h-12 bg-surface-variant text-on-surface-variant rounded-full flex items-center justify-center mb-3 group-hover:bg-on-surface-variant transition-colors group-hover:text-surface">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<span class="font-title-card text-title-card text-on-surface">Reports</span>
+</button>
+<!-- Settings Tile -->
+<button class="bg-surface-container-low border border-border-subtle p-5 rounded-xl flex flex-col items-center justify-center text-center active:scale-[0.98] transition-transform duration-100 hover:bg-surface-container-high group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_21}}'">
+<div class="w-12 h-12 bg-outline-variant text-on-surface-variant rounded-full flex items-center justify-center mb-3 group-hover:bg-outline transition-colors group-hover:text-surface">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<span class="font-title-card text-title-card text-on-surface">Settings</span>
+</button>
+<!-- Quick Action: Help/Sync (Utility) -->
+
+</div>
+<!-- System Overview / Quick Stats -->
+
+</main>
+<!-- Hardware Status Bar (Persistent) -->
+
+<!-- BottomNavBar -->
+
+<script>
+        // Simple micro-interaction for the hardware status bar
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusBar = document.querySelector('.fixed.bottom-20');
+            // Mock connection animation
+            setTimeout(() => {
+                statusBar.classList.remove('animate-pulse');
+            }, 3000);
+        });
+    </script>
+
+
+
+
+
+
+
+
+<div id="inventory-modal" class="fixed inset-0 z-[100] items-center justify-center p-4 flex hidden">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('inventory-modal').classList.add('hidden')"></div>
+  <div class="relative bg-surface-container-lowest w-full max-w-xs rounded-xl shadow-lg p-6 flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-headline-page text-headline-page-mobile text-on-surface">New Inventory Session</h2>
+      <p class="font-body-metadata text-on-surface-variant">Enter an Inventory Code to identify this session (e.g., "3 June Morning").</p>
+    </div>
+    <div class="flex flex-col gap-2">
+      <label for="inventory-code" class="font-label-caption text-on-surface-variant">Inventory Code</label>
+      <input type="text" id="inventory-code" placeholder="e.g. 3 June Morning" class="w-full px-4 py-2 rounded-lg border border-outline-variant bg-surface focus:outline-none focus:ring-2 focus:ring-primary text-on-surface">
+    </div>
+    <div class="flex gap-3 justify-end mt-2">
+      <button onclick="document.getElementById('inventory-modal').classList.add('hidden')" class="px-4 py-2 font-label-cta text-primary hover:bg-primary/5 rounded-lg transition-colors">Cancel</button>
+      <button onclick="window.location.href = '{{DATA:SCREEN:SCREEN_20}}'" class="px-6 py-2 font-label-cta bg-primary text-on-primary rounded-lg shadow-sm active:scale-95 transition-transform h-14">Save</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

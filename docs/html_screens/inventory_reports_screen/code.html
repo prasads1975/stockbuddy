@@ -1,0 +1,268 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>StockBuddy - Inventory Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Design System Tokens Injection -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-error": "#ffffff",
+                "surface-container": "#eeedf0",
+                "primary": "#002440",
+                "outline-variant": "#c3c7ce",
+                "on-surface-variant": "#43474d",
+                "on-secondary-fixed-variant": "#31495e",
+                "on-primary-container": "#87a4c6",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-container": "#4d3304",
+                "outline": "#73777e",
+                "status-available": "#2E7D32",
+                "inverse-primary": "#acc9ed",
+                "surface": "#faf9fc",
+                "secondary-fixed": "#cce5ff",
+                "tertiary-fixed": "#ffddb0",
+                "tertiary": "#321f00",
+                "on-surface": "#1a1c1e",
+                "on-secondary": "#ffffff",
+                "secondary-container": "#c9e2fd",
+                "primary-fixed": "#d0e4ff",
+                "surface-industrial": "#F8F9FA",
+                "on-tertiary-fixed": "#291800",
+                "status-excess": "#F9A825",
+                "surface-variant": "#e3e2e5",
+                "secondary": "#496177",
+                "secondary-fixed-dim": "#b0c9e3",
+                "surface-container-highest": "#e3e2e5",
+                "error": "#ba1a1a",
+                "surface-bright": "#faf9fc",
+                "border-subtle": "#E0E2E5",
+                "on-tertiary-container": "#c19b63",
+                "on-primary-fixed-variant": "#2b4967",
+                "error-container": "#ffdad6",
+                "on-background": "#1a1c1e",
+                "on-error-container": "#93000a",
+                "surface-container-low": "#f4f3f6",
+                "tertiary-fixed-dim": "#e9c085",
+                "on-secondary-container": "#4d657b",
+                "on-primary": "#ffffff",
+                "status-missing": "#C62828",
+                "surface-dim": "#dad9dc",
+                "primary-container": "#1b3a57",
+                "surface-tint": "#446180",
+                "inverse-surface": "#2f3033",
+                "background": "#faf9fc",
+                "surface-container-high": "#e9e8ea",
+                "on-secondary-fixed": "#011d31",
+                "primary-fixed-dim": "#acc9ed",
+                "on-primary-fixed": "#001d35",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-fixed-variant": "#5e4112",
+                "inverse-on-surface": "#f1f0f3"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "stack-gap": "8px",
+                "touch-target-min": "48dp",
+                "margin-mobile": "16px",
+                "action-height-primary": "56dp",
+                "thumb-zone-bottom": "40%",
+                "gutter": "16px"
+            },
+            "fontFamily": {
+                "label-cta": ["Inter"],
+                "headline-page": ["Inter"],
+                "title-card": ["Inter"],
+                "body-data": ["Inter"],
+                "label-caption": ["Inter"],
+                "display-count": ["Inter"],
+                "body-metadata": ["Inter"]
+            },
+            "fontSize": {
+                "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+        }
+        .rugged-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-interaction:active {
+            transform: scale(0.98);
+            background-color: var(--tw-color-surface-container-high);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-data antialiased"><header class="w-full top-0 sticky z-50 flex justify-between items-center px-margin-mobile h-[64px] bg-transparent">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="w-[48px] h-[48px] flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-page text-headline-page text-primary font-bold">Inventory Reports</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-[48px] h-[48px] flex items-center justify-center active:scale-95 transition-transform">
+
+</button>
+</div>
+</header><div class="sticky top-[64px] z-[100] px-margin-mobile py-2 bg-surface-container-low flex items-center border-b border-border-subtle"><div class="flex items-center gap-2 w-full"><span class="material-symbols-outlined text-status-available text-[16px]">sensors</span><span class="font-label-caption text-label-caption text-on-surface font-bold tracking-widest uppercase">READER CONNECTED</span><div class="flex-grow"></div></div></div>
+<!-- Persistent Hardware Status Bar (Rugged Utility Style) -->
+
+<!-- Top AppBar (JSON: TopAppBar context) -->
+
+<main class="px-margin-mobile pb-10 flex flex-col gap-gutter">
+<!-- Search & Filter Bar -->
+<div class="relative mt-2">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input aria-label="Search reports" class="w-full h-action-height-primary bg-surface-container border-none rounded-xl pl-12 pr-4 font-body-data text-on-surface focus:ring-2 focus:ring-primary-container transition-all" placeholder="Search reports by name or date..." type="text">
+</div>
+<!-- Inventory History List (Reverse Chronological) -->
+<div class="flex flex-col gap-stack-gap">
+<h2 class="font-label-caption text-label-caption text-on-surface-variant uppercase tracking-widest px-1 py-2">Past Sessions</h2>
+<!-- Session Card 1 -->
+<div class="active-interaction group bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex items-center justify-between cursor-pointer rugged-shadow transition-colors" onclick="location.href='#'">
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-primary">3 June Morning Count</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">June 3, 2026 • 10:45 AM</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Session Card 2 -->
+<div class="active-interaction group bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex items-center justify-between cursor-pointer rugged-shadow transition-colors" onclick="location.href='#'">
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-primary">Shelf B Weekly Audit</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">June 1, 2026 • 09:12 AM</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Session Card 3 -->
+<div class="active-interaction group bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex items-center justify-between cursor-pointer rugged-shadow transition-colors" onclick="location.href='#'">
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-primary">End of Month Sync</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">May 31, 2026 • 05:30 PM</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Session Card 4 -->
+<div class="active-interaction group bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex items-center justify-between cursor-pointer rugged-shadow transition-colors" onclick="location.href='#'">
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-primary">High-Value Items Check</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">May 28, 2026 • 11:20 AM</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Session Card 5 -->
+<div class="active-interaction group bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex items-center justify-between cursor-pointer rugged-shadow transition-colors" onclick="location.href='#'">
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-primary">Dock Zone A Sweep</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">May 25, 2026 • 08:00 AM</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Session Card 6 -->
+<div class="active-interaction group bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex items-center justify-between cursor-pointer rugged-shadow transition-colors" onclick="location.href='#'">
+<div class="flex flex-col gap-1">
+<span class="font-title-card text-title-card text-primary">Q2 Full Inventory</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">calendar_today</span>
+<span class="font-body-metadata text-body-metadata text-on-surface-variant">May 20, 2026 • 06:15 AM</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Empty State / End of List -->
+<div class="py-10 flex flex-col items-center text-center gap-4 opacity-40">
+
+
+</div>
+</main>
+<!-- Contextual FAB (Supressed as per logic for "Details/Transactional" style pages, but included here because "New Report" is a logical primary action for this screen type even if suppressed on Profile/Settings) -->
+<!-- However, task says "Create the Inventory Reports list screen" - usually implies viewing. If we were to add it, it'd go here. Instructions say suppress FAB on specific screens, but this is a main destination. We'll leave it out for maximum content focus as requested. -->
+<script>
+        // Micro-interaction for feedback
+        document.querySelectorAll('.active-interaction').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.add('bg-surface-container-high');
+                setTimeout(() => {
+                    this.classList.remove('bg-surface-container-high');
+                }, 150);
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

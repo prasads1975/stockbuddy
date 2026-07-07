@@ -1,0 +1,263 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StockBuddy - Edit Linked Item</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#dad9dc",
+                        "primary-container": "#1b3a57",
+                        "on-background": "#1a1c1e",
+                        "inverse-on-surface": "#f1f0f3",
+                        "surface-industrial": "#F8F9FA",
+                        "on-primary-fixed": "#001d35",
+                        "error": "#ba1a1a",
+                        "tertiary": "#321f00",
+                        "on-error": "#ffffff",
+                        "border-subtle": "#E0E2E5",
+                        "on-primary-container": "#87a4c6",
+                        "secondary-fixed-dim": "#b0c9e3",
+                        "inverse-primary": "#acc9ed",
+                        "tertiary-fixed-dim": "#e9c085",
+                        "surface-container": "#eeedf0",
+                        "surface-bright": "#faf9fc",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e3e2e5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d0e4ff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#c19b63",
+                        "surface-container-low": "#f4f3f6",
+                        "surface": "#faf9fc",
+                        "status-available": "#2E7D32",
+                        "tertiary-container": "#4d3304",
+                        "primary-fixed-dim": "#acc9ed",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffddb0",
+                        "surface-container-high": "#e9e8ea",
+                        "on-tertiary-fixed-variant": "#5e4112",
+                        "on-secondary-fixed-variant": "#31495e",
+                        "on-secondary-container": "#4d657b",
+                        "on-tertiary-fixed": "#291800",
+                        "on-primary-fixed-variant": "#2b4967",
+                        "status-missing": "#C62828",
+                        "outline-variant": "#c3c7ce",
+                        "primary": "#1b3a57",
+                        "on-secondary-fixed": "#011d31",
+                        "inverse-surface": "#2f3033",
+                        "outline": "#73777e",
+                        "secondary-fixed": "#cce5ff",
+                        "status-excess": "#F9A825",
+                        "secondary": "#496177",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e3e2e5",
+                        "on-surface-variant": "#43474d",
+                        "background": "#faf9fc",
+                        "secondary-container": "#c9e2fd",
+                        "surface-tint": "#446180",
+                        "on-surface": "#1a1c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "4px",
+                        "lg": "4px",
+                        "xl": "8px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "action-height-primary": "56px",
+                        "touch-target-min": "48px",
+                        "thumb-zone-bottom": "40%",
+                        "stack-gap": "8px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-page": ["Inter"],
+                        "body-metadata": ["Inter"],
+                        "title-card": ["Inter"],
+                        "label-caption": ["Inter"],
+                        "label-cta": ["Inter"],
+                        "body-data": ["Inter"],
+                        "display-count": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-page-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                        "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9fc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .thumb-zone-action {
+            height: 56px;
+        }
+        .input-rugged {
+            height: 52px;
+            border: 1px solid #c3c7ce;
+            border-radius: 4px;
+            padding: 0 16px;
+            width: 100%;
+            background: #ffffff;
+            font-size: 16px;
+        }
+        .input-rugged:focus {
+            border-color: #1b3a57;
+            ring: 1px #1b3a57;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- Top Status Bar (Hardware Status) -->
+
+<!-- Top AppBar -->
+<header class="w-full top-0 sticky z-50 bg-surface dark:bg-surface-container-highest border-b border-border-subtle dark:border-outline-variant flex items-center px-margin-mobile h-14">
+<button class="mr-4 active:scale-95 duration-100 transition-colors hover:bg-surface-container-high p-2 rounded-full">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-page text-headline-page-mobile md:text-headline-page text-primary truncate">Edit Linked Item</h1>
+</header><div class="px-margin-mobile py-2 bg-surface-container-low flex items-center border-b border-border-subtle">
+<div class="flex items-center gap-2 w-full">
+<span class="material-symbols-outlined text-status-available text-[16px]">sensors</span>
+<span class="font-label-caption text-label-caption text-on-surface-variant font-bold tracking-widest uppercase">READER CONNECTED</span>
+<div class="flex-grow"></div>
+
+</div>
+</div>
+<!-- Main Form Content -->
+<main class="flex-1 overflow-y-auto px-margin-mobile pt-6 pb-32">
+<div class="space-y-6 max-w-lg mx-auto">
+<!-- RFID Tag ID Field (Mandatory) -->
+<div class="space-y-2">
+<label class="block font-label-cta text-on-surface-variant">
+                    Barcode / EAN <span class="text-error">*</span>
+</label>
+<div class="relative flex items-center">
+<input class="input-rugged pr-12 font-body-data bg-surface-container-low" placeholder="Scan or enter barcode" type="text" value="6901234567890" readonly="readonly">
+
+</div>
+</div><div class="space-y-2">
+<label class="block font-label-cta text-on-surface-variant">
+                    RFID Tag ID <span class="text-error">*</span>
+</label>
+<div class="relative flex items-center"><div class="flex gap-2 w-full">
+<div class="relative flex-1">
+<input class="input-rugged font-body-data" placeholder="Scan or enter RFID" type="text" value="RFID_TAG_9921_X">
+</div>
+<button class="h-14 w-14 flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-lg active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+</div></div>
+<p class="text-[12px] text-on-surface-variant">Last scanned 2 minutes ago</p>
+</div>
+<!-- Article ID Field (Mandatory) -->
+<div class="space-y-2">
+
+
+</div>
+<!-- Product Name Field (Mandatory) -->
+<div class="space-y-2">
+<label class="block font-label-cta text-on-surface-variant">
+                    Product Name <span class="text-error">*</span>
+</label>
+<input class="input-rugged font-body-data bg-surface-container-low" placeholder="Enter full product name" type="text" value="Ultra-Light Running Shoes" readonly="readonly">
+</div>
+<!-- Barcode / EAN Field (Mandatory) -->
+
+<!-- Category Field (Mandatory) -->
+<div class="space-y-2">
+<label class="block font-label-cta text-on-surface-variant">
+                    Category <span class="text-error">*</span>
+</label>
+<div class="relative">
+<select class="input-rugged font-body-data appearance-none bg-surface-container-low" disabled="disabled">
+<option selected="" value="footwear">Footwear</option>
+<option value="apparel">Apparel</option>
+<option value="accessories">Accessories</option>
+<option value="equipment">Equipment</option>
+</select>
+
+</div>
+</div>
+<!-- Status Awareness Info Card (Rugged Style) -->
+
+</div>
+</main>
+<!-- Fixed Bottom Action Container -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-surface border-t border-border-subtle flex flex-col gap-3 md:hidden z-40">
+<button class="thumb-zone-action w-full bg-primary text-white font-label-cta flex items-center justify-center gap-2 rounded-lg active:scale-[0.98] transition-transform shadow-sm"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: &quot;FILL&quot; 1;">link</span> UPDATE LINK</button>
+<!-- Padding for system nav bars on some rugged devices -->
+<div class="h-2"></div>
+</div>
+<!-- Desktop Version of the same button (Centered in a narrow container) -->
+<div class="hidden md:flex fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-lg px-margin-mobile">
+<button class="thumb-zone-action w-full bg-primary text-white font-label-cta flex items-center justify-center gap-2 rounded-lg active:scale-[0.98] transition-transform shadow-lg"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: &quot;FILL&quot; 1;">link</span> UPDATE LINK</button>
+</div>
+<script>
+        // Simple micro-interaction for scan buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const icon = this.querySelector('.material-symbols-outlined');
+                if(icon && (icon.innerText === 'broadcast_on_personal' || icon.innerText === 'barcode_scanner')) {
+                    const originalColor = icon.style.color;
+                    icon.style.color = '#F9A825'; // Hardware activation color
+                    setTimeout(() => {
+                        icon.style.color = originalColor;
+                    }, 600);
+                }
+            });
+        });
+
+        // Prevention of accidental navigation on primary action
+        document.querySelector('.thumb-zone-action').addEventListener('click', (e) => {
+            console.log('Update Asset Triggered');
+            // Mock feedback
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> SAVING...';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> UPDATED';
+                btn.classList.replace('bg-primary', 'bg-status-available');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('bg-status-available', 'bg-primary');
+                    btn.disabled = false;
+                }, 1500);
+            }, 800);
+        });
+    </script>
+
+
+
+
+
+
+
+
+</body></html>
