@@ -6,7 +6,6 @@ Essential commands for building, installing, testing, and debugging the StockBud
 
 ### Clean Build
 ```bash
-cd app
 ./gradlew clean assembleDebug
 ```
 Removes all build artifacts and performs a full clean build of the debug APK.
@@ -15,7 +14,17 @@ Removes all build artifacts and performs a full clean build of the debug APK.
 ```bash
 ./gradlew assembleDebug
 ```
-Builds the debug APK incrementally (faster for iterative development).
+Builds the debug APK incrementally (faster for iterative development). Includes the
+Chainway SDK **ARM native libraries** — this is the build for the **physical C72** device.
+
+### Emulator Build — x86_64 AOSP AVD (`-Pemu`)
+```bash
+./gradlew assembleDebug -Pemu
+```
+Same debug APK but with the Chainway **ARM `.so` libraries stripped**. Required to install on a
+lightweight **x86_64 AOSP emulator** (which has no ARM translation layer — see the ABI section
+below). The app runs fine: it falls back to `EmulatorScannerManager`. **Never flash this build to
+a real device** — it has no RFID/imager native libs.
 
 ### Release Build
 ```bash
@@ -55,6 +64,52 @@ Installs the APK and immediately launches the app.
 
 ### Known Issue
 If you get `Error occurred while checking alignment of package` on emulator, use Android Studio instead of raw `adb install`. This is an emulator-side PackageManager quirk, not a code problem.
+
+---
+
+## Emulator vs Physical Device — Native Libraries (ABI)
+
+The Chainway SDK ships **ARM-only** native libraries (`libDeviceAPIM.so`, `libDeviceAPIQ.so`,
+`libIDFingerprintAlg.so`) for `arm64-v8a`, `armeabi-v7a`, and `armeabi`. There is **no x86_64**
+variant. This matters when choosing an emulator.
+
+| Target | ABI | Build command | Native libs | Scanner |
+|---|---|---|---|---|
+| **Physical C72** | arm64-v8a | `./gradlew assembleDebug` | included | real `ChainwayScannerManager` (hardware) |
+| **AOSP emulator** | x86_64 | `./gradlew assembleDebug -Pemu` | stripped | falls back to `EmulatorScannerManager` |
+
+### `INSTALL_FAILED_NO_MATCHING_ABIS`
+```
+adb: failed to install ...: Failure [INSTALL_FAILED_NO_MATCHING_ABIS: ...
+    Failed to extract native libraries, res=-113]
+```
+**Cause**: installing an APK that contains only ARM `.so` files onto an **x86_64** emulator that
+has no ARM translation layer (lightweight AOSP images don't include one; Google Play images do).
+**Fix**: build the emulator variant that strips the libs — `./gradlew assembleDebug -Pemu` — then
+`adb install -r ...`. The `-Pemu` flag is opt-in (`project.hasProperty("emu")` in
+`app/build.gradle.kts`); default builds are untouched.
+
+### Verify which APK you have before installing
+```bash
+unzip -l app/build/outputs/apk/debug/app-debug.apk | grep '\.so$'
+```
+- **Device build**: shows `lib/arm64-v8a/*.so` (+ armeabi variants) → flash to C72.
+- **Emulator build** (`-Pemu`): shows **no** `.so` → install on the x86_64 AOSP AVD.
+
+> Both variants output to the same `app-debug.apk`. Before flashing the C72, run a clean
+> **`./gradlew clean assembleDebug`** (no `-Pemu`) so you never push a stripped APK to hardware.
+
+### Recommended emulator: lightweight AOSP AVD
+On a low-RAM host, heavy Google Play emulator images (with GMS/Play Services) can trigger the
+kernel **low-memory killer**, which `SIGKILL`s the foreground app — appearing as a "crash" with
+**no** Java stack trace / `FATAL` in logcat. Prefer an **AOSP** system image (API 34, `x86_64`,
+Target "Android 14.0" *without* "Google APIs"/"Google Play"), 3072 MB RAM. It's lighter and
+matches the C72 (AOSP, NFR-26). Confirm memory health while the app runs:
+```bash
+adb shell cat /proc/meminfo | grep -E "MemAvailable|SwapFree"
+```
+If `SwapFree` is near zero and the app vanishes with no exception, it's an out-of-memory kill, not
+a code bug — free host RAM and/or use the AOSP image.
 
 ---
 
@@ -138,7 +193,7 @@ Extracts the Room database for inspection on your machine.
 ```bash
 adb shell cat /data/data/com.gigakin.stockbuddy/shared_prefs/*.xml
 ```
-Displays all SharedPreferences values (articleIdMode, fieldConfigCompleted, etc.).
+Displays all SharedPreferences values (`fieldConfigCompleted`, etc.).
 
 ---
 
@@ -165,9 +220,9 @@ Soft-reboots the emulator. Device will disconnect briefly.
 
 ### Emulator Wipe and Restart
 ```bash
-emulator -avd Pixel_7_API_34 -wipe-data
+emulator -avd Pixel_7 -wipe-data
 ```
-Wipes emulator data and restarts fresh (adjust emulator name as needed).
+Wipes emulator data and restarts fresh (adjust emulator name as needed; use your AOSP AVD's name).
 
 ---
 
@@ -300,12 +355,15 @@ Stops all Gradle daemons and restarts fresh.
 
 | Task | Command |
 |------|---------|
-| Build app | `./gradlew assembleDebug` |
+| Build for **device (C72)** | `./gradlew assembleDebug` |
+| Build for **x86_64 AOSP emulator** | `./gradlew assembleDebug -Pemu` |
+| Verify APK ABI libs | `unzip -l app/build/outputs/apk/debug/app-debug.apk \| grep '\.so$'` |
 | Install (ADB) | `adb install -r app/build/outputs/apk/debug/app-debug.apk` |
 | Launch app | `adb shell am start -n com.gigakin.stockbuddy/.ui.MainActivity` |
 | View logs | `adb logcat \| grep "StockBuddy"` |
 | Clear logs | `adb logcat -c` |
 | Clear app data | `adb shell pm clear com.gigakin.stockbuddy` |
+| Check memory (OOM debug) | `adb shell cat /proc/meminfo \| grep -E "MemAvailable\|SwapFree"` |
 | List devices | `adb devices -l` |
 | Uninstall app | `adb uninstall com.gigakin.stockbuddy` |
 | Run tests | `./gradlew test` |

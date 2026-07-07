@@ -67,7 +67,7 @@
         android:paddingEnd="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:background="@color/md_theme_surface">
+        android:background="@color/surface_container_low">
 
         <ImageView
             android:id="@+id/readerStatusIcon"
@@ -104,13 +104,26 @@
             android:paddingTop="24dp">
 
             <!-- Featured Inventory Card (spans full width) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardInventoryFeatured"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="176dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp">
+
+                <!-- Decorative background blur (cosmetic) -->
+                <View
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="-40dp"
+                    android:layout_marginEnd="-40dp"
+                    android:background="@drawable/home_featured_blur" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardInventoryFeatured"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                 app:cardBackgroundColor="@color/md_theme_primary"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="2dp">
 
                 <LinearLayout
@@ -149,8 +162,18 @@
                             android:textColor="@color/home_featured_subtitle"
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
+
+                    <!-- Accent indicator dot (bottom-right) -->
+                    <View
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/home_featured_dot" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
+            </FrameLayout>
 
             <!-- Row 1: Linking and Assets -->
             <LinearLayout
@@ -168,7 +191,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardBackgroundColor="@color/home_tile_background"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="12dp"
                     app:cardElevation="1dp"
                     app:strokeColor="@color/home_tile_border"
                     app:strokeWidth="1dp">
@@ -213,7 +236,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardBackgroundColor="@color/home_tile_background"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="12dp"
                     app:cardElevation="1dp"
                     app:strokeColor="@color/home_tile_border"
                     app:strokeWidth="1dp">
@@ -267,7 +290,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardBackgroundColor="@color/home_tile_background"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="12dp"
                     app:cardElevation="1dp"
                     app:strokeColor="@color/home_tile_border"
                     app:strokeWidth="1dp">
@@ -311,7 +334,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardBackgroundColor="@color/home_tile_background"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="12dp"
                     app:cardElevation="1dp"
                     app:strokeColor="@color/home_tile_border"
                     app:strokeWidth="1dp">

@@ -86,7 +86,7 @@
          HOME SCREEN DESIGN (from Figma)
          ============================================================================ -->
     <color name="home_background">#faf9fc</color>            <!-- Light background -->
-    <color name="home_featured_subtitle">#B3D9E8</color>     <!-- Light blue subtitle text -->
+    <color name="home_featured_subtitle">#6A6F76</color>     <!-- Muted grey subtitle (on-surface-variant @ 80% opacity) -->
     <color name="home_tile_background">#f4f3f6</color>       <!-- Tile background -->
     <color name="home_tile_border">#E0E2E5</color>           <!-- Tile border -->
     <color name="home_tile_title">#1a1c1e</color>            <!-- Tile text -->

@@ -32,10 +32,16 @@ class InventoryCodeDialogFragment : DialogFragment() {
             dismiss()
         }
 
-        return MaterialAlertDialogBuilder(requireContext())
+        // Create the dialog with Material Design styling (scrim + rounded corners)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
-            .setCancelable(false)
+            .setCancelable(true)  // Allow dismissing via back or outside tap
             .create()
+
+        // Apply Material Design dialog window styling
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        return dialog
     }
 
     override fun onDestroyView() {

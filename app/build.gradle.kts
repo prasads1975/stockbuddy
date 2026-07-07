@@ -52,6 +52,16 @@ android {
     packaging {
         // Common need once native .so libs from hardware SDKs are added (NFR-23).
         jniLibs.useLegacyPackaging = false
+
+        // Emulator builds (`-Pemu`): the Chainway SDK ships ARM-only native libs
+        // (arm64-v8a / armeabi*), which a lightweight x86_64 AOSP emulator image can't
+        // install (INSTALL_FAILED_NO_MATCHING_ABIS — no ARM translation layer). Strip them
+        // so the APK installs; the app falls back to EmulatorScannerManager anyway
+        // (ScannerManagerProvider catches the UnsatisfiedLinkError). Real-device / default
+        // builds keep the libs untouched.
+        if (project.hasProperty("emu")) {
+            jniLibs.excludes += "**/*.so"
+        }
     }
 }
 

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Inventory Code Entry Dialog — matches design: max-width, rounded corners, 56dp primary button -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@drawable/dialog_inventory_rounded"
+    android:maxWidth="320dp">
 
     <!-- Title -->
     <TextView
@@ -14,7 +17,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/md_theme_onSurface"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="4dp" />
 
     <!-- Description -->
     <TextView
@@ -23,20 +26,44 @@
         android:text="@string/inventory_code_description"
         android:textSize="14sp"
         android:textColor="@color/md_theme_onSurfaceVariant"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="16dp" />
 
-    <!-- Code Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutCode"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    <!-- Input Section -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/inventory_code_hint">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editCode"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <!-- Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/inventory_code_label"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Code Input with 8dp corner radius -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutCode"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="wrap_content"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="@string/inventory_code_hint" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <!-- Button Group -->
     <LinearLayout
@@ -44,21 +71,29 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="8dp">
 
+        <!-- Cancel Button (Text, padding 16/8) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancel"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="@string/action_cancel" />
 
+        <!-- Save Button (Filled, height 56dp, padding 24/8) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStartSession"
             style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
             android:text="@string/action_create" />
     </LinearLayout>
 </LinearLayout>
