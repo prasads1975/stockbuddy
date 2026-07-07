@@ -1,0 +1,202 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>StockBuddy RFID - Splash</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#acc9ed",
+                    "surface-container-high": "#e9e8ea",
+                    "on-secondary-container": "#4d657b",
+                    "on-primary-fixed": "#001d35",
+                    "status-available": "#2E7D32",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#c19b63",
+                    "on-secondary-fixed": "#011d31",
+                    "on-secondary-fixed-variant": "#31495e",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f1f0f3",
+                    "secondary-container": "#c9e2fd",
+                    "on-primary-fixed-variant": "#2b4967",
+                    "surface-variant": "#e3e2e5",
+                    "tertiary-fixed": "#ffddb0",
+                    "outline": "#73777e",
+                    "background": "#faf9fc",
+                    "surface-container-highest": "#e3e2e5",
+                    "border-subtle": "#E0E2E5",
+                    "surface-tint": "#446180",
+                    "primary-fixed-dim": "#acc9ed",
+                    "on-primary-container": "#87a4c6",
+                    "surface-dim": "#dad9dc",
+                    "outline-variant": "#c3c7ce",
+                    "on-surface-variant": "#43474d",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#002440",
+                    "surface-container": "#eeedf0",
+                    "tertiary": "#321f00",
+                    "on-background": "#1a1c1e",
+                    "surface-industrial": "#F8F9FA",
+                    "on-tertiary-fixed": "#291800",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#4d3304",
+                    "secondary-fixed-dim": "#b0c9e3",
+                    "secondary-fixed": "#cce5ff",
+                    "status-missing": "#C62828",
+                    "surface-container-low": "#f4f3f6",
+                    "primary-fixed": "#d0e4ff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#2f3033",
+                    "tertiary-fixed-dim": "#e9c085",
+                    "on-tertiary-fixed-variant": "#5e4112",
+                    "surface-bright": "#faf9fc",
+                    "secondary": "#496177",
+                    "surface": "#faf9fc",
+                    "on-surface": "#1a1c1e",
+                    "status-excess": "#F9A825",
+                    "primary-container": "#1b3a57"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "thumb-zone-bottom": "40%",
+                    "stack-gap": "8px",
+                    "touch-target-min": "48dp",
+                    "gutter": "16px",
+                    "action-height-primary": "56dp"
+            },
+            "fontFamily": {
+                    "title-card": ["Inter"],
+                    "label-cta": ["Inter"],
+                    "label-caption": ["Inter"],
+                    "body-metadata": ["Inter"],
+                    "display-count": ["Inter"],
+                    "headline-page": ["Inter"],
+                    "body-data": ["Inter"]
+            },
+            "fontSize": {
+                    "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                    "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                    "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #faf9fc;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            min-height: max(884px, 100dvh);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #1b3a57 0%, #446180 50%, #1b3a57 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .logo-bounce {
+            animation: softBounce 3s ease-in-out infinite;
+        }
+        @keyframes softBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-margin-mobile bg-background">
+<!-- Splash Screen Container -->
+<main class="flex flex-col items-center justify-between w-full max-w-md h-[707px]">
+<!-- Top Spacer for centering the logo vertically in the visual field -->
+<div class="h-12"></div>
+<!-- Center Identity Section -->
+<div class="flex flex-col items-center text-center">
+<!-- Brand Logo -->
+<div class="mb-8 logo-bounce">
+<div class="w-24 h-24 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white text-5xl" style="font-variation-settings: 'FILL' 1;">sensors</span>
+</div>
+</div>
+<!-- Brand Name & Subtitle -->
+<div class="space-y-1">
+<h1 class="font-headline-page text-headline-page text-primary tracking-tight">StockBuddy RFID</h1>
+<p class="font-label-cta text-label-cta text-on-surface-variant tracking-widest uppercase opacity-80">Enterprise Asset Tracking</p>
+</div>
+</div>
+<!-- Bottom Loading & Branding Section -->
+<div class="w-full space-y-12 flex flex-col items-center">
+<!-- Progress Feedback Area (Thumb-Zone Optimization) -->
+<div class="w-full max-w-xs space-y-4">
+<div class="flex justify-between items-end mb-1 px-1">
+<span class="font-label-caption text-label-caption text-on-surface-variant">Initializing Hardware &amp; Middleware...</span>
+<span class="font-label-caption text-label-caption font-bold text-primary" id="progress-percent">49%</span>
+</div>
+<!-- Progress Bar Track -->
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<!-- Progress Bar Fill -->
+<div class="h-full w-[49%] bg-primary rounded-full shimmer transition-all duration-1000 ease-out" id="progress-bar"></div>
+</div>
+<!-- Manual Entry for Preview -->
+<div class="pt-4 flex justify-center">
+<button class="px-6 py-2 bg-primary text-on-primary font-label-cta rounded-full shadow-md active:scale-95 transition-transform flex items-center gap-2" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_18}}'">
+<span>Enter App</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Corporate Branding Footer -->
+<div class="flex flex-col items-center space-y-1 opacity-60">
+<p class="font-label-caption text-label-caption text-on-surface-variant">Powered by</p>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-on-surface-variant rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-white">bolt</span>
+</div>
+<span class="font-label-cta text-label-cta text-on-surface text-[12px]">GIGAKIN</span>
+</div>
+<p class="font-label-caption text-[10px] text-on-surface-variant">www.gigakin.com</p>
+</div>
+</div>
+</main>
+<script>
+        // Static visual maintenance for the preview tool.
+        // Redirection logic is disabled per request to allow manual testing and screenshot capture.
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-percent');
+            
+            // Slow visual pulse for the progress bar without finishing or redirecting
+            let progress = 49;
+            setInterval(() => {
+                if (progress < 85) {
+                    progress += Math.random() * 0.5;
+                    progressBar.style.width = `${progress}%`;
+                    progressText.innerText = `${Math.round(progress)}%`;
+                }
+            }, 2000);
+        });
+    </script>
+</body></html>

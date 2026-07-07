@@ -117,6 +117,16 @@
     <string name="edit_asset_price_label">Price ($)</string>
     <string name="edit_asset_article_id_label">Article ID</string>
     <string name="action_save_changes">Save Changes</string>
+    <!-- Splash screen -->
+    <string name="splash_title">StockBuddy RFID</string>
+    <string name="splash_subtitle">Enterprise Asset Tracking</string>
+    <string name="splash_initializing">Initializing Hardware &amp; Middleware…</string>
+    <string name="splash_percent">%1$d%%</string>
+    <string name="splash_percent_start">0%</string>
+    <string name="splash_powered_by">Powered by</string>
+    <string name="splash_brand">GIGAKIN</string>
+    <string name="splash_website">www.gigakin.com</string>
+
     <string name="delete_asset_confirm">Are you sure you want to delete this asset?</string>
     <string name="delete_product_confirm">Delete \"%1$s\"? This will also remove its %2$d linked unit(s). This cannot be undone.</string>
     <string name="delete_category_confirm">Delete \"%1$s\"? This will also delete %2$d product(s) and all their linked units. This cannot be undone.</string>
