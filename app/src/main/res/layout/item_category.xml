@@ -36,7 +36,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/action_edit"
             android:scaleType="centerInside"
-            android:tint="@color/md_theme_primary" />
+            android:tint="@color/md_theme_onSecondaryContainer" />
 
         <ImageButton
             android:id="@+id/btnDelete"

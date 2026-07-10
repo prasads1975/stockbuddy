@@ -44,8 +44,8 @@ class CategoryFragment : Fragment() {
         binding.recyclerCategories.adapter = adapter
 
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
-            android.util.Log.d("CategoryFragment", "Observer received ${categories.size} categories: ${categories.map { it.name }}")
             adapter.submitList(categories)
+            updateCategoryCount()
         }
 
         binding.btnBack.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
@@ -56,6 +56,7 @@ class CategoryFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 adapter.filter(s?.toString().orEmpty())
+                updateCategoryCount()
             }
             override fun afterTextChanged(s: Editable?) {}
         })
@@ -70,6 +71,12 @@ class CategoryFragment : Fragment() {
         }
 
         observeReaderStatus()
+    }
+
+    /** Live "N Categories" count reflecting the current (filtered) list. */
+    private fun updateCategoryCount() {
+        val count = adapter.itemCount
+        binding.tvCategoryCount.text = resources.getQuantityString(R.plurals.categories_count, count, count)
     }
 
     private fun observeReaderStatus() {

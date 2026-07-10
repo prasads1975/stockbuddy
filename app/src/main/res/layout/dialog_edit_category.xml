@@ -65,7 +65,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editCategoryName"
                 android:layout_width="match_parent"
-                android:layout_height="48dp" />
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:inputType="text"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 

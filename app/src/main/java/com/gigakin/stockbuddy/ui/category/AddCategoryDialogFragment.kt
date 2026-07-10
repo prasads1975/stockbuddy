@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
+import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.DialogAddCategoryBinding
 import com.gigakin.stockbuddy.util.LimitCheck
@@ -54,10 +55,19 @@ class AddCategoryDialogFragment : BottomSheetDialogFragment() {
 
         binding.btnSave.setOnClickListener {
             val name = binding.editCategoryName.text?.toString()?.trim().orEmpty()
-            if (name.isNotBlank()) {
-                viewModel.add(name)
-            } else {
-                binding.editCategoryName.error = "Category name is required"
+            if (name.isBlank()) {
+                binding.editCategoryName.error = getString(R.string.category_name_required)
+                return@setOnClickListener
+            }
+            binding.editCategoryName.error = null
+            // Reject duplicates with clear inline feedback instead of a silent no-op close.
+            viewModel.checkNameTaken(name, null) { taken ->
+                if (!isAdded) return@checkNameTaken
+                if (taken) {
+                    binding.editCategoryName.error = getString(R.string.category_duplicate_error)
+                } else {
+                    viewModel.add(name)   // addResult → Ok dismiss / Exceeded(limit) snackbar
+                }
             }
         }
     }

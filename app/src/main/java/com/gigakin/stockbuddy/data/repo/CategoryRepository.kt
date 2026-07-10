@@ -33,4 +33,14 @@ class CategoryRepository(private val dao: CategoryDao) {
     suspend fun update(category: CategoryEntity) = dao.update(category)
     suspend fun delete(category: CategoryEntity) = dao.delete(category)
     suspend fun exists(name: String): Boolean = dao.countByName(name) > 0
+
+    /**
+     * True if [name] (case-insensitive) is already used by a category other than [excludeId].
+     * Add → pass excludeId = null; Edit → pass the category being renamed so its own name is allowed.
+     * Guards both the silent add-duplicate no-op and the rename-to-duplicate UNIQUE crash.
+     */
+    suspend fun isNameTaken(name: String, excludeId: Long?): Boolean {
+        val existingId = dao.findIdByName(name) ?: return false
+        return excludeId == null || existingId != excludeId
+    }
 }

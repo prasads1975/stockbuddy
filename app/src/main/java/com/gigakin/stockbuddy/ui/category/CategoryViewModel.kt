@@ -36,5 +36,10 @@ class CategoryViewModel(
         cb(productRepository.countByCategory(categoryId))
     }
 
+    /** Duplicate-name check (case-insensitive). excludeId = null on Add; the category's own id on Edit. */
+    fun checkNameTaken(name: String, excludeId: Long?, cb: (Boolean) -> Unit) = viewModelScope.launch {
+        cb(withContext(Dispatchers.IO) { repository.isNameTaken(name, excludeId) })
+    }
+
     fun consumeAddResult() { _addResult.value = null }
 }
