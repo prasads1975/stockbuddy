@@ -1,0 +1,195 @@
+<!DOCTYPE html><html lang="en" class="light" style=""><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#e9c085",
+                        "secondary-fixed-dim": "#b0c9e3",
+                        "inverse-on-surface": "#f1f0f3",
+                        "on-secondary-fixed-variant": "#31495e",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffddb0",
+                        "primary-container": "#1b3a57",
+                        "surface-container": "#eeedf0",
+                        "secondary-fixed": "#cce5ff",
+                        "secondary": "#496177",
+                        "on-primary-container": "#87a4c6",
+                        "status-available": "#2E7D32",
+                        "surface-dim": "#dad9dc",
+                        "secondary-container": "#c9e2fd",
+                        "on-surface": "#1a1c1e",
+                        "on-primary-fixed-variant": "#2b4967",
+                        "status-excess": "#F9A825",
+                        "inverse-surface": "#2f3033",
+                        "background": "#faf9fc",
+                        "primary-fixed": "#d0e4ff",
+                        "surface-container-low": "#f4f3f6",
+                        "border-subtle": "#E0E2E5",
+                        "outline-variant": "#c3c7ce",
+                        "on-tertiary": "#ffffff",
+                        "status-missing": "#C62828",
+                        "tertiary": "#321f00",
+                        "surface-bright": "#faf9fc",
+                        "on-background": "#1a1c1e",
+                        "outline": "#73777e",
+                        "primary-fixed-dim": "#acc9ed",
+                        "on-secondary-container": "#4d657b",
+                        "on-primary": "#ffffff",
+                        "surface": "#faf9fc",
+                        "on-error": "#ffffff",
+                        "surface-industrial": "#F8F9FA",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2e5",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001d35",
+                        "on-tertiary-container": "#c19b63",
+                        "on-secondary-fixed": "#011d31",
+                        "on-tertiary-fixed": "#291800",
+                        "surface-tint": "#446180",
+                        "surface-variant": "#e3e2e5",
+                        "on-surface-variant": "#43474d",
+                        "on-tertiary-fixed-variant": "#5e4112",
+                        "inverse-primary": "#acc9ed",
+                        "primary": "#002440",
+                        "surface-container-high": "#e9e8ea",
+                        "tertiary-container": "#4d3304"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "touch-target-min": "48px",
+                        "gutter": "16px",
+                        "action-height-primary": "56px",
+                        "stack-gap": "8px",
+                        "thumb-zone-bottom": "40%",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-data": ["Inter"],
+                        "title-card": ["Inter"],
+                        "body-metadata": ["Inter"],
+                        "label-cta": ["Inter"],
+                        "display-count": ["Inter"],
+                        "label-caption": ["Inter"],
+                        "headline-page": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-data": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-card": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-metadata": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-cta": ["14px", {"lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600"}],
+                        "display-count": ["48px", {"lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700"}],
+                        "label-caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-page": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-background text-on-surface font-body-data flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface border-b border-subtle flex items-center justify-between px-margin-mobile w-full h-[56px] top-0 z-50 fixed">
+<div class="flex items-center gap-4">
+<button class="w-[48px] h-[48px] flex items-center justify-center hover:bg-surface-container-high transition-colors rounded-full active:opacity-80">
+<span class="material-symbols-outlined text-primary" data-original-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-page text-headline-page text-primary truncate">QR Code Linking</h1>
+</div>
+<button class="w-[48px] h-[48px] flex items-center justify-center hover:bg-surface-container-high transition-colors rounded-full active:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant" data-original-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Hardware Status Bar -->
+<div class="mt-14 px-margin-mobile py-2 bg-surface-container-low flex items-center border-b border-subtle"><div class="flex items-center gap-2 w-full"><span class="material-symbols-outlined text-status-available text-[16px]">sensors</span><span class="font-label-caption text-label-caption text-on-surface font-bold tracking-widest uppercase">READER CONNECTED</span><div class="flex-grow"></div></div></div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col p-margin-mobile pt-20">
+<!-- Viewfinder Area -->
+<div class="relative flex-1 w-full max-h-[500px] bg-black rounded-xl overflow-hidden shadow-md">
+<!-- Simulated Camera Feed Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center opacity-70" data-alt="A professional top-down warehouse environment photograph with industrial shelving and wooden pallets. The image is blurred slightly to simulate a camera focus hunting effect. The lighting is bright overhead industrial LED. The color palette is dominated by neutral grays and warm wood tones, consistent with a modern distribution center style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAM5vLW8MTWQ6eEnAm8ov4M8GRa9eI9L1G4EtspTaG5jUirCJ3hLkh1DJLQ7VNZoG05UBcUSPhV3I0ZdJppVZ02nvFne0gkNvfWX6PmTJxPNvrjrESjvtshwl4dmtX_yyxfcB03yrojXEEmxaKc_lTrs1dRTSdbLbyH9MhXStAPy8omHQYfrdagniJSUq7ff_AOHrg5HSs3S1xr29-zzvsUx1LQ5dQ6zFFOZavvNZ_FmhntdsooJ_LL')">
+</div>
+<!-- Viewfinder Overlay -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative w-64 h-64 sm:w-80 sm:h-80">
+<!-- Scanning Animation Line -->
+<div class="scanning-line z-10"></div>
+<!-- Brackets -->
+<div class="corner-bracket top-0 left-0 border-t-4 border-l-4 rounded-tl-lg"></div>
+<div class="corner-bracket top-0 right-0 border-t-4 border-r-4 rounded-tr-lg"></div>
+<div class="corner-bracket bottom-0 left-0 border-b-4 border-l-4 rounded-bl-lg"></div>
+<div class="corner-bracket bottom-0 right-0 border-b-4 border-r-4 rounded-br-lg"></div>
+<!-- Scanned Object Hint (Faded UI) -->
+<div class="absolute inset-4 border-2 border-white/20 border-dashed rounded flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-white/40 text-4xl mb-2">qr_code_scanner</span>
+<p class="text-white/60 font-label-caption text-center px-4 uppercase tracking-widest">Scanning...</p>
+</div>
+</div>
+</div>
+<!-- Exposure/Zoom Micro-controls -->
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 bg-black/40 backdrop-blur-md p-2 rounded-full border border-white/10">
+<button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 rounded-full">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 rounded-full">
+<span class="material-symbols-outlined">flash_on</span>
+</button>
+</div>
+</div>
+<!-- Instructions & Actions -->
+<div class="mt-8 flex flex-col items-center text-center space-y-gutter">
+<div class="max-w-xs">
+<p class="font-body-data text-on-surface">
+                    Center the QR code within the frame to link the item.
+                </p>
+<p class="font-body-metadata text-outline mt-2">
+                    Ensure the code is well-lit and not obscured.
+                </p>
+</div>
+<!-- Manual Entry Trigger - Bottom 40% Ergonomic Zone -->
+<div class="w-full pt-8 pb-4">
+
+
+</div>
+</div>
+</main>
+<!-- Haptic feedback script simulation -->
+<script>
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(10);
+                }
+                console.log('Interaction detected on:', btn.innerText || 'Icon Button');
+            });
+        });
+
+        // Simple animation logic for the viewfinder
+        const viewfinder = document.querySelector('.corner-bracket');
+        let scale = 1;
+        let growing = true;
+        
+        function pulse() {
+            const brackets = document.querySelectorAll('.corner-bracket');
+            if (growing) {
+                scale += 0.005;
+                if (scale >= 1.05) growing = false;
+            } else {
+                scale -= 0.005;
+                if (scale <= 0.95) growing = true;
+            }
+            
+            brackets.forEach(b => {
+                // b.style.transform = `scale(${scale})`;
+            });
+            requestAnimationFrame(pulse);
+        }
+        // pulse(); // Disabled for performance, using CSS for core animations
+    </script>
+
+</body></html>

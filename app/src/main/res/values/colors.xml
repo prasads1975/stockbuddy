@@ -39,6 +39,7 @@
     <color name="md_theme_surfaceVariant">#DEE4E3</color>
     <color name="md_theme_onSurfaceVariant">#4F616E</color>
     <color name="md_theme_surfaceContainer">#EEF0EE</color>
+    <color name="md_theme_surfaceContainerHighest">#e3e2e5</color>
     <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
     <color name="surface_container_low">#f4f3f6</color>        <!-- Light container for summary cards -->
 

@@ -152,14 +152,23 @@
 <p class="font-body-metadata text-body-metadata text-on-surface-variant">Choose how you want to associate assets with the digital inventory system.</p>
 </div>
 <!-- Linking Options Grid (Bento/Card Style) -->
-<div class="grid grid-cols-1 gap-4 thumb-zone">
+<div class="grid grid-cols-1 gap-4 thumb-zone"><button class="active-state flex items-center gap-4 w-full bg-surface-container-lowest border border-border-subtle p-4 rounded-lg shadow-sm hover:border-primary transition-all group" onclick="window.location.href = '#'">
+<div class="p-3 bg-primary/5 rounded-lg group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary text-[24px]" data-icon="qr_code_scanner">qr_code_scanner</span>
+</div>
+<div class="flex-grow">
+<h3 class="font-title-card text-title-card font-bold text-on-surface">QR Code Linking</h3>
+<p class="font-body-metadata text-body-metadata text-on-surface-variant">Instantly link items by scanning warehouse-generated QR labels.</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
+</button>
 <!-- Option 1: Individual Linking -->
 <button class="active-state flex items-center gap-4 w-full bg-surface-container-lowest border border-border-subtle p-4 rounded-lg shadow-sm hover:border-primary transition-all group" onclick="window.location.href = '{{DATA:SCREEN:SCREEN_11}}'">
 <div class="p-3 bg-primary/5 rounded-lg group-hover:bg-primary transition-colors">
 <span class="material-symbols-outlined text-primary group-hover:text-on-primary text-[24px]" data-icon="add_box">add_box</span>
 </div>
 <div class="flex-grow">
-<h3 class="font-title-card text-title-card font-bold text-on-surface">Individual Linking</h3>
+<h3 class="font-title-card text-title-card font-bold text-on-surface">Manual Linking</h3>
 <p class="font-body-metadata text-body-metadata text-on-surface-variant">Scan or manually link a single item.</p>
 </div>
 <span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
@@ -196,6 +205,8 @@
       });
     });
   </script>
+
+
 
 
 

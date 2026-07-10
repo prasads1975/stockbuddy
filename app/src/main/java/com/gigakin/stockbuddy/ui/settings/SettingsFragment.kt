@@ -15,8 +15,10 @@ import com.gigakin.stockbuddy.databinding.FragmentSettingsBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 
 /**
- * S16 — Settings: minimal shell, exactly two destinations (Section 1.9, MVP Scope doc).
- * No login, no role gating, no License/Backup/Admin Password/Operator PIN items.
+ * S16 — Settings: minimal shell. Two functional destinations (Field Configuration, Category
+ * Management) plus a read-only Application Details section (App Info + a static License Status
+ * placeholder for visual parity with the design). No login, role gating, backup, admin
+ * password, or operator PIN — and the License card carries NO licensing logic (out of scope).
  */
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
