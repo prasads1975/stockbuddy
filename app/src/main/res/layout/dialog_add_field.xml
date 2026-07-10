@@ -67,7 +67,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editFieldLabel"
                 android:layout_width="match_parent"
-                android:layout_height="48dp" />
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:inputType="text"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Data Type Dropdown -->
@@ -89,7 +92,8 @@
             <AutoCompleteTextView
                 android:id="@+id/fieldTypeDropdown"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -170,6 +174,8 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            app:cornerRadius="24dp"
             android:text="@string/action_cancel" />
 
         <com.google.android.material.button.MaterialButton
@@ -178,7 +184,8 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="@string/action_save" />
+            app:cornerRadius="24dp"
+            android:text="@string/action_save_field" />
     </LinearLayout>
 
 </LinearLayout>

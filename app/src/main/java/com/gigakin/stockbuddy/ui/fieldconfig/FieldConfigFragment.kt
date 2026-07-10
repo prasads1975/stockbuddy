@@ -16,6 +16,7 @@ import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.FragmentFieldConfigBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /**
  * S19/S20 — Field Configuration: the headline domain-switching demo feature (FR-77i-o).
@@ -60,7 +61,7 @@ class FieldConfigFragment : Fragment() {
         // Setup RecyclerView with edit/delete callbacks
         adapter = FieldDefAdapter(
             onEditClick = { field -> showEditDialog(field) },
-            onDeleteClick = { field -> viewModel.removeField(field) }
+            onDeleteClick = { field -> confirmDelete(field) }
         )
         binding.recyclerFields.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerFields.adapter = adapter
@@ -77,6 +78,16 @@ class FieldConfigFragment : Fragment() {
             viewModel.addField(field)
         }
         dialog.show(childFragmentManager, "add_field")
+    }
+
+    /** Confirm before deleting a domain field (destructive: orphans product attribute data). */
+    private fun confirmDelete(field: FieldDefinitionEntity) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.field_config_delete_title))
+            .setMessage(getString(R.string.field_config_delete_confirm, field.label))
+            .setNegativeButton(getString(R.string.action_cancel), null)
+            .setPositiveButton(getString(R.string.action_delete)) { _, _ -> viewModel.removeField(field) }
+            .show()
     }
 
     private fun showEditDialog(field: FieldDefinitionEntity) {

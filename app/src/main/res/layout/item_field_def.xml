@@ -21,24 +21,36 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvLabel"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_onSurface"
-                tools:text="Net Weight *" />
+                tools:text="Retail Price" />
 
+            <!-- Type badge — inline uppercase pill (design) -->
             <TextView
                 android:id="@+id/tvType"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="13sp"
-                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_type_badge"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textAllCaps="true"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:textColor="@color/md_theme_onSurface"
                 tools:text="NUMBER" />
         </LinearLayout>
 

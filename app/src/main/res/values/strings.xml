@@ -118,6 +118,7 @@
     <string name="edit_asset_price_label">Price ($)</string>
     <string name="edit_asset_article_id_label">Article ID</string>
     <string name="action_save_changes">Save Changes</string>
+    <string name="action_save_field">Save Field</string>
     <!-- Splash screen -->
     <string name="splash_title">StockBuddy RFID</string>
     <string name="splash_subtitle">Enterprise Asset Tracking</string>
@@ -151,7 +152,14 @@
 
     <!-- Field Configuration -->
     <string name="field_config_title">Field Configuration</string>
+    <string name="field_config_delete_title">Delete Field?</string>
+    <string name="field_config_delete_confirm">Delete \"%1$s\"? Any data already saved under this field will no longer be shown in linking, assets, or exports.</string>
     <string name="field_config_fixed_fields">Fixed System Fields</string>
+    <!-- Fixed-field card labels (design wording, no asterisks) -->
+    <string name="field_config_sys_product_name">Product Name</string>
+    <string name="field_config_sys_barcode">Barcode (GTIN)</string>
+    <string name="field_config_sys_category">Category</string>
+    <string name="field_config_sys_rfid">RFID EPC</string>
     <string name="field_config_domain_fields">Domain-Specific Fields</string>
     <string name="field_config_add_field">Add Custom Field</string>
     <string name="field_config_edit_field">Edit Field</string>

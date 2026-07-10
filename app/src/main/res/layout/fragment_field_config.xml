@@ -7,10 +7,10 @@
     android:orientation="vertical"
     android:background="@color/md_theme_background">
 
-    <!-- Top App Bar (64dp) -->
+    <!-- Top App Bar (56dp, per design h-14) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
@@ -33,10 +33,10 @@
             android:layout_weight="1"
             android:layout_marginStart="16dp"
             android:text="@string/field_config_title"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/md_theme_primary"
-            android:lineHeight="32sp" />
+            android:lineHeight="28sp" />
 
         <View
             android:layout_width="48dp"
@@ -127,7 +127,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:layout_marginEnd="8dp"
-                        android:src="@drawable/ic_lock"
+                        android:src="@drawable/lock_24px"
                         android:tint="@color/md_theme_primary"
                         android:contentDescription="@null" />
 
@@ -182,10 +182,18 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/field_product_name"
+                                android:text="@string/field_config_sys_product_name"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/md_theme_onSurface" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="12dp"
+                                android:src="@drawable/info_24px"
+                                android:tint="@color/md_theme_outlineVariant"
+                                android:contentDescription="@null" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -222,10 +230,18 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/field_barcode"
+                                android:text="@string/field_config_sys_barcode"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/md_theme_onSurface" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="12dp"
+                                android:src="@drawable/ic_barcode"
+                                android:tint="@color/md_theme_outlineVariant"
+                                android:contentDescription="@null" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -262,10 +278,18 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/field_category"
+                                android:text="@string/field_config_sys_category"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/md_theme_onSurface" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="12dp"
+                                android:src="@drawable/category_24px"
+                                android:tint="@color/md_theme_outlineVariant"
+                                android:contentDescription="@null" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -302,10 +326,18 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/field_rfid"
+                                android:text="@string/field_config_sys_rfid"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/md_theme_onSurface" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginTop="12dp"
+                                android:src="@drawable/sensors_24px"
+                                android:tint="@color/md_theme_outlineVariant"
+                                android:contentDescription="@null" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </GridLayout>
