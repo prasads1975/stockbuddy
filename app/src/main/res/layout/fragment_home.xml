@@ -213,7 +213,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/link_24px"
-                                android:tint="#1B4F7C"
+                                android:tint="@color/home_icon_tint_linking"
                                 android:layout_gravity="center"
                                 android:contentDescription="@null" />
                         </FrameLayout>
@@ -258,7 +258,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/package_2_24px"
-                                android:tint="#D4851A"
+                                android:tint="@color/home_icon_tint_assets"
                                 android:layout_gravity="center"
                                 android:contentDescription="@null" />
                         </FrameLayout>
@@ -305,13 +305,14 @@
                         <FrameLayout
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:background="@drawable/home_icon_bg_green"
+                            android:background="@drawable/home_icon_bg_grey"
                             android:layout_marginBottom="12dp">
 
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/analytics_24px"
+                                android:tint="@color/home_icon_tint_neutral"
                                 android:layout_gravity="center"
                                 android:contentDescription="@null" />
                         </FrameLayout>
@@ -349,14 +350,14 @@
                         <FrameLayout
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:background="@drawable/home_icon_bg_grey"
+                            android:background="@drawable/home_icon_bg_outline"
                             android:layout_marginBottom="12dp">
 
                             <ImageView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@drawable/settings_24px"
-                                android:tint="#616161"
+                                android:tint="@color/home_icon_tint_neutral"
                                 android:layout_gravity="center"
                                 android:contentDescription="@null" />
                         </FrameLayout>

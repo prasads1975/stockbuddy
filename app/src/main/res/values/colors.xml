@@ -86,15 +86,21 @@
          HOME SCREEN DESIGN (from Figma)
          ============================================================================ -->
     <color name="home_background">#faf9fc</color>            <!-- Light background -->
-    <color name="home_featured_subtitle">#6A6F76</color>     <!-- Muted grey subtitle (on-surface-variant @ 80% opacity) -->
+    <color name="home_featured_subtitle">#CCFFFFFF</color>   <!-- on-primary @ 80% (white) — subtitle on the navy featured card -->
     <color name="home_tile_background">#f4f3f6</color>       <!-- Tile background -->
     <color name="home_tile_border">#E0E2E5</color>           <!-- Tile border -->
     <color name="home_tile_title">#1a1c1e</color>            <!-- Tile text -->
-    <color name="home_icon_bg_blue">#c9e2fd</color>          <!-- Linking icon bg (light blue) -->
-    <color name="home_icon_bg_peach">#ffddb0</color>         <!-- Assets icon bg (peach) -->
-    <color name="home_icon_bg_grey">#e3e2e5</color>          <!-- Reports/Settings icon bg (grey) -->
-    <color name="home_icon_bg_green">#A8D5BA</color>         <!-- Bulk Linking icon bg (light green) -->
+    <!-- Home tile icon backgrounds (MD3 tokens per home_hub design) -->
+    <color name="home_icon_bg_blue">#c9e2fd</color>          <!-- Linking: secondary-container -->
+    <color name="home_icon_bg_peach">#ffddb0</color>         <!-- Assets: tertiary-fixed -->
+    <color name="home_icon_bg_grey">#e3e2e5</color>          <!-- Reports: surface-variant -->
+    <color name="home_icon_bg_outline">#c3c7ce</color>       <!-- Settings: outline-variant -->
+    <color name="home_icon_bg_green">#A8D5BA</color>         <!-- (unused on home; kept for bulk linking) -->
     <color name="home_icon_green">#2E7D32</color>            <!-- Bulk Linking icon tint (dark green) -->
+    <!-- Home tile icon tints (MD3 on-container tokens per design) -->
+    <color name="home_icon_tint_linking">#4d657b</color>     <!-- on-secondary-container -->
+    <color name="home_icon_tint_assets">#5e4112</color>      <!-- on-tertiary-fixed-variant -->
+    <color name="home_icon_tint_neutral">#43474d</color>     <!-- on-surface-variant (Reports/Settings) -->
     <color name="home_reader_status_bg">#2E7D32</color>      <!-- Green for reader connected -->
 
 </resources>
