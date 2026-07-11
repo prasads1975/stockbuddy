@@ -7,6 +7,7 @@ import com.rscja.barcode.BarcodeDecoder
 import com.rscja.barcode.BarcodeFactory
 import com.rscja.deviceapi.RFIDWithUHFUART
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
 /**
@@ -112,21 +113,44 @@ class ChainwayScannerManager(private val context: Context) : ScannerManager {
         }
     }
 
-    override suspend fun scanBarcode(): String? = suspendCancellableCoroutine { continuation ->
-        try {
-            if (uhfReader == null) {
+    override suspend fun scanBarcode(): String? = withTimeoutOrNull(10000) {
+        suspendCancellableCoroutine { continuation ->
+            try {
+                // FR-06: invoke C72 imager for 1D barcode scan (EAN-13, Code128, etc.)
+                // Uses same BarcodeDecoder API as QR; handles both symbologies.
+                val decoder = BarcodeFactory.getInstance().barcodeDecoder
+                val opened = decoder.open(context)
+                if (!opened) {
+                    continuation.resume(null)
+                    return@suspendCancellableCoroutine
+                }
+
+                decoder.setDecodeCallback { entity ->
+                    try {
+                        if (entity != null && entity.resultCode == BarcodeDecoder.DECODE_SUCCESS && continuation.isActive) {
+                            val data = entity.barcodeData
+                            if (!data.isNullOrBlank()) {
+                                decoder.stopScan()
+                                decoder.close()
+                                continuation.resume(data)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Ignore; keep imager armed for next attempt.
+                    }
+                }
+
+                decoder.startScan()
+
+                continuation.invokeOnCancellation {
+                    try {
+                        decoder.stopScan()
+                        decoder.close()
+                    } catch (e: Exception) {}
+                }
+            } catch (e: Exception) {
                 continuation.resume(null)
-                return@suspendCancellableCoroutine
             }
-
-            // FR-06: invoke C72 imager for barcode/QR scan
-            // SDK barcode scanning API is typically image-capture based; placeholder
-            // until barcode API is confirmed in SDK documentation or reference project.
-            val barcode: String? = null
-
-            continuation.resume(barcode)
-        } catch (e: Exception) {
-            continuation.resume(null)
         }
     }
 
