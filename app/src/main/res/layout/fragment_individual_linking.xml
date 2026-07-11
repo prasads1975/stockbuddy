@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/linking_title"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/md_theme_primary"
             android:layout_marginStart="8dp" />
@@ -93,26 +93,53 @@
             android:paddingBottom="24dp">
 
 
+            <!-- Intro / description -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/linking_description"
+                android:textSize="14sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="20dp" />
+
             <!-- Product Name * -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/field_product_name"
+                android:textSize="12sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginBottom="4dp" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutName"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/field_product_name">
+                app:hintEnabled="false">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/field_name_hint"
+                    android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- RFID Tag ID * (with Scan Button on RHS) -->
+            <!-- RFID Tag ID * -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/field_rfid"
+                android:textSize="12sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="12dp">
+                android:gravity="center_vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layoutRfid"
@@ -120,11 +147,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="@string/field_rfid">
+                    app:hintEnabled="false">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editRfid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="@string/field_rfid_hint"
                         android:inputType="text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -133,20 +161,28 @@
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/button_circular"
+                    android:background="@drawable/bg_scan_button"
                     android:src="@drawable/sensors_24px"
                     android:scaleType="centerInside"
                     android:contentDescription="@string/action_scan_rfid"
-                    android:tint="@color/md_theme_onSecondaryContainer" />
+                    android:tint="@color/md_theme_onPrimary" />
             </LinearLayout>
 
-            <!-- Barcode / EAN * (with Scan Button on RHS) -->
+            <!-- Barcode / EAN * -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/field_barcode"
+                android:textSize="12sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="12dp">
+                android:gravity="center_vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layoutBarcode"
@@ -154,11 +190,13 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="@string/field_barcode">
+                    app:hintEnabled="false">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editBarcode"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:hint="@string/field_barcode_hint"
+                        android:inputType="text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageButton
@@ -166,33 +204,33 @@
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/button_circular"
+                    android:background="@drawable/bg_scan_button"
                     android:src="@drawable/barcode_scanner_24px"
                     android:scaleType="centerInside"
                     android:contentDescription="@string/action_scan_barcode"
-                    android:tint="@color/md_theme_onSecondaryContainer" />
+                    android:tint="@color/md_theme_onPrimary" />
             </LinearLayout>
 
-            <!-- Category * (Dropdown) with Label -->
+            <!-- Category * -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/field_category"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
                 android:textColor="@color/md_theme_onSurfaceVariant"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="4dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutCategory"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:hintEnabled="false">
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/category_placeholder"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 

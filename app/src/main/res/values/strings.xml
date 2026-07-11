@@ -6,6 +6,7 @@
     <string name="home_linking">Linking</string>
     <string name="linking_info_help">Need help? Check the <b>Hardware Guide</b> for scanner calibration tips.</string>
     <string name="linking_qr_coming_soon">QR scanning is coming soon.</string>
+    <string name="item_linked_success">Item linked successfully</string>
     <string name="home_inventory">Inventory</string>
     <string name="home_assets">Assets</string>
     <string name="home_reports">Reports</string>
@@ -23,9 +24,11 @@
     <string name="linking_description">Enter item details and scan the unique RFID tag to establish a permanent inventory link.</string>
     <string name="field_rfid_hint">Scan or enter RFID ID</string>
     <string name="field_barcode_hint">Scan or type barcode</string>
+    <string name="field_name_hint">e.g. Ultra-Light Running Shoes</string>
+    <string name="category_placeholder">Select category</string>
     <string name="action_scan_barcode">Scan Barcode</string>
     <string name="field_product_name">Product Name *</string>
-    <string name="field_barcode">Barcode *</string>
+    <string name="field_barcode">Barcode / EAN *</string>
     <string name="field_category">Category *</string>
     <string name="field_article_id">Article ID</string>
     <string name="field_rfid">RFID Tag ID *</string>

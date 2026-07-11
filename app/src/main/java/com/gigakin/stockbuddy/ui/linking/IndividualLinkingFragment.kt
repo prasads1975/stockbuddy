@@ -25,8 +25,9 @@ import com.gigakin.stockbuddy.util.ViewModelFactory
  * S06 — Manual Entry form (QR mode, FR-01-04, is cut from MVP; this is the only entry path).
  * Renders fixed fields (name, barcode, category, RFID) + all domain-specific fields
  * (including articleId) dynamically from field_definitions (NFR-52). Article ID is now
- * a configurable field stored in attributesJson, not a separate column. RFID/Barcode scan
- * use secondary container buttons (NFR-10f); Save Link = thumb-zone primary action (NFR-10c/d).
+ * a configurable field stored in attributesJson, not a separate column. Fields use a
+ * label-above layout; RFID/Barcode scan are navy (primary) square icon buttons beside each
+ * field per the Individual Linking design; Save Link = thumb-zone primary action (NFR-10c/d).
  */
 class IndividualLinkingFragment : Fragment() {
     private var _binding: FragmentIndividualLinkingBinding? = null
@@ -40,6 +41,9 @@ class IndividualLinkingFragment : Fragment() {
     }
 
     private val dynamicFieldViews = mutableMapOf<String, EditText>()
+    // Key → the field's TextInputLayout, so we can show errors on it. (editText.parent is the
+    // TextInputLayout's internal frame, NOT the TextInputLayout — casting it fails silently.)
+    private val dynamicFieldLayouts = mutableMapOf<String, TextInputLayout>()
     private var currentFieldDefs: List<FieldDefinitionEntity> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -136,53 +140,55 @@ class IndividualLinkingFragment : Fragment() {
 
         binding.dynamicFieldsContainer.removeAllViews()
         dynamicFieldViews.clear()
+        dynamicFieldLayouts.clear()
 
+        val inflater = LayoutInflater.from(requireContext())
         visibleDefs.forEach { def ->
-            val margins = android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = 8; bottomMargin = 8 }
+            val isDropdown = def.type == "DROPDOWN"
+            // Inflate the same outlined-box template the fixed fields use, so rendering is identical.
+            val layoutRes = if (isDropdown) R.layout.item_linking_dynamic_dropdown else R.layout.item_linking_dynamic_text
+            val fieldView = inflater.inflate(layoutRes, binding.dynamicFieldsContainer, false)
 
-            if (def.type == "DROPDOWN") {
-                // Outlined exposed-dropdown-menu style → matches the static Category field (box + chevron).
-                val til = TextInputLayout(
-                    requireContext(), null,
-                    com.google.android.material.R.attr.textInputOutlinedExposedDropdownMenuStyle
-                ).apply {
-                    hint = def.label + if (def.mandatory) " *" else ""
-                    layoutParams = margins
-                }
+            fieldView.findViewById<android.widget.TextView>(R.id.fieldLabel).text =
+                def.label + if (def.mandatory) " *" else ""
+
+            val input = fieldView.findViewById<EditText>(R.id.fieldInput)
+            if (isDropdown) {
                 val options = def.dropdownOptionsCsv?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
-                val autoComplete = AutoCompleteTextView(requireContext()).apply {
-                    inputType = android.text.InputType.TYPE_NULL
+                (input as AutoCompleteTextView).apply {
                     keyListener = null
                     setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, options))
                 }
-                til.addView(autoComplete)
-                binding.dynamicFieldsContainer.addView(til)
-                dynamicFieldViews[def.key] = autoComplete
             } else {
-                // Outlined box style → matches the static Name/Barcode fields.
-                val til = TextInputLayout(
-                    requireContext(), null,
-                    com.google.android.material.R.attr.textInputOutlinedStyle
-                ).apply {
-                    hint = def.label + if (def.mandatory) " *" else ""
-                    layoutParams = margins
-                }
-                val edit = TextInputEditText(requireContext()).apply {
-                    inputType = if (def.type == "NUMBER") android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-                                else android.text.InputType.TYPE_CLASS_TEXT
-                }
-                til.addView(edit)
-                binding.dynamicFieldsContainer.addView(til)
-                dynamicFieldViews[def.key] = edit
+                input.inputType = if (def.type == "NUMBER")
+                    android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+                else android.text.InputType.TYPE_CLASS_TEXT
             }
+
+            binding.dynamicFieldsContainer.addView(fieldView)
+            dynamicFieldViews[def.key] = input
+            dynamicFieldLayouts[def.key] = fieldView.findViewById(R.id.fieldInputLayout)
         }
     }
 
     private fun showReaderUnavailableIfNeeded() {
         Snackbar.make(binding.root, R.string.error_reader_unavailable, Snackbar.LENGTH_LONG).show()
+    }
+
+    /** Centered, auto-dismissing "Item linked successfully" confirmation (no screen dimming). */
+    private fun showLinkedSuccess() {
+        val dialog = android.app.Dialog(requireContext())
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.view_success_overlay)
+        dialog.setCancelable(true)
+        dialog.window?.apply {
+            setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+            setDimAmount(0f)   // don't dim the screen behind it
+        }
+        dialog.show()
+        binding.root.postDelayed({
+            if (isAdded && dialog.isShowing) dialog.dismiss()
+        }, 1500)
     }
 
     private fun attemptSave() {
@@ -203,10 +209,9 @@ class IndividualLinkingFragment : Fragment() {
         // Check mandatory custom fields
         var hasMissingMandatory = false
         currentFieldDefs.filter { it.mandatory && it.showOnLinking }.forEach { def ->
-            val view = dynamicFieldViews[def.key]
-            val value = view?.text?.toString()?.trim().orEmpty()
+            val value = dynamicFieldViews[def.key]?.text?.toString()?.trim().orEmpty()
             if (value.isBlank()) {
-                (view?.parent as? TextInputLayout)?.error = "Required"
+                dynamicFieldLayouts[def.key]?.error = "Required"
                 hasMissingMandatory = true
             }
         }
@@ -229,7 +234,7 @@ class IndividualLinkingFragment : Fragment() {
     private fun handleSaveResult(result: com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult?) {
         when (result) {
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.Success -> {
-                Snackbar.make(binding.root, "Item saved", Snackbar.LENGTH_SHORT).show()
+                showLinkedSuccess()
                 clearForm()
                 viewModel.consumeSaveResult()
             }
@@ -256,23 +261,23 @@ class IndividualLinkingFragment : Fragment() {
     }
 
     private fun applyFieldErrors(errors: Map<String, String>) {
-        if (errors.containsKey("name")) binding.layoutName.error = "Required"
-        if (errors.containsKey("barcode")) binding.layoutBarcode.error = "Required"
-        if (errors.containsKey("category")) binding.layoutCategory.error = "Required"
-        if (errors.containsKey("rfid")) binding.layoutRfid.error = "Required"
+        // Show the repository's actual message (e.g. "Category doesn't exist — add it in Settings
+        // first", "Barcode already exists as 'X'"), not a flattened "Required".
+        errors["name"]?.let { binding.layoutName.error = it }
+        errors["barcode"]?.let { binding.layoutBarcode.error = it }
+        errors["category"]?.let { binding.layoutCategory.error = it }
+        errors["rfid"]?.let { binding.layoutRfid.error = it }
 
         // All domain-specific field errors are in the form "attr_fieldKey"
-        dynamicFieldViews.forEach { (fieldKey, view) ->
-            if (errors.containsKey("attr_$fieldKey")) {
-                (view.parent as? TextInputLayout)?.error = errors["attr_$fieldKey"] ?: "Required"
-            }
+        dynamicFieldLayouts.forEach { (fieldKey, layout) ->
+            errors["attr_$fieldKey"]?.let { layout.error = it }
         }
     }
 
     private fun clearFieldErrors() {
         binding.layoutName.error = null; binding.layoutBarcode.error = null
         binding.layoutCategory.error = null; binding.layoutRfid.error = null
-        dynamicFieldViews.values.forEach { (it.parent as? TextInputLayout)?.error = null }
+        dynamicFieldLayouts.values.forEach { it.error = null }
     }
 
     private fun clearForm() {
