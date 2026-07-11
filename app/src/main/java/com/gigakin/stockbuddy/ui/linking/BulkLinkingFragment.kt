@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
@@ -26,7 +28,7 @@ class BulkLinkingFragment : Fragment() {
 
     private val app get() = requireActivity().application as StockBuddyApp
     private val viewModel: BulkLinkingViewModel by viewModels {
-        ViewModelFactory { BulkLinkingViewModel(app.itemRepository, app.fieldConfigRepository) }
+        ViewModelFactory { BulkLinkingViewModel(app.itemRepository, app.fieldConfigRepository, app.exportRepository) }
     }
 
     private val filePicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -97,11 +99,6 @@ class BulkLinkingFragment : Fragment() {
             }
         }
 
-        // Observe field definitions to populate CSV schema
-        viewModel.fieldDefinitions.observe(viewLifecycleOwner) { fieldDefs ->
-            populateSchemaTable(fieldDefs)
-        }
-
         // Import result observer
         viewModel.result.observe(viewLifecycleOwner) { result ->
             if (result != null) {
@@ -111,82 +108,68 @@ class BulkLinkingFragment : Fragment() {
                 viewModel.consumeResult()
             }
         }
+
+        // Append configured domain-specific (custom) fields as extra rows in the schema table,
+        // in the same style as the four fixed rows, so admins see the full expected CSV shape.
+        viewModel.fieldDefinitions.observe(viewLifecycleOwner) { fieldDefs ->
+            populateCustomSchemaRows(fieldDefs.filter { it.showOnCsv })
+        }
+
+        // Download Template — a ready-to-fill CSV matching the Expected CSV Schema above.
+        binding.btnDownloadTemplate.setOnClickListener { viewModel.downloadTemplate() }
+
+        viewModel.templateResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is BulkLinkingViewModel.TemplateDownloadResult.Success -> {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getString(R.string.download_success))
+                        .setMessage(getString(R.string.download_location_format, result.location))
+                        .setPositiveButton(getString(R.string.action_ok), null)
+                        .show()
+                    viewModel.consumeTemplateResult()
+                }
+                BulkLinkingViewModel.TemplateDownloadResult.Failure -> {
+                    Snackbar.make(binding.root, getString(R.string.download_failed), Snackbar.LENGTH_LONG).show()
+                    viewModel.consumeTemplateResult()
+                }
+                null -> {}
+            }
+        }
     }
 
-    private fun populateSchemaTable(fieldDefs: List<FieldDefinitionEntity>) {
-        // Clear existing rows
-        binding.schemaHeaderRow.removeAllViews()
-        binding.schemaDataContainer.removeAllViews()
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
-        // Build header from system fields + custom fields
-        val systemFields = listOf("Name", "Barcode", "Category", "RFID ID")
-        val customFields = fieldDefs.filter { it.showOnCsv }
+    private fun exampleTextFor(field: FieldDefinitionEntity): String = when (field.type) {
+        "NUMBER" -> "19.99"
+        "DATE" -> "2026-01-15"
+        "DROPDOWN" -> field.dropdownOptionsCsv?.split(",")?.map { it.trim() }?.firstOrNull { it.isNotEmpty() } ?: "Option"
+        else -> "Sample text"
+    }
 
-        // Header row
-        (systemFields + customFields.map { it.label }).forEach { header ->
-            val tv = TextView(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                text = header
-                textSize = 11f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setTextColor(requireContext().getColor(R.color.md_theme_onSurfaceVariant))
-                textAlignment = View.TEXT_ALIGNMENT_CENTER
+    private fun populateCustomSchemaRows(customFields: List<FieldDefinitionEntity>) {
+        binding.customSchemaRows.removeAllViews()
+        customFields.forEach { field ->
+            binding.customSchemaRows.addView(View(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1))
+                setBackgroundColor(requireContext().getColor(R.color.md_theme_outlineVariant))
+            })
+
+            val row = LinearLayout(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                orientation = LinearLayout.HORIZONTAL
+                setBackgroundColor(requireContext().getColor(android.R.color.white))
+                setPadding(dp(12), dp(12), dp(12), dp(12))
             }
-            binding.schemaHeaderRow.addView(tv)
-        }
-
-        // Example data row
-        val exampleData = listOf("Rugged Case X1", "88291022", "Accessory", "E28011912...") +
-            customFields.map { "" }
-
-        val dataRow = LinearLayout(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            orientation = LinearLayout.HORIZONTAL
-            setBackgroundColor(requireContext().getColor(R.color.md_theme_surfaceContainerLowest))
-            setPadding(12, 12, 12, 12)
-        }
-
-        exampleData.forEachIndexed { idx, value ->
-            val tv = TextView(requireContext()).apply {
+            fun cell(text: String) = TextView(requireContext()).apply {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                text = value
-                textSize = 13f
-                setTextColor(requireContext().getColor(R.color.md_theme_onSurfaceVariant))
-                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                this.text = text
+                textSize = 14f
+                setTextColor(requireContext().getColor(R.color.md_theme_onSurface))
             }
-            dataRow.addView(tv)
+            row.addView(cell(field.label + if (field.mandatory) " *" else ""))
+            row.addView(cell(exampleTextFor(field)))
+            binding.customSchemaRows.addView(row)
         }
-
-        binding.schemaDataContainer.addView(dataRow)
-
-        // Mandatory/optional indicator row
-        val indicatorRow = LinearLayout(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            orientation = LinearLayout.HORIZONTAL
-            setBackgroundColor(requireContext().getColor(R.color.md_theme_surfaceContainerLowest))
-            setPadding(12, 8, 12, 8)
-            alpha = 0.6f
-        }
-
-        // All system fields are mandatory
-        (systemFields.map { "Required" } + customFields.map { if (it.mandatory) "Required" else "Optional" }).forEach { indicator ->
-            val tv = TextView(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                text = indicator
-                textSize = 10f
-                setTextColor(requireContext().getColor(R.color.md_theme_outline))
-                textAlignment = View.TEXT_ALIGNMENT_CENTER
-            }
-            indicatorRow.addView(tv)
-        }
-
-        binding.schemaDataContainer.addView(indicatorRow)
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

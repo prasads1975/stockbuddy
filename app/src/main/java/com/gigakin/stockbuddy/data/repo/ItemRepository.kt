@@ -109,8 +109,9 @@ class ItemRepository(
         val header = rows.first().map { it.trim() }
         val dataRows = rows.drop(1)
         fun colIndex(name: String) = header.indexOfFirst { it.equals(name, ignoreCase = true) }
-        val iName = colIndex("Name"); val iBarcode = colIndex("Barcode")
-        val iCategory = colIndex("Category"); val iRfid = colIndex("RFID")
+        // Column names match the on-screen "Expected CSV Schema" table / downloadable template.
+        val iName = colIndex("Product Name"); val iBarcode = colIndex("Barcode")
+        val iCategory = colIndex("Category"); val iRfid = colIndex("RFID ID")
 
         var inserted = 0; var skipped = 0; var rejected = 0
         val reasons = mutableListOf<String>()

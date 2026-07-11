@@ -50,6 +50,33 @@ class ExportRepository(private val context: Context) {
         return rows
     }
 
+    /** FR-16: filename for the downloadable Bulk Linking import template. */
+    fun buildTemplateFileName(): String = "StockBuddy_Bulk_Linking_Template.csv"
+
+    /**
+     * FR-16: header + one example row for the downloadable Bulk Linking CSV template.
+     * Column names match exactly what ItemRepository.bulkImport() looks for (Product Name,
+     * Barcode, Category, RFID ID), plus any showOnCsv domain-specific fields by their label.
+     */
+    fun buildImportTemplateCsv(fieldDefs: List<FieldDefinitionEntity>): List<Array<String>> {
+        val customFields = fieldDefs.filter { it.showOnCsv }
+
+        val header = mutableListOf("Product Name", "Barcode", "Category", "RFID ID")
+        customFields.forEach { header.add(it.label) }
+
+        val example = mutableListOf("Rugged Smartphone", "88291022", "Accessory", "E28011912345678")
+        customFields.forEach { example.add(templateExampleFor(it)) }
+
+        return listOf(header.toTypedArray(), example.toTypedArray())
+    }
+
+    private fun templateExampleFor(field: FieldDefinitionEntity): String = when (field.type) {
+        "NUMBER" -> "19.99"
+        "DATE" -> "2026-01-15"
+        "DROPDOWN" -> field.dropdownOptionsCsv?.split(",")?.map { it.trim() }?.firstOrNull { it.isNotEmpty() } ?: "Option"
+        else -> "Sample text"
+    }
+
     /** Writes the CSV to the app's external files exports/ dir (shared base for FR-52 and FR-52a). */
     fun writeCsvFile(fileName: String, rows: List<Array<String>>): File {
         val dir = File(context.getExternalFilesDir(null), "exports").apply { mkdirs() }

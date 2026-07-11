@@ -45,14 +45,24 @@
     <string name="bulk_linking_title">Bulk Linking</string>
     <string name="action_choose_csv">Choose CSV File</string>
     <string name="action_import">Import</string>
+    <string name="action_import_data">Import Data</string>
     <string name="import_summary_format">Inserted: %1$d   Skipped: %2$d   Rejected: %3$d</string>
     <string name="bulk_linking_select_csv">Select CSV File</string>
     <string name="bulk_linking_select_csv_hint">Tap to browse or drag &amp; drop</string>
     <string name="bulk_linking_file_ready">File ready for import</string>
     <string name="bulk_linking_csv_schema">Expected CSV Schema</string>
-    <string name="bulk_linking_fr16_standard">FR-16 Standard</string>
+    <string name="bulk_linking_download_template">Download Template</string>
+    <string name="bulk_schema_col_name">Column Name</string>
+    <string name="bulk_schema_col_example">Example</string>
+    <string name="bulk_schema_product_name">Product Name</string>
+    <string name="bulk_schema_example_product_name">Rugged Smartphone</string>
+    <string name="bulk_schema_barcode">Barcode</string>
+    <string name="bulk_schema_example_barcode">88291022</string>
+    <string name="bulk_schema_category">Category</string>
+    <string name="bulk_schema_example_category">Accessory</string>
+    <string name="bulk_schema_rfid_id">RFID ID</string>
+    <string name="bulk_schema_example_rfid_id">E28011912…</string>
     <string name="bulk_linking_duplicate_rfid_warning">Ensure all RFID Tag IDs are unique. System will flag duplicates during the validation stage.</string>
-    <string name="bulk_linking_nfr10d">NFR-10d: Batch linking optimized for warehouse scale</string>
 
     <!-- Inventory -->
     <string name="new_inventory_session">New Inventory Session</string>

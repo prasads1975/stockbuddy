@@ -39,6 +39,7 @@
     <color name="md_theme_surfaceVariant">#DEE4E3</color>
     <color name="md_theme_onSurfaceVariant">#4F616E</color>
     <color name="md_theme_surfaceContainer">#EEF0EE</color>
+    <color name="md_theme_surfaceContainerHigh">#e9e8ea</color>
     <color name="md_theme_surfaceContainerHighest">#e3e2e5</color>
     <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
     <color name="surface_container_low">#f4f3f6</color>        <!-- Light container for summary cards -->
@@ -82,6 +83,12 @@
          For modals, bottom sheets, and dimmed backgrounds
          ============================================================================ -->
     <color name="scrim">#000000</color>                       <!-- 32% alpha overlay -->
+
+    <!-- ============================================================================
+         BULK LINKING — upload zone icon chip (per bulk_linking_screen design)
+         ============================================================================ -->
+    <color name="bulk_upload_icon_bg">#d0e4ff</color>        <!-- primary-fixed -->
+    <color name="bulk_upload_icon_tint">#2b4967</color>      <!-- on-primary-fixed-variant -->
 
     <!-- ============================================================================
          HOME SCREEN DESIGN (from Figma)
