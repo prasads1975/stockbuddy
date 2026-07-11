@@ -33,6 +33,17 @@ interface LinkedItemDao {
     @Query("SELECT COUNT(*) FROM linked_items WHERE barcode = :barcode")
     suspend fun countByBarcode(barcode: String): Int
 
+    /** Individual tags for a product, for the Assets screen's expandable per-tag list. */
+    @Query("SELECT * FROM linked_items WHERE barcode = :barcode ORDER BY linkedAt ASC")
+    suspend fun getByBarcode(barcode: String): List<LinkedItemEntity>
+
+    @Query("DELETE FROM linked_items WHERE rfid_tag_id = :rfid")
+    suspend fun deleteByRfid(rfid: String)
+
+    /** Reassign a tag to a different product. RFID (PK) is unchanged; only the barcode FK moves. */
+    @Query("UPDATE linked_items SET barcode = :newBarcode WHERE rfid_tag_id = :rfid")
+    suspend fun reassignBarcode(rfid: String, newBarcode: String)
+
     /** Full master with product details (join), for one-time snapshot computation at STOP. */
     @Query("""
         SELECT l.rfid_tag_id, l.barcode, p.product_name, c.name AS category_name, p.attributes

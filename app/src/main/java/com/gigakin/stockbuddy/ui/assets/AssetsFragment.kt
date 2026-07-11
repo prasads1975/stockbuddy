@@ -13,6 +13,7 @@ import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.dao.ProductSummary
 import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
+import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 import com.gigakin.stockbuddy.databinding.FragmentAssetsBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
@@ -24,7 +25,7 @@ class AssetsFragment : Fragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: AssetsViewModel by viewModels {
-        ViewModelFactory { AssetsViewModel(app.productRepository, app.categoryRepository) }
+        ViewModelFactory { AssetsViewModel(app.productRepository, app.itemRepository, app.categoryRepository) }
     }
     private lateinit var adapter: AssetsAdapter
     private var filterCategories: List<CategoryEntity> = emptyList()
@@ -58,12 +59,17 @@ class AssetsFragment : Fragment() {
             adapter = AssetsAdapter(
                 fieldDefs = fieldDefs,
                 onEditClick = { item -> showEditDialog(item) },
-                onDeleteClick = { item -> confirmAndDeleteItem(item) }
+                onDeleteClick = { item -> confirmAndDeleteItem(item) },
+                onTagsExpandRequested = { barcode ->
+                    viewModel.loadTags(barcode) { tags -> adapter.setTagsForBarcode(barcode, tags) }
+                },
+                onTagEditClick = { tag -> showReassignTagDialog(tag) },
+                onTagDeleteClick = { tag -> confirmAndDeleteTag(tag) }
             )
             binding.recyclerAssets.adapter = adapter
 
             // Submit current items when adapter changes
-            viewModel.items.value?.let { adapter.submitList(it) }
+            viewModel.items.value?.let { adapter.submitList(it, viewModel.currentQuery) }
         }
 
         viewModel.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
@@ -80,7 +86,7 @@ class AssetsFragment : Fragment() {
 
         viewModel.items.observe(viewLifecycleOwner) { items ->
             if (::adapter.isInitialized) {
-                adapter.submitList(items)
+                adapter.submitList(items, viewModel.currentQuery)
             }
             binding.tvCount.text = getString(R.string.assets_count_format, items.size)
         }
@@ -89,6 +95,24 @@ class AssetsFragment : Fragment() {
     private fun showEditDialog(product: ProductSummary) {
         val dialog = EditAssetDialogFragment.newInstance(product.barcode)
         dialog.show(childFragmentManager, "edit_asset")
+    }
+
+    private fun showReassignTagDialog(tag: LinkedItemEntity) {
+        val dialog = ReassignTagDialogFragment.newInstance(tag.rfidTagId, tag.barcode)
+        dialog.show(childFragmentManager, "reassign_tag")
+    }
+
+    private fun confirmAndDeleteTag(tag: LinkedItemEntity) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_tag_title)
+            .setMessage(getString(R.string.delete_tag_confirm, tag.rfidTagId))
+            .setNegativeButton(R.string.action_cancel) { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton(R.string.action_delete) { _, _ ->
+                viewModel.deleteTag(tag.rfidTagId) {
+                    viewModel.loadTags(tag.barcode) { tags -> adapter.setTagsForBarcode(tag.barcode, tags) }
+                }
+            }
+            .show()
     }
 
     private fun confirmAndDeleteItem(product: ProductSummary) {

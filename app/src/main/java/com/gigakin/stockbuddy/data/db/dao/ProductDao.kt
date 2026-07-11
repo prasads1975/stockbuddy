@@ -14,7 +14,9 @@ data class ProductSummary(
     @ColumnInfo(name = "category_id") val categoryId: Long,
     @ColumnInfo(name = "category_name") val categoryName: String,
     @ColumnInfo(name = "attributes") val attributesJson: String,
-    @ColumnInfo(name = "linked_count") val linkedCount: Int
+    @ColumnInfo(name = "linked_count") val linkedCount: Int,
+    /** True if the current search query matched one of this product's RFID tags (Assets auto-expand). */
+    @ColumnInfo(name = "matched_by_rfid") val matchedByRfid: Boolean
 )
 
 @Dao
@@ -25,16 +27,29 @@ interface ProductMasterDao {
     @Query("SELECT COUNT(*) FROM product_master WHERE category_id = :categoryId")
     suspend fun countByCategory(categoryId: Long): Int
 
-    /** Product-level Assets list: product ⋈ categories + linked-unit count, searchable/filterable. */
+    /**
+     * Product-level Assets list: product ⋈ categories + linked-unit count, searchable/filterable.
+     * RFID match uses an EXISTS subquery (not a direct OR on the joined `l.rfid_tag_id`) so it
+     * doesn't interact with the LEFT JOIN + GROUP BY: filtering the joined rows directly would
+     * collapse `linked_count` down to just the matching tag instead of the product's true total.
+     */
     @Query("""
         SELECT p.barcode, p.product_name, p.category_id, c.name AS category_name,
-               p.attributes, COUNT(l.rfid_tag_id) AS linked_count
+               p.attributes, COUNT(l.rfid_tag_id) AS linked_count,
+               (:query != '' AND EXISTS (
+                   SELECT 1 FROM linked_items li
+                   WHERE li.barcode = p.barcode AND li.rfid_tag_id LIKE '%' || :query || '%'
+               )) AS matched_by_rfid
         FROM product_master p
         JOIN categories c ON c.id = p.category_id
         LEFT JOIN linked_items l ON l.barcode = p.barcode
         WHERE (:query = '' OR p.product_name LIKE '%' || :query || '%'
                OR p.barcode LIKE '%' || :query || '%'
-               OR c.name LIKE '%' || :query || '%')
+               OR c.name LIKE '%' || :query || '%'
+               OR EXISTS (
+                   SELECT 1 FROM linked_items li
+                   WHERE li.barcode = p.barcode AND li.rfid_tag_id LIKE '%' || :query || '%'
+               ))
           AND (:categoryId IS NULL OR p.category_id = :categoryId)
         GROUP BY p.barcode
         ORDER BY p.product_name ASC

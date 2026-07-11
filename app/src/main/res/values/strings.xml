@@ -162,6 +162,17 @@
     <string name="delete_product_confirm">Delete \"%1$s\"? This will also remove its %2$d linked unit(s). This cannot be undone.</string>
     <string name="delete_category_confirm">Delete \"%1$s\"? This will also delete %2$d product(s) and all their linked units. This cannot be undone.</string>
 
+    <!-- Assets — RFID tag management -->
+    <string name="rfid_tags_toggle_format">RFID Tags (%1$d)</string>
+    <string name="delete_tag_title">Delete Tag?</string>
+    <string name="delete_tag_confirm">Remove tag \"%1$s\" from this product? This cannot be undone.</string>
+    <string name="reassign_tag_title">Reassign Tag</string>
+    <string name="reassign_tag_rfid_label">RFID Tag ID</string>
+    <string name="reassign_tag_product_label">Move to Product *</string>
+    <string name="reassign_tag_product_not_found">Select a valid product from the list</string>
+    <string name="reassign_tag_success">Item reassigned</string>
+    <string name="reassign_tag_not_found">This tag no longer exists — it may have been deleted or its product removed</string>
+
     <!-- Categories -->
     <string name="categories_title">Categories</string>
     <string name="categories_description">Manage inventory categories and hierarchies</string>

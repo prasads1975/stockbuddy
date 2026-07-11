@@ -26,6 +26,28 @@ class ItemRepository(
     suspend fun getByRfid(rfid: String): LinkedItemEntity? = linkedItemDao.getByRfid(rfid)
     suspend fun countLinkedForBarcode(barcode: String): Int = linkedItemDao.countByBarcode(barcode)
 
+    /** Assets screen (S09): individual tags behind a product's "RFID Tags (N)" expand row. */
+    suspend fun getTagsForBarcode(barcode: String): List<LinkedItemEntity> = linkedItemDao.getByBarcode(barcode)
+
+    /** Assets screen: remove a single mis-linked tag. Does not touch product_master or session data. */
+    suspend fun deleteTag(rfid: String) = linkedItemDao.deleteByRfid(rfid)
+
+    sealed class ReassignResult {
+        object Success : ReassignResult()
+        object ProductNotFound : ReassignResult()
+        object TagNotFound : ReassignResult()
+        object NoChange : ReassignResult()
+    }
+
+    /** Assets screen: move a tag from its current product to a different one (RFID/PK unchanged). */
+    suspend fun reassignTag(rfid: String, newBarcode: String): ReassignResult {
+        val current = linkedItemDao.getByRfid(rfid) ?: return ReassignResult.TagNotFound
+        if (current.barcode == newBarcode) return ReassignResult.NoChange
+        productRepository.getByBarcode(newBarcode) ?: return ReassignResult.ProductNotFound
+        linkedItemDao.reassignBarcode(rfid, newBarcode)
+        return ReassignResult.Success
+    }
+
     sealed class SaveResult {
         object Success : SaveResult()
         data class ValidationError(val fieldErrors: Map<String, String>) : SaveResult()

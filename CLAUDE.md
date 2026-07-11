@@ -126,7 +126,8 @@ Entity count: **7 registered** (DB version 3).
 - RFID uniqueness → DB `@PrimaryKey` + repo-level check → `SaveResult.DuplicateRfid`.
 - Category is an FK, resolved by name in `ItemRepository` — **no auto-create**; unknown category rejects.
 - Product write is **insert-or-reject-on-name-mismatch** (never overwrite an existing barcode's name).
-- Linking is append-only: `linked_items` insert if RFID new, else skip. `linked_items` is not directly editable.
+- Linking (Individual/Bulk/QR) is append-only: `linked_items` insert if RFID new, else skip — those flows never update an existing row.
+- **Assets screen (S09) exception**: each product card has an expandable "RFID Tags (N)" row exposing per-tag `Delete` (`ItemRepository.deleteTag()`) and `Edit` = reassign to a different product (`ItemRepository.reassignTag()`, via `ReassignTagDialogFragment`). This is the *only* place `linked_items` rows are mutated/removed outside of product-cascade delete. RFID (the PK) never changes — reassignment only moves the `barcode` FK.
 - Product delete (Assets) / category delete → block + warn, then **FK CASCADE** removes dependents.
 - Scan dedup → `OnConflictStrategy.IGNORE` on `SessionTagDao.insert()`.
 - Live scan counts → in-memory master RFID set (`linkedItemDao.getAllRfids()`); missing = total − available.

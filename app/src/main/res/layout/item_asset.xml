@@ -49,63 +49,67 @@
             android:tint="@color/status_missing" />
     </LinearLayout>
 
-    <!-- Barcode Row -->
+    <!-- Barcode + Category (2-column row) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="8dp">
 
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="@string/label_barcode"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            android:letterSpacing="0.05" />
-
-        <TextView
-            android:id="@+id/tvBarcode"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="14sp"
-            android:fontFamily="monospace"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            tools:text="8801234567890" />
-    </LinearLayout>
+            android:orientation="vertical">
 
-    <!-- Category Row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_barcode"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="2dp" />
 
-        <TextView
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="@string/label_category"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            android:letterSpacing="0.05"
-            android:ellipsize="end"
-            android:maxLines="1" />
+            <TextView
+                android:id="@+id/tvBarcode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:fontFamily="monospace"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                tools:text="8801234567890" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvCategory"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="14sp"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            tools:text="Office Furniture" />
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_category"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:letterSpacing="0.05"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:id="@+id/tvCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                tools:text="Office Furniture" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Dynamic Custom Fields Container -->
@@ -114,6 +118,52 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />
+
+    <!-- RFID Tags — expandable row listing each individual physical unit linked to this product. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="4dp">
+
+        <LinearLayout
+            android:id="@+id/rowTagsToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvTagsToggleLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:letterSpacing="0.05"
+                tools:text="RFID Tags (2)" />
+
+            <ImageView
+                android:id="@+id/ivTagsExpandIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/expand_more"
+                android:tint="@color/md_theme_onSurfaceVariant"
+                android:contentDescription="@null" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rfidTagsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <!-- Divider -->
     <View

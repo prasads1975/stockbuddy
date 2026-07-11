@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A single RFID tag row inside a product card's expanded "RFID Tags (N)" section. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="0dp">
+
+    <TextView
+        android:id="@+id/tvTagRfid"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14sp"
+        android:fontFamily="monospace"
+        android:textColor="@color/md_theme_onSurfaceVariant"
+        tools:text="3034 1E24 0000 0001" />
+
+    <ImageButton
+        android:id="@+id/btnTagEdit"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_edit"
+        android:scaleType="centerInside"
+        android:padding="12dp"
+        android:tint="@color/md_theme_primary" />
+
+    <ImageButton
+        android:id="@+id/btnTagDelete"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_delete"
+        android:scaleType="centerInside"
+        android:padding="12dp"
+        android:tint="@color/status_missing" />
+</LinearLayout>

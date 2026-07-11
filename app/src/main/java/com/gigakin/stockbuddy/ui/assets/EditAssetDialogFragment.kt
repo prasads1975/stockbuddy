@@ -26,7 +26,7 @@ class EditAssetDialogFragment : BottomSheetDialogFragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: AssetsViewModel by viewModels {
-        ViewModelFactory { AssetsViewModel(app.productRepository, app.categoryRepository) }
+        ViewModelFactory { AssetsViewModel(app.productRepository, app.itemRepository, app.categoryRepository) }
     }
 
     private var editingProduct: ProductMasterEntity? = null
