@@ -44,7 +44,7 @@
 | FR-10 | Save locally, immediately usable in scans |
 | FR-21 | Product written first on save (insert-or-reject-on-name-mismatch); no dedicated Product Master screen |
 
-*UX note: the mode-switching concern (QR Scan vs. Manual Entry) is moot for this scope — QR mode (FR-01–04) is already cut, so there's only ever one form on screen, with Barcode and RFID Tag ID each carrying their own inline scan affordance (NFR-10f). Barcode scan is a compact inline icon next to the field; RFID Tag ID scan is a more prominent labelled "Scan" button, given it's the field the whole app's uniqueness logic hangs on and it has richer feedback states (success / no tag / multiple tags). Save Link stays the one true oversized, thumb-zone primary action (NFR-10c/d) — distinct from both scan buttons.*
+*UX note: the mode-switching concern (QR Scan vs. Manual Entry) is moot for this scope — the QR **scanning screen (S07, FR-01–04) is not yet built** (the QR Code Linking option on Linking Options is shown but non-functional), so there's only ever one form on screen, with Barcode and RFID Tag ID each carrying their own inline scan affordance (NFR-10f). Barcode scan is a compact inline icon next to the field; RFID Tag ID scan is a more prominent labelled "Scan" button, given it's the field the whole app's uniqueness logic hangs on and it has richer feedback states (success / no tag / multiple tags). Save Link stays the one true oversized, thumb-zone primary action (NFR-10c/d) — distinct from both scan buttons.*
 
 ### 1.4 Bulk Linking
 | FR | Requirement |
@@ -198,7 +198,7 @@ What still stays deferred, unchanged from Section 2: load testing, query tuning 
 | Licensing | NFR-31–38, Section 5.8, FR-77a–d, FR-80 | No real device fleet to license yet |
 | Backup & Restore | NFR-39–50, Section 5.9 | No production data at risk yet |
 | Authentication / RBAC | NFR-20a–o, Section 5.5, FR-77e–h, screen S02 | Login screens slow down a live demo |
-| QR Scan linking mode | FR-01–04, FR-11 | Requires a label-printing dependency; manual entry suffices for live demo |
+| QR **scanning** screen (S07) | FR-01–04, FR-11 | The QR Code Linking **option** is now shown on the Linking Options screen (in scope) but non-functional ("coming soon"); only the scanning screen is deferred — needs the QR payload schema (OQ-01) + a label-printing dependency. Individual Linking remains manual-entry only. |
 | Standalone Product Master screen | FR-22–28 | The product-level **Assets** screen (v2, §1.8) is the product UI — list/edit/delete; no separate screen needed |
 | API / LAN export channels | FR-53–56 | No real endpoint/server to demo against |
 | Non-skippable First-Run Wizard | FR-77, FR-77a–h, FR-78, FR-78a, FR-79 | Replaced by direct Settings access to Field Config + Categories |

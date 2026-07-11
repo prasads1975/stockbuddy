@@ -3,7 +3,7 @@
 ## What this project is
 
 Android RFID Inventory Management app for the Chainway C72 handheld scanner.
-Package: `com.gigakin.stockbuddy` | SRS: `RFID_App_SRS_C72.md` v3.15 | Scope: `StockBuddy_MVP_Demo_Scope.md` | Data model: `docs/design/StockBuddy_System_Design.md` §4.0 (v2)
+Package: `com.gigakin.stockbuddy` | SRS: `RFID_App_SRS_C72.md` v3.16 | Scope: `StockBuddy_MVP_Demo_Scope.md` | Data model: `docs/design/StockBuddy_System_Design.md` §4.0 (v2)
 
 The core sales pitch: **one APK, reconfigured in 30 seconds for any retail industry** (toy store, jewellery, pharma, etc.) by switching domain-specific field configuration at runtime — no code changes, no APK update. This is the headline feature. Every architecture decision serves it.
 
@@ -20,7 +20,7 @@ Current phase: **MVP/Demo only.** The app must build, run on an Android emulator
 - Add internet permissions or outbound API calls. The app is fully offline in MVP (NFR-09, NFR-15).
 - Use `Bundle` directly for navigation arguments. Always use Safe Args typed Directions/Args classes.
 - Implement licensing, authentication/RBAC, backup/restore, or the first-run wizard. These are explicitly out of scope.
-- Implement QR scan mode (FR-01–04). Cut from MVP.
+- Wire the QR Code Linking option to real navigation or implement QR scanning yet. The **QR Code Linking option is now shown** on the Linking Options screen (in scope), but the **QR scanning screen (S07, FR-01–04) is not built** — tapping the option shows a "coming soon" snackbar. Build the S07 scanning screen (and update `docs/html_screens/` design + this file) before wiring it.
 - Change `viewBinding = false` anywhere. ViewBinding is the codebase-wide pattern.
 - Remove the JSON-attributes column (`attributes` on `product_master`). It is the architectural foundation of the dynamic-field feature. Note (v2): attributes are **product-level only**, and `linked_items` is normalized (no denormalized product columns) — see Data Model section below.
 - Re-denormalize `linked_items` (adding product_name/category back). v2 deliberately normalized it; results immutability comes from the `session_result_items` snapshot, not from denormalization.
@@ -344,7 +344,7 @@ Defined as `BuildConfig` fields in `app/build.gradle.kts`. Read via `DemoLimits.
 
 ## Explicitly out of MVP scope — do not implement
 
-- QR Scan linking mode (FR-01–04, FR-11)
+- QR **scanning** screen (S07, FR-01–04, FR-11) — the QR Code Linking *option* is now shown on Linking Options (in scope) but non-functional ("coming soon"); only the scanning screen itself is deferred
 - Standalone Product Master screen (FR-22–28) — the product-level **Assets** screen (v2) is the product UI (list/edit/delete); no separate Product Master screen
 - API upload / LAN transfer export (FR-53–56)
 - Authentication / RBAC / login screen
@@ -391,7 +391,7 @@ All reference documents live under `docs/srs/` relative to the project root.
 
 | Path | Version | Purpose |
 |---|---|---|
-| `docs/srs/RFID_App_SRS_C72.md` | v3.14 | **Primary source of truth.** Every FR/NFR cited in code comments traces here. Consult before making any requirement-level decision. |
+| `docs/srs/RFID_App_SRS_C72.md` | v3.16 | **Primary source of truth.** Every FR/NFR cited in code comments traces here. Consult before making any requirement-level decision. |
 | `docs/srs/StockBuddy_MVP_Demo_Scope.md` | current | MVP scope decisions: what is in scope, what is explicitly cut, testing strategy (emulator vs physical C72), demo mode limits rationale, build tooling decisions. |
 | `docs/srs/StockBuddy_Test_Values_RFID_Barcode.md` | current | 20 sample RFID EPC hex values and 20 sample EAN-13 barcodes with valid check digits, for manual entry during emulator-based testing before physical tags are in hand. Includes suggested test scenarios (grouping, duplicate-RFID rejection, Missing-item detection). |
 

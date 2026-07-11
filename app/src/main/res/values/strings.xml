@@ -4,6 +4,8 @@
 
     <!-- Home -->
     <string name="home_linking">Linking</string>
+    <string name="linking_info_help">Need help? Check the <b>Hardware Guide</b> for scanner calibration tips.</string>
+    <string name="linking_qr_coming_soon">QR scanning is coming soon.</string>
     <string name="home_inventory">Inventory</string>
     <string name="home_assets">Assets</string>
     <string name="home_reports">Reports</string>

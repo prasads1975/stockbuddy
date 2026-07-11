@@ -6,12 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentLinkingOptionsBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 
-/** S04 — choice between Individual Linking and Bulk Linking. QR mode (FR-01-04) is cut from MVP. */
+/**
+ * S04 — choice between QR Code Linking, Individual Linking, and Bulk Linking.
+ * QR Code Linking is in scope as an option (FR-01-04); the QR scanning screen is not yet
+ * implemented, so tapping it shows a "coming soon" message.
+ */
 class LinkingOptionsFragment : Fragment() {
     private var _binding: FragmentLinkingOptionsBinding? = null
     private val binding get() = _binding!!
@@ -26,6 +31,11 @@ class LinkingOptionsFragment : Fragment() {
         // Back button navigation
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
+        }
+
+        // QR Code Linking — scanning screen not yet built; show a "coming soon" message.
+        binding.btnQrLinking.setOnClickListener {
+            Snackbar.make(binding.root, getString(R.string.linking_qr_coming_soon), Snackbar.LENGTH_SHORT).show()
         }
 
         // Card click listeners
