@@ -152,7 +152,7 @@
     <string name="dialog_edit_category_title">Edit Category</string>
     <string name="dialog_category_name_label">Category Name *</string>
     <string name="dialog_category_hint">e.g., Plush Toys</string>
-    <string name="dialog_add_category_save">Add Category</string>
+    <string name="dialog_add_category_save">Save</string>
     <string name="dialog_delete_category_title">Delete Category?</string>
     <string name="dialog_delete_category_message">Are you sure you want to delete this category? This action cannot be undone.</string>
 
