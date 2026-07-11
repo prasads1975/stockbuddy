@@ -28,6 +28,7 @@ class FieldDefAdapter(
         val f = items[position]
         holder.b.tvLabel.text = f.label + if (f.mandatory) " *" else ""
         holder.b.tvType.text = FieldType.labelForValue(f.type)
+        holder.b.tvKey.text = holder.b.root.context.getString(com.gigakin.stockbuddy.R.string.field_key_label, f.key)
     }
 
     override fun getItemCount() = items.size

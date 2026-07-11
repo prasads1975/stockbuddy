@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/home_background">
+
+    <!-- Top App Bar (56dp, per design h-14) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:background="@color/home_background">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:scaleType="centerInside"
+            android:tint="@color/md_theme_primary"
+            android:contentDescription="@string/action_back"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/qr_linking_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_primary" />
+    </LinearLayout>
+
+    <!-- Reader Status Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@color/surface_container_low">
+
+        <ImageView
+            android:id="@+id/readerStatusIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/sensors_24px"
+            android:tint="@color/status_available"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/tvReaderStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:text="@string/reader_connected" />
+    </LinearLayout>
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Aim zone (imager target area — no live camera feed) -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_qr_aimzone">
+
+            <FrameLayout
+                android:layout_width="240dp"
+                android:layout_height="240dp"
+                android:layout_gravity="center">
+
+                <!-- Corner brackets (one drawable rotated to each corner) -->
+                <View android:layout_width="32dp" android:layout_height="32dp"
+                    android:layout_gravity="top|start" android:background="@drawable/bg_qr_corner"
+                    android:rotation="0" />
+                <View android:layout_width="32dp" android:layout_height="32dp"
+                    android:layout_gravity="top|end" android:background="@drawable/bg_qr_corner"
+                    android:rotation="90" />
+                <View android:layout_width="32dp" android:layout_height="32dp"
+                    android:layout_gravity="bottom|end" android:background="@drawable/bg_qr_corner"
+                    android:rotation="180" />
+                <View android:layout_width="32dp" android:layout_height="32dp"
+                    android:layout_gravity="bottom|start" android:background="@drawable/bg_qr_corner"
+                    android:rotation="270" />
+
+                <!-- Scanning line (animated in code) -->
+                <View
+                    android:id="@+id/scanLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_gravity="top"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_qr_scanline" />
+
+                <!-- Center hint -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginBottom="8dp"
+                        android:src="@drawable/qr_code_scanner_24px"
+                        android:tint="#66FFFFFF"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/tvScanState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/qr_linking_scanning"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.15"
+                        android:textColor="#99FFFFFF" />
+                </LinearLayout>
+            </FrameLayout>
+        </FrameLayout>
+
+        <!-- Instructions -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/qr_linking_instruction_primary"
+            android:textSize="16sp"
+            android:textColor="@color/md_theme_onSurface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@string/qr_linking_instruction_secondary"
+            android:textSize="14sp"
+            android:textColor="@color/md_theme_outline" />
+    </LinearLayout>
+
+    <!-- Bottom Action -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnScan"
+        style="@style/Widget.StockBuddy.PrimaryActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:text="@string/qr_linking_scan_button"
+        app:icon="@drawable/qr_code_scanner_24px"
+        app:iconGravity="textStart"
+        tools:ignore="ContentDescription" />
+
+</LinearLayout>

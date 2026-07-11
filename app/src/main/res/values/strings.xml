@@ -7,6 +7,20 @@
     <string name="linking_info_help">Need help? Check the <b>Hardware Guide</b> for scanner calibration tips.</string>
     <string name="linking_qr_coming_soon">QR scanning is coming soon.</string>
     <string name="item_linked_success">Item linked successfully</string>
+
+    <!-- QR Code Linking (S07) -->
+    <string name="qr_linking_title">QR Code Linking</string>
+    <string name="qr_linking_scanning">Scanning…</string>
+    <string name="qr_linking_state_unavailable">Reader unavailable</string>
+    <string name="qr_linking_instruction_primary">Center the QR code within the frame to link the item.</string>
+    <string name="qr_linking_instruction_secondary">Ensure the code is well-lit and not obscured.</string>
+    <string name="qr_linking_scan_button">Scan QR Code</string>
+    <string name="qr_linking_invalid">Unrecognized QR code. Please try again.</string>
+    <string name="qr_invalid_dropdown_values">Scanned value(s) for %1$s didn\'t match the allowed options and were left blank. Please select manually.</string>
+
+    <!-- Field Configuration -->
+    <string name="field_key_label">key: %1$s</string>
+
     <string name="home_inventory">Inventory</string>
     <string name="home_assets">Assets</string>
     <string name="home_reports">Reports</string>

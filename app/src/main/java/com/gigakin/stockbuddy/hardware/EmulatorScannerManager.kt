@@ -25,4 +25,9 @@ class EmulatorScannerManager : ScannerManager {
     override fun stopContinuousScan() { /* no-op */ }
 
     override suspend fun scanBarcode(): String? = null
+
+    // No 2D imager on the emulator — report unavailable so the QR screen shows the FR-81a state.
+    override fun openImager(onDecoded: (String) -> Unit): Boolean = false
+    override fun triggerImagerScan() { /* no-op */ }
+    override fun closeImager() { /* no-op */ }
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Top-left corner bracket for the QR viewfinder. Placed 4× with rotation 0/90/180/270. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Horizontal (top) arm -->
+    <item android:gravity="top">
+        <shape android:shape="rectangle">
+            <size android:height="4dp" />
+            <solid android:color="@color/md_theme_primaryFixed" />
+        </shape>
+    </item>
+    <!-- Vertical (left) arm -->
+    <item android:gravity="left">
+        <shape android:shape="rectangle">
+            <size android:width="4dp" />
+            <solid android:color="@color/md_theme_primaryFixed" />
+        </shape>
+    </item>
+</layer-list>

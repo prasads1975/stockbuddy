@@ -28,13 +28,30 @@
     <fragment android:id="@+id/linkingOptionsFragment"
         android:name="com.gigakin.stockbuddy.ui.linking.LinkingOptionsFragment"
         android:label="Linking">
+        <action android:id="@+id/action_to_qrLinking" app:destination="@id/qrLinkingFragment" />
         <action android:id="@+id/action_to_individualLinking" app:destination="@id/individualLinkingFragment" />
         <action android:id="@+id/action_to_bulkLinking" app:destination="@id/bulkLinkingFragment" />
     </fragment>
 
+    <!-- S07 — QR Code Linking (imager). Navigates to Individual Linking WITHOUT popUpTo, so the
+         back arrow on Individual Linking returns here (not to Linking Options). -->
+    <fragment android:id="@+id/qrLinkingFragment"
+        android:name="com.gigakin.stockbuddy.ui.linking.QrLinkingFragment"
+        android:label="@string/qr_linking_title">
+        <action android:id="@+id/action_qr_to_individualLinking" app:destination="@id/individualLinkingFragment" />
+    </fragment>
+
     <fragment android:id="@+id/individualLinkingFragment"
         android:name="com.gigakin.stockbuddy.ui.linking.IndividualLinkingFragment"
-        android:label="@string/linking_title" />
+        android:label="@string/linking_title">
+        <!-- Pre-fill args from the QR flow (all default so the Manual path needs none). -->
+        <argument android:name="fromQr" app:argType="boolean" android:defaultValue="false" />
+        <argument android:name="prefillProductName" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="prefillBarcode" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="prefillCategory" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="prefillRfid" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="prefillAttributesJson" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+    </fragment>
 
     <fragment android:id="@+id/bulkLinkingFragment"
         android:name="com.gigakin.stockbuddy.ui.linking.BulkLinkingFragment"

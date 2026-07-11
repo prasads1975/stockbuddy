@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -18,27 +19,32 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.FragmentIndividualLinkingBinding
 import com.gigakin.stockbuddy.hardware.RfidScanResult
+import com.gigakin.stockbuddy.util.QrPayloadParser
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /**
- * S06 — Manual Entry form (QR mode, FR-01-04, is cut from MVP; this is the only entry path).
- * Renders fixed fields (name, barcode, category, RFID) + all domain-specific fields
- * (including articleId) dynamically from field_definitions (NFR-52). Article ID is now
- * a configurable field stored in attributesJson, not a separate column. Fields use a
- * label-above layout; RFID/Barcode scan are navy (primary) square icon buttons beside each
- * field per the Individual Linking design; Save Link = thumb-zone primary action (NFR-10c/d).
+ * S06 — Individual Linking form. Reached either from Linking Options (Manual) or from the
+ * QR Code Linking screen (S07) with the fields pre-filled from the scanned payload (FR-02/03).
+ * Renders fixed fields (name, barcode, category, RFID) + all domain-specific fields dynamically
+ * from field_definitions (NFR-52). Fields use a label-above layout; RFID/Barcode scan are navy
+ * square icon buttons; Save Link = thumb-zone primary action (NFR-10c/d). When arrived via QR
+ * (fromQr), a successful save returns to the scanner for the next item (FR-11).
  */
 class IndividualLinkingFragment : Fragment() {
     private var _binding: FragmentIndividualLinkingBinding? = null
     private val binding get() = _binding!!
 
     private val app get() = requireActivity().application as StockBuddyApp
+    private val args: IndividualLinkingFragmentArgs by navArgs()
     private val viewModel: IndividualLinkingViewModel by viewModels {
         ViewModelFactory {
             IndividualLinkingViewModel(app.itemRepository, app.fieldConfigRepository, app.categoryRepository, app.scannerManager)
         }
     }
+
+    // QR-prefilled domain attribute values, applied once the dynamic fields are rendered.
+    private var pendingAttributes: Map<String, String>? = null
 
     private val dynamicFieldViews = mutableMapOf<String, EditText>()
     // Key → the field's TextInputLayout, so we can show errors on it. (editText.parent is the
@@ -109,6 +115,21 @@ class IndividualLinkingFragment : Fragment() {
         viewModel.saveResult.observe(viewLifecycleOwner) { result -> handleSaveResult(result) }
 
         observeReaderStatus()
+
+        applyPrefill()
+    }
+
+    /** FR-02/03: pre-fill fixed fields from the QR payload; dynamic-field values are applied in
+     *  renderDynamicFields() once those views exist. No-op for the Manual path (all args null). */
+    private fun applyPrefill() {
+        args.prefillProductName?.let { binding.editName.setText(it) }
+        args.prefillBarcode?.let { binding.editBarcode.setText(it) }
+        args.prefillRfid?.let { binding.editRfid.setText(it) }
+        args.prefillCategory?.let {
+            (binding.layoutCategory.editText as? AutoCompleteTextView)?.setText(it, false)
+        }
+        val attrs = QrPayloadParser.attributesFromJson(args.prefillAttributesJson)
+        if (attrs.isNotEmpty()) pendingAttributes = attrs
     }
 
     private fun observeReaderStatus() {
@@ -168,6 +189,32 @@ class IndividualLinkingFragment : Fragment() {
             binding.dynamicFieldsContainer.addView(fieldView)
             dynamicFieldViews[def.key] = input
             dynamicFieldLayouts[def.key] = fieldView.findViewById(R.id.fieldInputLayout)
+        }
+
+        // Apply any QR-prefilled attribute values now that the dynamic fields exist (once).
+        pendingAttributes?.let { attrs ->
+            val invalidLabels = mutableListOf<String>()
+            attrs.forEach { (key, value) ->
+                val def = visibleDefs.find { it.key == key } ?: return@forEach
+                if (def.type == "DROPDOWN") {
+                    // Dropdown fields are pick-only in the UI (keyListener = null), so a QR value
+                    // must match one of the configured options exactly (case-insensitive) or it's
+                    // left blank rather than silently injecting an out-of-list value.
+                    val options = def.dropdownOptionsCsv?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
+                    val match = options.firstOrNull { it.equals(value, ignoreCase = true) }
+                    if (match != null) {
+                        dynamicFieldViews[key]?.setText(match)
+                    } else if (value.isNotBlank()) {
+                        invalidLabels.add(def.label)
+                    }
+                } else {
+                    dynamicFieldViews[key]?.setText(value)
+                }
+            }
+            if (invalidLabels.isNotEmpty()) {
+                Snackbar.make(binding.root, getString(R.string.qr_invalid_dropdown_values, invalidLabels.joinToString(", ")), Snackbar.LENGTH_LONG).show()
+            }
+            pendingAttributes = null
         }
     }
 
@@ -234,9 +281,15 @@ class IndividualLinkingFragment : Fragment() {
     private fun handleSaveResult(result: com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult?) {
         when (result) {
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.Success -> {
-                showLinkedSuccess()
-                clearForm()
                 viewModel.consumeSaveResult()
+                if (args.fromQr) {
+                    // FR-11: return to the scanner (re-armed on its onStart) for the next item.
+                    android.widget.Toast.makeText(requireContext(), R.string.item_linked_success, android.widget.Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack(R.id.qrLinkingFragment, false)
+                } else {
+                    showLinkedSuccess()
+                    clearForm()
+                }
             }
             is com.gigakin.stockbuddy.data.repo.ItemRepository.SaveResult.ValidationError -> {
                 applyFieldErrors(result.fieldErrors)

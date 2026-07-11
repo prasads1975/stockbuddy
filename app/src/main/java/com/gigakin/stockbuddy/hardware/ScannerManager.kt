@@ -27,6 +27,18 @@ interface ScannerManager {
 
     /** Barcode/QR imager scan (FR-06). */
     suspend fun scanBarcode(): String?
+
+    /**
+     * FR-01/02: 2D imager (QR) lifecycle for the QR Code Linking screen (S07).
+     * [openImager] arms the C72 imager and registers [onDecoded] for each successful read
+     * (the decoded string is delivered from an SDK thread — callers must marshal to the main
+     * thread). Returns false when no imager is available (e.g. emulator) so the screen can show
+     * the FR-81a unavailable state. [triggerImagerScan] fires a software scan (the C72 hardware
+     * trigger also delivers to [onDecoded]); [closeImager] releases it.
+     */
+    fun openImager(onDecoded: (String) -> Unit): Boolean
+    fun triggerImagerScan()
+    fun closeImager()
 }
 
 sealed class RfidScanResult {

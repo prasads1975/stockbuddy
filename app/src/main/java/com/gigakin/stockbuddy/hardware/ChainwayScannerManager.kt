@@ -3,6 +3,8 @@ package com.gigakin.stockbuddy.hardware
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.gigakin.stockbuddy.util.ReaderStatus
+import com.rscja.barcode.BarcodeDecoder
+import com.rscja.barcode.BarcodeFactory
 import com.rscja.deviceapi.RFIDWithUHFUART
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -24,6 +26,8 @@ class ChainwayScannerManager(private val context: Context) : ScannerManager {
     private var uhfReader: RFIDWithUHFUART? = null
     private var isScanning = false
     private var lastSessionPowerLevel: Int? = null
+
+    private var barcodeDecoder: BarcodeDecoder? = null
 
     init {
         try {
@@ -126,12 +130,52 @@ class ChainwayScannerManager(private val context: Context) : ScannerManager {
         }
     }
 
+    // FR-01/02: 2D imager (QR) via com.rscja.barcode.BarcodeDecoder.
+    override fun openImager(onDecoded: (String) -> Unit): Boolean {
+        return try {
+            val decoder = BarcodeFactory.getInstance().barcodeDecoder
+            val opened = decoder.open(context)
+            if (opened) {
+                decoder.setDecodeCallback { entity ->
+                    try {
+                        if (entity != null && entity.resultCode == BarcodeDecoder.DECODE_SUCCESS) {
+                            val data = entity.barcodeData
+                            if (!data.isNullOrBlank()) onDecoded(data)
+                        }
+                    } catch (e: Exception) {
+                        // Ignore a malformed decode result; keep the imager armed.
+                    }
+                }
+                barcodeDecoder = decoder
+            }
+            opened
+        } catch (e: Exception) {
+            barcodeDecoder = null
+            false
+        }
+    }
+
+    override fun triggerImagerScan() {
+        try { barcodeDecoder?.startScan() } catch (e: Exception) {}
+    }
+
+    override fun closeImager() {
+        try {
+            barcodeDecoder?.stopScan()
+            barcodeDecoder?.close()
+        } catch (e: Exception) {
+            // Silent fail; imager may already be closed.
+        }
+        barcodeDecoder = null
+    }
+
     fun close() {
         try {
             uhfReader?.free()
         } catch (e: Exception) {
             // Silent fail
         }
+        closeImager()
         uhfReader = null
         isScanning = false
     }
