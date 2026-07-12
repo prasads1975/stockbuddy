@@ -64,7 +64,6 @@ class ResultsFragment : Fragment() {
                 ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
                 ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
             }
-            binding.tvReaderVersion.text = "UHF Reader v2.4"
         }
 
         adapter = ResultGroupAdapter(requireContext())

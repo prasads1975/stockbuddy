@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/transparent">
+            android:background="@color/surface_container_low">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -80,15 +80,6 @@
                     android:textAllCaps="true"
                     android:textColor="@color/md_theme_onSurfaceVariant"
                     android:letterSpacing="0.05"
-                    android:lineHeight="16sp" />
-
-                <TextView
-                    android:id="@+id/tvReaderVersion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@color/md_theme_onSurfaceVariant"
-                    android:alpha="0.7"
                     android:lineHeight="16sp" />
             </LinearLayout>
 
@@ -239,7 +230,7 @@
                                 <View
                                     android:layout_width="8dp"
                                     android:layout_height="8dp"
-                                    android:background="@color/status_available"
+                                    android:background="@drawable/shape_status_dot"
                                     android:layout_marginEnd="8dp" />
 
                                 <TextView
@@ -322,7 +313,7 @@
                                 <View
                                     android:layout_width="8dp"
                                     android:layout_height="8dp"
-                                    android:background="@color/status_missing"
+                                    android:background="@drawable/shape_status_dot_missing"
                                     android:layout_marginEnd="8dp" />
 
                                 <TextView
@@ -402,7 +393,7 @@
                                 <View
                                     android:layout_width="8dp"
                                     android:layout_height="8dp"
-                                    android:background="@color/status_excess"
+                                    android:background="@drawable/shape_status_dot_excess"
                                     android:layout_marginEnd="8dp" />
 
                                 <TextView
