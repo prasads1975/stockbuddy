@@ -176,6 +176,9 @@ Success(epc: String) | NoTagDetected | MultipleTagsDetected(count: Int) | Reader
 ### FR-81a rule (enforced in Fragments)
 When `status == NOT_AVAILABLE`, all scan-triggering buttons must be **disabled** with a clear inline message. The emulator manager returns `ReaderUnavailable` as a safety net, but disabling the button is the primary safeguard.
 
+### Reader status is live, and centralised
+`status` is **not** a startup snapshot — `ChainwayScannerManager` drives it from the SDK's event-driven `setConnectionStatusCallback` (seeded once via `getConnectStatus()`), so a mid-session disconnect (FR-81 real-time clause) repaints the bar automatically. `CONNECTING → NOT_CONNECTED`. Every screen renders the bar through the **one** helper `util/ReaderStatusBar.kt` — give the bar container `@+id/readerStatusBar` and call `ReaderStatusBar.bind(status, bar, icon, text)` in the `scannerManager.status` observer; never re-inline the colour/text mapping. Palette + the design rationale (asymmetric: green calm / filled-red alert / grey = informational-not-error) live in that one file. See System Design §5.4.
+
 ### Wiring the real SDK (when `app/libs/chainway-sdk.aar` is present)
 1. Uncomment `implementation(name = "chainway-sdk", ext = "aar")` in `app/build.gradle.kts`
 2. Add required `<uses-permission>` entries to `AndroidManifest.xml` (check SDK docs)

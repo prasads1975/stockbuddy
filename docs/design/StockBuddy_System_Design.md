@@ -1547,37 +1547,47 @@ This is a P3 (Nice to Have) feature and can be deferred to a later release.
 
 ### 5.1 Abstraction Design
 
-The Chainway SDK is wrapped behind interfaces to allow unit testing with mocks and future device portability.
+The Chainway SDK is wrapped behind a **single** interface, `ScannerManager`, so the rest of the
+app never references the SDK directly. This is what makes graceful emulator degradation (FR-81a) a
+one-place concern rather than a try/catch scattered across every screen. UHF RFID **and** the 2D
+imager (barcode/QR) both live behind this one interface — they are two modules of the same physical
+device, not two separately-connected peripherals.
 
-```java
-// UHF RFID Interface
-public interface RfidReader {
-  void startContinuousScan(RfidCallback callback);
-  void stopScan();
-  boolean isConnected();
-  void release();
+```kotlin
+interface ScannerManager {
+    // Connection contract (FR-81): the one observable every screen's status bar binds to.
+    // Three states — CONNECTED | NOT_CONNECTED | NOT_AVAILABLE. See §5.4.
+    val status: LiveData<ReaderStatus>
+
+    // UHF RFID
+    suspend fun scanSingleRfidTag(): RfidScanResult          // single-shot (Linking, FR-07a)
+    fun startContinuousScan(onTagRead: (String) -> Unit)     // Inventory session (FR-33/34/37)
+    fun stopContinuousScan()
+
+    // 2D imager (barcode + QR)
+    suspend fun scanBarcode(): String?                       // 1D barcode field scan (FR-06)
+    fun openImager(onDecoded: (String) -> Unit): Boolean     // QR Code Linking S07 (FR-01/02);
+    fun triggerImagerScan()                                  //   false = no imager (emulator)
+    fun closeImager()
 }
 
-public interface RfidCallback {
-  void onTagRead(String epc);
-  void onError(RfidError error);
+sealed class RfidScanResult {
+    data class Success(val epc: String)          : RfidScanResult()
+    object NoTagDetected                         : RfidScanResult()
+    data class MultipleTagsDetected(val count: Int) : RfidScanResult()
+    object ReaderUnavailable                     : RfidScanResult()
 }
-
-// Barcode / QR Imager Interface
-public interface Imager {
-  void startScan(ImagerCallback callback);
-  void stopScan();
-}
-
-public interface ImagerCallback {
-  void onBarcodeRead(String data, BarcodeFormat format);
-  void onError(ImagerError error);
-}
-
-// Chainway-specific implementations
-public class ChainwayRfidReader implements RfidReader { ... }
-public class ChainwayImager implements Imager { ... }
 ```
+
+**Two implementations, chosen at startup by `ScannerManagerProvider`:**
+
+- `ChainwayScannerManager` — wraps the real SDK (`RFIDWithUHFUART`, `BarcodeDecoder`). Constructed
+  first; if SDK init throws (SDK missing, non-C72 device), the provider falls back.
+- `EmulatorScannerManager` — `status` is permanently `NOT_AVAILABLE`; all scan calls return
+  `ReaderUnavailable`/`null`/`false`. Lets the whole app run on an emulator without crashing (NFR-26a).
+
+The chosen instance is created **once** as an app-scoped singleton in `StockBuddyApp` and shared by
+every screen, so all status bars observe the same `status` LiveData (see §5.4).
 
 ### 5.2 RFID Read Loop
 
@@ -1610,6 +1620,43 @@ onBarcodeRead(data, format)
    │          └── Missing fields? → switch to manual form, pre-fill what was parsed (FR-04)
    └── NO (1D barcode) → populate Barcode field only (FR-06)
 ```
+
+### 5.4 Connection Status Handling (FR-81)
+
+`ScannerManager.status` (a `LiveData<ReaderStatus>`) is the **single source of truth** for reader
+connectivity. Every screen's status bar binds to it through one helper (`util/ReaderStatusBar.kt`),
+and because the manager is an app-scoped singleton, a single status change repaints the bar on
+whatever screen is currently showing.
+
+**FR-81 requires the indicator to update in real time** (e.g. reader power-cycled mid-session), not
+just at launch. `ChainwayScannerManager` satisfies this with the SDK's **event-driven** connection
+callback rather than polling:
+
+```
+init(context) succeeds
+   │
+   ├─ status = CONNECTED
+   │
+   └─ registerConnectionStatusListener():
+        reader.setConnectionStatusCallback { connStatus, _ ->      // fires on SDK thread
+            status.postValue(map(connStatus))                      // → repaints every screen's bar
+        }
+        status.postValue(map(reader.getConnectStatus()))           // seed current state once
+```
+
+- **Mapping** (`com.rscja.deviceapi.interfaces.ConnectionStatus` → `ReaderStatus`):
+  `CONNECTED → CONNECTED`; `DISCONNECTED`/`CONNECTING → NOT_CONNECTED`. `CONNECTING` is treated as
+  not-yet-usable so scan actions stay disabled per FR-81a.
+- **Threading:** the callback arrives on an SDK thread, so `postValue` (not `value`) is used.
+- **Graceful fallback:** registration is wrapped in try/catch — on an older SDK build without the
+  callback, the startup status still applies and a failed `startContinuousScan()` still flips the
+  status to `NOT_CONNECTED` as a secondary signal.
+- **Emulator:** `EmulatorScannerManager` has no reader, so `status` stays `NOT_AVAILABLE` and this
+  whole path is inert — the live green/red transitions are only observable on a physical C72.
+
+FR-81a graceful degradation (disabling scan-triggering controls with an inline message) is then
+purely a function of whichever `status` value is currently emitted — no screen re-checks the reader
+itself.
 
 ---
 
