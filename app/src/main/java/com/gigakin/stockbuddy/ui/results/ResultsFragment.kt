@@ -19,7 +19,7 @@ import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.FragmentResultsBinding
 import com.gigakin.stockbuddy.ui.export.ExportBottomSheetFragment
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S13 — Results Summary: Available/Missing/Excess tabs (FR-43), grouped by Barcode (FR-45). */
@@ -50,20 +50,7 @@ class ResultsFragment : Fragment() {
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
 
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            binding.readerStatusIcon.setColorFilter(
-                requireContext().getColor(
-                    when (status) {
-                        ReaderStatus.CONNECTED -> R.color.status_available
-                        ReaderStatus.NOT_CONNECTED -> android.R.color.holo_orange_light
-                        ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
-                    }
-                )
-            )
-            binding.tvReaderStatus.text = when (status) {
-                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
-                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
-                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
-            }
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
 
         adapter = ResultGroupAdapter(requireContext())

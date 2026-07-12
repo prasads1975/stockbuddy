@@ -20,7 +20,7 @@ import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.FragmentIndividualLinkingBinding
 import com.gigakin.stockbuddy.hardware.RfidScanResult
 import com.gigakin.stockbuddy.util.QrPayloadParser
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /**
@@ -134,19 +134,7 @@ class IndividualLinkingFragment : Fragment() {
 
     private fun observeReaderStatus() {
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val statusText = when (status) {
-                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
-                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
-                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
-            }
-            binding.tvReaderStatus.text = statusText
-
-            val statusColor = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available
-                ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
-                ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
-            }
-            binding.iconReaderStatus.setColorFilter(requireContext().getColor(statusColor))
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.iconReaderStatus, binding.tvReaderStatus)
         }
     }
 

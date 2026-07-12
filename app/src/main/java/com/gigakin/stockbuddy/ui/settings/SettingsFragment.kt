@@ -12,7 +12,7 @@ import com.gigakin.stockbuddy.BuildConfig
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentSettingsBinding
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 
 /**
  * S16 — Settings: minimal shell. Two functional destinations (Field Configuration, Category
@@ -36,18 +36,9 @@ class SettingsFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        // Reader status observer
+        // Reader status observer (FR-81) — centralised in ReaderStatusBar.
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val (colorRes, textRes) = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available to R.string.reader_connected
-                ReaderStatus.NOT_CONNECTED -> R.color.status_excess to R.string.reader_not_connected
-                ReaderStatus.NOT_AVAILABLE -> R.color.reader_not_available to R.string.reader_not_available
-            }
-            ImageViewCompat.setImageTintList(
-                binding.readerStatusIcon,
-                ResourcesCompat.getColorStateList(requireContext().resources, colorRes, null)
-            )
-            binding.tvReaderStatus.text = getString(textRes)
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
 
         // Card click listeners

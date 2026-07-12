@@ -16,7 +16,7 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.databinding.FragmentCategoryBinding
 import com.gigakin.stockbuddy.util.LimitCheck
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S17 — Category Management (FR-72/73), with the demo cap (Section 4, MVP Scope doc). */
@@ -80,20 +80,9 @@ class CategoryFragment : Fragment() {
     }
 
     private fun observeReaderStatus() {
+        // FR-81 — centralised in ReaderStatusBar.
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val statusText = when (status) {
-                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
-                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
-                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
-            }
-            binding.tvReaderStatus.text = statusText
-
-            val statusColor = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available
-                ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
-                ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
-            }
-            binding.iconReaderStatus.setColorFilter(requireContext().getColor(statusColor))
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.iconReaderStatus, binding.tvReaderStatus)
         }
     }
 

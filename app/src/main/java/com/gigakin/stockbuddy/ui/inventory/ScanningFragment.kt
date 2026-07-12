@@ -11,7 +11,7 @@ import androidx.navigation.fragment.navArgs
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentScanningBinding
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S12 — Inventory Scanning: START/STOP (FR-33/36), real-time count (FR-34), category filter (FR-35, locked). */
@@ -72,21 +72,8 @@ class ScanningFragment : Fragment() {
             binding.btnStart.isEnabled = true
             binding.btnStart.text = getString(R.string.action_start)
 
-            // Update reader status text and icon
-            val statusText = when (status) {
-                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
-                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
-                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
-            }
-            binding.tvReaderStatus.text = statusText
-
-            val statusColor = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available
-                ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
-                ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
-            }
-            // Update status icon color
-            binding.readerStatusIcon.setColorFilter(requireContext().getColor(statusColor))
+            // Reader status bar (FR-81) — centralised in ReaderStatusBar.
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
 
         binding.btnStart.setOnClickListener {

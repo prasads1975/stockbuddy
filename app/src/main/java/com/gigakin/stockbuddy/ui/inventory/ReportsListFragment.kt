@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentReportsListBinding
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import kotlinx.coroutines.launch
 
 private const val TAG = "ReportsListFragment"
@@ -35,22 +35,9 @@ class ReportsListFragment : Fragment() {
         // Back button
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
 
-        // Reader status bar
+        // Reader status bar (FR-81) — centralised in ReaderStatusBar.
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            binding.readerStatusIcon.setColorFilter(
-                requireContext().getColor(
-                    when (status) {
-                        ReaderStatus.CONNECTED -> com.gigakin.stockbuddy.R.color.status_available
-                        ReaderStatus.NOT_CONNECTED -> android.R.color.holo_orange_light
-                        ReaderStatus.NOT_AVAILABLE -> com.gigakin.stockbuddy.R.color.md_theme_onSurfaceVariant
-                    }
-                )
-            )
-            binding.tvReaderStatus.text = when (status) {
-                ReaderStatus.CONNECTED -> getString(com.gigakin.stockbuddy.R.string.reader_connected)
-                ReaderStatus.NOT_CONNECTED -> getString(com.gigakin.stockbuddy.R.string.reader_not_connected)
-                ReaderStatus.NOT_AVAILABLE -> getString(com.gigakin.stockbuddy.R.string.reader_not_available)
-            }
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
 
         // Adapter setup

@@ -10,7 +10,7 @@ import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentHomeBinding
 import com.gigakin.stockbuddy.ui.inventory.InventoryCodeDialogFragment
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 
 /** S03 Home — hub for the 4 top-level modules (Section 3, SRS). */
 class HomeFragment : Fragment() {
@@ -43,21 +43,9 @@ class HomeFragment : Fragment() {
             findNavController().navigate(HomeFragmentDirections.actionHomeToSettings())
         }
 
-        // Reader status indicator
+        // Reader status indicator (FR-81) — centralised in ReaderStatusBar.
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val statusText = when (status) {
-                ReaderStatus.CONNECTED -> getString(R.string.reader_connected)
-                ReaderStatus.NOT_CONNECTED -> getString(R.string.reader_not_connected)
-                ReaderStatus.NOT_AVAILABLE -> getString(R.string.reader_not_available)
-            }
-            binding.tvReaderStatus.text = statusText
-
-            val statusColor = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available
-                ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error
-                ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant
-            }
-            binding.readerStatusIcon.setColorFilter(requireContext().getColor(statusColor))
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
     }
 

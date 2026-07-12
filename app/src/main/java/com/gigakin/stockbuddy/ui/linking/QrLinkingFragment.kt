@@ -15,6 +15,7 @@ import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.databinding.FragmentQrLinkingBinding
 import com.gigakin.stockbuddy.util.QrPayloadParser
 import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /**
@@ -44,15 +45,9 @@ class QrLinkingFragment : Fragment() {
 
         binding.btnScan.setOnClickListener { viewModel.triggerScan() }
 
-        // Reader status → status bar + FR-81a graceful degradation.
+        // Reader status → status bar (centralised) + FR-81a graceful degradation.
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val (colorRes, textRes) = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available to R.string.reader_connected
-                ReaderStatus.NOT_CONNECTED -> R.color.md_theme_error to R.string.reader_not_connected
-                ReaderStatus.NOT_AVAILABLE -> R.color.md_theme_onSurfaceVariant to R.string.reader_not_available
-            }
-            binding.readerStatusIcon.setColorFilter(requireContext().getColor(colorRes))
-            binding.tvReaderStatus.text = getString(textRes)
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
 
             val available = status == ReaderStatus.CONNECTED
             binding.btnScan.isEnabled = available

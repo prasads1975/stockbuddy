@@ -15,7 +15,7 @@ import com.gigakin.stockbuddy.data.db.dao.ProductSummary
 import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.data.db.entity.LinkedItemEntity
 import com.gigakin.stockbuddy.databinding.FragmentAssetsBinding
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
 /** S09 — Assets: flat list (FR-61), search (FR-63), category filter (FR-67), live count (FR-64). */
@@ -39,16 +39,7 @@ class AssetsFragment : Fragment() {
         binding.btnBack.setOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
 
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val (colorRes, textRes) = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available to R.string.reader_connected
-                ReaderStatus.NOT_CONNECTED -> R.color.status_excess to R.string.reader_not_connected
-                ReaderStatus.NOT_AVAILABLE -> R.color.reader_not_available to R.string.reader_not_available
-            }
-            androidx.core.widget.ImageViewCompat.setImageTintList(
-                binding.readerStatusIcon,
-                androidx.core.content.res.ResourcesCompat.getColorStateList(requireContext().resources, colorRes, null)
-            )
-            binding.tvReaderStatus.text = getString(textRes)
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
 
         binding.recyclerAssets.layoutManager = LinearLayoutManager(requireContext())

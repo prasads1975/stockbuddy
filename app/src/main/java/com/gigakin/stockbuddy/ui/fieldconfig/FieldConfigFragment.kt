@@ -14,7 +14,7 @@ import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
 import com.gigakin.stockbuddy.data.db.entity.FieldDefinitionEntity
 import com.gigakin.stockbuddy.databinding.FragmentFieldConfigBinding
-import com.gigakin.stockbuddy.util.ReaderStatus
+import com.gigakin.stockbuddy.util.ReaderStatusBar
 import com.gigakin.stockbuddy.util.ViewModelFactory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -44,18 +44,9 @@ class FieldConfigFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        // Reader status observer
+        // Reader status observer (FR-81) — centralised in ReaderStatusBar.
         app.scannerManager.status.observe(viewLifecycleOwner) { status ->
-            val (colorRes, textRes) = when (status) {
-                ReaderStatus.CONNECTED -> R.color.status_available to R.string.reader_connected
-                ReaderStatus.NOT_CONNECTED -> R.color.status_excess to R.string.reader_not_connected
-                ReaderStatus.NOT_AVAILABLE -> R.color.reader_not_available to R.string.reader_not_available
-            }
-            ImageViewCompat.setImageTintList(
-                binding.readerStatusIcon,
-                ResourcesCompat.getColorStateList(requireContext().resources, colorRes, null)
-            )
-            binding.tvReaderStatus.text = getString(textRes)
+            ReaderStatusBar.bind(status, binding.readerStatusBar, binding.readerStatusIcon, binding.tvReaderStatus)
         }
 
         // Setup RecyclerView with edit/delete callbacks
