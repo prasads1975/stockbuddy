@@ -49,7 +49,7 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
         binding.btnDownload.setOnClickListener {
             lifecycleScope.launch {
                 try {
-                    val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
+                    val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeScopedResults(sessionId)
                     val fieldDefs = app.fieldConfigRepository.getFields()
                     val rows = app.exportRepository.buildCsv(results, fieldDefs)
                     val fileName = app.exportRepository.buildFileName(sessionCode)
@@ -74,7 +74,7 @@ class ExportBottomSheetFragment : BottomSheetDialogFragment() {
         binding.btnShare.setOnClickListener {
             lifecycleScope.launch {
                 try {
-                    val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeResults(sessionId, null)
+                    val results: List<InventoryRepository.ResultItem> = app.inventoryRepository.computeScopedResults(sessionId)
                     val fieldDefs = app.fieldConfigRepository.getFields()
                     val rows = app.exportRepository.buildCsv(results, fieldDefs)
                     val fileName = app.exportRepository.buildFileName(sessionCode)

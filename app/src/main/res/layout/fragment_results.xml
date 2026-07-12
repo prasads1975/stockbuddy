@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Session Info Section (pt-4 = 16dp top padding) -->
+                <!-- Session Info + Category Filter Section (pt-4 = 16dp top padding) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,33 +121,80 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:paddingTop="16dp"
-                    android:paddingBottom="0dp">
+                    android:paddingBottom="0dp"
+                    android:baselineAligned="false">
 
-                    <TextView
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_session"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true"
+                            android:textColor="@color/md_theme_onSurfaceVariant"
+                            android:letterSpacing="0.05"
+                            android:lineHeight="16sp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipSessionCode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="12dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/md_theme_primary"
+                            android:checkable="false"
+                            app:chipBackgroundColor="@android:color/transparent"
+                            app:chipCornerRadius="12dp"
+                            app:chipMinHeight="24dp"
+                            app:chipStrokeWidth="0dp"
+                            app:ensureMinTouchTargetSize="false"
+                            tools:text="June 3 Morning" />
+                    </LinearLayout>
+
+                    <!-- Category Filter (FR-46): only interactive when the session was scanned with
+                         "All" selected. When scoped to a specific category, switching to any other
+                         category is meaningless (always reads 0/0), so a plain locked label is
+                         shown instead of an interactive control that mostly leads to dead ends. -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/label_session"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textAllCaps="true"
-                        android:textColor="@color/md_theme_onSurfaceVariant"
-                        android:letterSpacing="0.05"
-                        android:lineHeight="16sp" />
+                        android:orientation="vertical"
+                        android:minWidth="120dp"
+                        android:layout_marginStart="16dp">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipSessionCode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="12dp"
-                        android:textSize="12sp"
-                        android:textColor="@color/md_theme_primary"
-                        android:checkable="false"
-                        app:chipBackgroundColor="@android:color/transparent"
-                        app:chipCornerRadius="12dp"
-                        app:chipMinHeight="24dp"
-                        app:chipStrokeWidth="0dp"
-                        app:ensureMinTouchTargetSize="false"
-                        tools:text="June 3 Morning" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/category_label"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true"
+                            android:textColor="@color/md_theme_onSurfaceVariant"
+                            android:layout_marginBottom="4dp" />
+
+                        <Spinner
+                            android:id="@+id/spinnerCategoryFilter"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/tvCategoryLocked"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:gravity="center_vertical"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/md_theme_onSurface"
+                            android:visibility="gone"
+                            tools:text="Electronics" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <!-- KPI Cards Grid (pt-4 = 16dp top padding, gap-stack-gap = 8dp) -->

@@ -45,15 +45,22 @@ class ScanningViewModel(
     private var simulationJob: Job? = null
     private var simulatedTagCounter = 0
 
+    // The category selected on the Start screen (FR-35), loaded once per session and applied to
+    // every live stats update. Null = "All" (unscoped).
+    private var categoryFilter: String? = null
+
     fun start(sessionId: String) {
         _scanning.value = true
-        val readerStatus = scannerManager.status.value
+        viewModelScope.launch {
+            categoryFilter = inventoryRepository.getSession(sessionId)?.categoryFilter
+            val readerStatus = scannerManager.status.value
 
-        // If reader is available, use real scanning; otherwise use simulation mode
-        if (readerStatus == ReaderStatus.CONNECTED) {
-            startRealScanning(sessionId)
-        } else {
-            startSimulatedScanning(sessionId)
+            // If reader is available, use real scanning; otherwise use simulation mode
+            if (readerStatus == ReaderStatus.CONNECTED) {
+                startRealScanning(sessionId)
+            } else {
+                startSimulatedScanning(sessionId)
+            }
         }
     }
 
@@ -90,7 +97,7 @@ class ScanningViewModel(
     }
 
     private fun updateScanStats(sessionId: String) = viewModelScope.launch {
-        val repoStats = inventoryRepository.computeSessionStats(sessionId)
+        val repoStats = inventoryRepository.computeSessionStats(sessionId, categoryFilter)
         _scanStats.value = ScanStats(
             available = repoStats.available,
             missing = repoStats.missing,

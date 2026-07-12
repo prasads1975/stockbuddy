@@ -24,6 +24,15 @@ interface LinkedItemDao {
     @Query("SELECT rfid_tag_id FROM linked_items")
     suspend fun getAllRfids(): List<String>
 
+    /** Category-scoped master RFID set, for live Available/Missing when a scan session is scoped to one category (FR-35). */
+    @Query("""
+        SELECT l.rfid_tag_id FROM linked_items l
+        JOIN product_master p ON p.barcode = l.barcode
+        JOIN categories c ON c.id = p.category_id
+        WHERE c.name = :categoryName
+    """)
+    suspend fun getRfidsByCategory(categoryName: String): List<String>
+
     @Query("SELECT * FROM linked_items WHERE rfid_tag_id = :rfid LIMIT 1")
     suspend fun getByRfid(rfid: String): LinkedItemEntity?
 

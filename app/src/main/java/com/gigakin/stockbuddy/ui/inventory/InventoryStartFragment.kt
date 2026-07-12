@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
+import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.databinding.FragmentInventoryStartBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.google.android.material.snackbar.Snackbar
@@ -24,6 +25,7 @@ class InventoryStartFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: InventoryStartFragmentArgs by navArgs()
     private val app get() = requireActivity().application as StockBuddyApp
+    private var filterCategories: List<CategoryEntity> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentInventoryStartBinding.inflate(inflater, container, false)
@@ -41,6 +43,7 @@ class InventoryStartFragment : Fragment() {
 
         // Load categories and populate dropdown
         app.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
+            filterCategories = cats
             val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
             binding.spinnerCategoryFilter.adapter = ArrayAdapter(
                 requireContext(),
@@ -76,8 +79,11 @@ class InventoryStartFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 binding.btnStartScanning.isEnabled = false
+                // Position 0 is "All" (no filter); otherwise resolve to the selected category name (FR-35).
+                val position = binding.spinnerCategoryFilter.selectedItemPosition
+                val categoryFilter = if (position <= 0) null else filterCategories.getOrNull(position - 1)?.name
                 val sessionId = withContext(Dispatchers.IO) {
-                    app.inventoryRepository.startSession(args.inventoryCode)
+                    app.inventoryRepository.startSession(args.inventoryCode, categoryFilter)
                 }
                 findNavController().navigate(
                     InventoryStartFragmentDirections.actionInventoryStartToScanning(

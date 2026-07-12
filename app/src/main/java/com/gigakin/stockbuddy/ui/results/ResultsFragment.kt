@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.gigakin.stockbuddy.R
 import com.gigakin.stockbuddy.StockBuddyApp
+import com.gigakin.stockbuddy.data.db.entity.CategoryEntity
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.databinding.FragmentResultsBinding
 import com.gigakin.stockbuddy.ui.export.ExportBottomSheetFragment
@@ -31,6 +34,9 @@ class ResultsFragment : Fragment() {
     }
 
     private lateinit var adapter: ResultGroupAdapter
+    private var filterCategories: List<CategoryEntity> = emptyList()
+    // Guards against the ViewModel-driven spinner sync re-triggering setCategoryFilter (feedback loop).
+    private var isApplyingProgrammaticSelection = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentResultsBinding.inflate(inflater, container, false)
@@ -77,11 +83,62 @@ class ResultsFragment : Fragment() {
         })
 
         viewModel.filteredResults.observe(viewLifecycleOwner) { renderCurrentTab() }
+
+        setupCategoryFilter()
         viewModel.load(args.sessionId)
 
         binding.fabExport.setOnClickListener {
             ExportBottomSheetFragment.newInstance(args.sessionId, args.sessionCode)
                 .show(parentFragmentManager, "export")
+        }
+    }
+
+    /**
+     * FR-46: the filter is only interactive when the session was scanned with "All" selected.
+     * When scoped to a specific category, every other option would read 0/0 (see
+     * ResultsViewModel.applyFilter), so a locked read-only label is shown instead.
+     */
+    private fun setupCategoryFilter() {
+        app.categoryRepository.observeAll().observe(viewLifecycleOwner) { cats ->
+            filterCategories = cats
+            val names = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
+            binding.spinnerCategoryFilter.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, names)
+            syncSpinnerSelection()
+        }
+
+        binding.spinnerCategoryFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (isApplyingProgrammaticSelection) return
+                val category = if (position <= 0) null else filterCategories.getOrNull(position - 1)?.name
+                viewModel.setCategoryFilter(category)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Reflects the Start-screen carry-over (FR-35) once the session loads, and any later manual change.
+        viewModel.categoryFilter.observe(viewLifecycleOwner) { syncSpinnerSelection() }
+
+        viewModel.sessionScope.observe(viewLifecycleOwner) { scope ->
+            val isLocked = scope != null
+            binding.spinnerCategoryFilter.visibility = if (isLocked) View.GONE else View.VISIBLE
+            binding.tvCategoryLocked.visibility = if (isLocked) View.VISIBLE else View.GONE
+            if (isLocked) binding.tvCategoryLocked.text = scope
+        }
+    }
+
+    /** Sets the spinner's displayed position to match the ViewModel's authoritative filter, without re-triggering it. */
+    private fun syncSpinnerSelection() {
+        val filter = viewModel.categoryFilter.value
+        val targetPosition = if (filter == null) 0 else {
+            val index = filterCategories.indexOfFirst { it.name == filter }
+            if (index >= 0) index + 1 else 0
+        }
+        if (binding.spinnerCategoryFilter.selectedItemPosition != targetPosition) {
+            isApplyingProgrammaticSelection = true
+            binding.spinnerCategoryFilter.setSelection(targetPosition)
+            // Spinner defers onItemSelected to a posted Runnable rather than firing it synchronously,
+            // so resetting the guard right here would race it. Post the reset to run after it instead.
+            binding.spinnerCategoryFilter.post { isApplyingProgrammaticSelection = false }
         }
     }
 
