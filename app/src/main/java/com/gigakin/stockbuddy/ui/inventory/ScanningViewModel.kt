@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gigakin.stockbuddy.data.repo.CategoryRepository
 import com.gigakin.stockbuddy.data.repo.InventoryRepository
 import com.gigakin.stockbuddy.hardware.ScannerManager
 import com.gigakin.stockbuddy.util.ReaderStatus
@@ -13,10 +12,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-/** FR-33-37: START/STOP scanning, real-time dedup count, category filter (display-only). */
+/** FR-33-37: START/STOP scanning, real-time dedup count, category filter (locked for the session, FR-35). */
 class ScanningViewModel(
     private val inventoryRepository: InventoryRepository,
-    private val categoryRepository: CategoryRepository,
     private val scannerManager: ScannerManager
 ) : ViewModel() {
 
@@ -25,8 +23,6 @@ class ScanningViewModel(
         val missing: Int = 0,
         val excess: Int = 0
     )
-
-    val categories = categoryRepository.observeAll()
 
     private val _scanCount = MutableLiveData(0)
     val scanCount: LiveData<Int> get() = _scanCount
@@ -46,13 +42,15 @@ class ScanningViewModel(
     private var simulatedTagCounter = 0
 
     // The category selected on the Start screen (FR-35), loaded once per session and applied to
-    // every live stats update. Null = "All" (unscoped).
-    private var categoryFilter: String? = null
+    // every live stats update. Null = "All" (unscoped). Exposed for the read-only display on
+    // this screen — the category is locked for the whole session, never changeable mid-scan.
+    private val _categoryFilter = MutableLiveData<String?>(null)
+    val categoryFilter: LiveData<String?> get() = _categoryFilter
 
     fun start(sessionId: String) {
         _scanning.value = true
         viewModelScope.launch {
-            categoryFilter = inventoryRepository.getSession(sessionId)?.categoryFilter
+            _categoryFilter.value = inventoryRepository.getSession(sessionId)?.categoryFilter
             val readerStatus = scannerManager.status.value
 
             // If reader is available, use real scanning; otherwise use simulation mode
@@ -97,7 +95,7 @@ class ScanningViewModel(
     }
 
     private fun updateScanStats(sessionId: String) = viewModelScope.launch {
-        val repoStats = inventoryRepository.computeSessionStats(sessionId, categoryFilter)
+        val repoStats = inventoryRepository.computeSessionStats(sessionId, _categoryFilter.value)
         _scanStats.value = ScanStats(
             available = repoStats.available,
             missing = repoStats.missing,

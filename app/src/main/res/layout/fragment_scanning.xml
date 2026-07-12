@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/inventory_scan_title"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/md_theme_primary" />
     </LinearLayout>
@@ -30,33 +30,46 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:background="@color/md_theme_surface">
+        android:orientation="vertical"
+        android:background="@color/surface_container_low">
 
-        <ImageView
-            android:id="@+id/readerStatusIcon"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@drawable/sensors_24px"
-            android:tint="@color/status_available"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:id="@+id/tvReaderStatus"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:textColor="@color/md_theme_onSurfaceVariant"
-            android:text="@string/reader_connected" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/readerStatusIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/sensors_24px"
+                android:tint="@color/status_available"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/tvReaderStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/md_theme_onSurfaceVariant"
+                android:letterSpacing="0.05"
+                android:text="@string/reader_connected" />
+        </LinearLayout>
+
+        <!-- Border divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/md_theme_outline" />
     </LinearLayout>
 
     <!-- Session Identity & Filter Section -->
@@ -95,7 +108,8 @@
                 tools:text="3 June Morning" />
         </LinearLayout>
 
-        <!-- Right: Category Filter -->
+        <!-- Right: Category (FR-35) — read-only. The category is locked for the whole session at
+             Start and never changeable mid-scan, so this is a label, not an interactive control. -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -113,20 +127,14 @@
                 android:textColor="@color/md_theme_onSurfaceVariant"
                 android:layout_marginBottom="4dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCategoryFilter"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="@string/filter_all_categories"
-                android:textSize="14sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                app:cornerRadius="8dp"
-                android:textColor="@color/md_theme_onSurfaceVariant"
-                app:strokeColor="@color/md_theme_onSurfaceVariant"
-                app:strokeWidth="1dp"
-                app:backgroundTint="@color/surface_container_low" />
+            <TextView
+                android:id="@+id/tvCategoryLocked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_onSurface"
+                tools:text="All" />
         </LinearLayout>
     </LinearLayout>
 

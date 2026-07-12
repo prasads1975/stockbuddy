@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,7 +14,7 @@ import com.gigakin.stockbuddy.databinding.FragmentScanningBinding
 import com.gigakin.stockbuddy.util.ReaderStatus
 import com.gigakin.stockbuddy.util.ViewModelFactory
 
-/** S12 — Inventory Scanning: START/STOP (FR-33/36), real-time count (FR-34), category filter (FR-35). */
+/** S12 — Inventory Scanning: START/STOP (FR-33/36), real-time count (FR-34), category filter (FR-35, locked). */
 class ScanningFragment : Fragment() {
     private var _binding: FragmentScanningBinding? = null
     private val binding get() = _binding!!
@@ -23,10 +22,8 @@ class ScanningFragment : Fragment() {
     private val app get() = requireActivity().application as StockBuddyApp
 
     private val viewModel: ScanningViewModel by viewModels {
-        ViewModelFactory { ScanningViewModel(app.inventoryRepository, app.categoryRepository, app.scannerManager) }
+        ViewModelFactory { ScanningViewModel(app.inventoryRepository, app.scannerManager) }
     }
-
-    private var categories: List<String> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentScanningBinding.inflate(inflater, container, false)
@@ -36,8 +33,8 @@ class ScanningFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.tvSessionCode.text = args.sessionCode
 
-        viewModel.categories.observe(viewLifecycleOwner) { cats ->
-            categories = listOf(getString(R.string.filter_all_categories)) + cats.map { it.name }
+        viewModel.categoryFilter.observe(viewLifecycleOwner) { category ->
+            binding.tvCategoryLocked.text = category ?: getString(R.string.filter_all_categories)
         }
 
         viewModel.scanCount.observe(viewLifecycleOwner) { count ->
@@ -111,27 +108,10 @@ class ScanningFragment : Fragment() {
             }
         }
 
-        // Category filter dropdown
-        binding.btnCategoryFilter.setOnClickListener { button ->
-            showCategoryDropdown(button)
-        }
-
         // Auto-start scanning if coming from InventoryStartFragment
         if (args.autoStart) {
             viewModel.start(args.sessionId)
         }
-    }
-
-    private fun showCategoryDropdown(anchorView: View) {
-        val popup = PopupMenu(requireContext(), anchorView)
-        categories.forEachIndexed { index, category ->
-            popup.menu.add(0, index, index, category)
-        }
-        popup.setOnMenuItemClickListener { item ->
-            binding.btnCategoryFilter.text = categories[item.itemId]
-            true
-        }
-        popup.show()
     }
 
     private fun startProgressBarAnimation() {
